@@ -1,0 +1,48 @@
+name: "📌 Task"
+description: "Uma unidade de trabalho do projeto (feature, ETL, componente, etc.)"
+title: "[Task]: "
+labels: ["task"]
+body:
+  - type: markdown
+    attributes:
+      value: "Descreva a tarefa de forma objetiva. Tarefas pequenas e bem definidas geram melhores evidências de progresso."
+  - type: textarea
+    id: objetivo
+    attributes:
+      label: "🎯 Objetivo"
+      description: "O que precisa ser feito e por quê?"
+      placeholder: "Ex.: Implementar o ETL que baixa e normaliza o CSV de registro da ANVISA."
+    validations:
+      required: true
+  - type: textarea
+    id: criterios
+    attributes:
+      label: "✅ Critérios de aceite"
+      description: "Como saber que a tarefa está concluída?"
+      placeholder: |
+        - [ ] CSV baixado e salvo em /data
+        - [ ] Campos normalizados (registro, nome, princípio ativo, situação)
+        - [ ] Dados persistidos no PostgreSQL
+    validations:
+      required: true
+  - type: dropdown
+    id: area
+    attributes:
+      label: "🧩 Área"
+      options:
+        - ETL / Ingestão
+        - Banco de dados
+        - API / Busca
+        - Front-end
+        - Documentação
+        - Infra / Deploy
+    validations:
+      required: true
+  - type: textarea
+    id: evidencia
+    attributes:
+      label: "📎 Evidência prevista"
+      description: "Qual evidência esta tarefa vai gerar? (commit, print, vídeo, teste...)"
+      placeholder: "Ex.: commit do serviço + print da tabela populada no banco."
+    validations:
+      required: false
