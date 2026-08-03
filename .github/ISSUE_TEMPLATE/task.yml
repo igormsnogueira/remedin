@@ -1,4 +1,4 @@
-name: "📌 Task"
+name: "Task"
 description: "Uma unidade de trabalho do projeto (feature, ETL, componente, etc.)"
 title: "[Task]: "
 labels: ["task"]
@@ -9,7 +9,7 @@ body:
   - type: textarea
     id: objetivo
     attributes:
-      label: "🎯 Objetivo"
+      label: "Objetivo"
       description: "O que precisa ser feito e por quê?"
       placeholder: "Ex.: Implementar o ETL que baixa e normaliza o CSV de registro da ANVISA."
     validations:
@@ -17,7 +17,7 @@ body:
   - type: textarea
     id: criterios
     attributes:
-      label: "✅ Critérios de aceite"
+      label: "Critérios de aceite"
       description: "Como saber que a tarefa está concluída?"
       placeholder: |
         - [ ] CSV baixado e salvo em /data
@@ -28,7 +28,7 @@ body:
   - type: dropdown
     id: area
     attributes:
-      label: "🧩 Área"
+      label: "Área"
       options:
         - ETL / Ingestão
         - Banco de dados

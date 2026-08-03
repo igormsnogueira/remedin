@@ -1,4 +1,4 @@
-name: "🐛 Bug"
+name: "Bug"
 description: "Relatar um comportamento incorreto ou inesperado"
 title: "[Bug]: "
 labels: ["bug"]
@@ -6,7 +6,7 @@ body:
   - type: textarea
     id: descricao
     attributes:
-      label: "🐛 Descrição do problema"
+      label: "Descrição do problema"
       description: "O que aconteceu?"
       placeholder: "Ex.: A busca por princípio ativo retorna medicamentos com registro cancelado."
     validations:
@@ -14,7 +14,7 @@ body:
   - type: textarea
     id: passos
     attributes:
-      label: "🔁 Passos para reproduzir"
+      label: "Passos para reproduzir"
       placeholder: |
         1. Acessar a busca
         2. Pesquisar "dipirona"
@@ -24,14 +24,14 @@ body:
   - type: textarea
     id: esperado
     attributes:
-      label: "✅ Comportamento esperado"
+      label: "Comportamento esperado"
       placeholder: "Apenas medicamentos com registro válido deveriam aparecer."
     validations:
       required: true
   - type: dropdown
     id: area
     attributes:
-      label: "🧩 Área afetada"
+      label: "Área afetada"
       options:
         - ETL / Ingestão
         - Banco de dados
