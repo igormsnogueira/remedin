@@ -431,7 +431,4 @@ FodyWeavers.xsd
 data/raw/
 *.csv
 !data/samples/*.csv
-
-# Documento de contexto entre sessões de trabalho — contém e-mail do
-# professor, horas e critérios de avaliação. Não vai pro repositório.
-CONTEXTO.md
+.DS_Store

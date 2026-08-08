@@ -29,10 +29,12 @@ A partir de **fontes públicas oficiais**, o cidadão pode pesquisar um medicame
 | Fonte | Órgão | Conteúdo | Formato |
 |-------|-------|----------|---------|
 | [Medicamentos Registrados no Brasil](https://dados.gov.br/dataset/medicamentos-registrados-no-brasil) | ANVISA (Datavisa) | Registro e situação do medicamento | CSV |
+| [Preço de Medicamentos — Consumidor](https://dados.gov.br/dados/conjuntos-dados/preco-de-medicamentos-no-brasil-consumidor) | ANVISA / CMED | Preço Fábrica (PF) e Preço Máximo ao Consumidor (PMC) | CSV |
 | [Bulário Eletrônico](https://www.gov.br/anvisa/pt-br/sistemas/bulario-eletronico) | ANVISA | Indicações, tarja, exigência de receita | PDF |
-| [Lista de Preços — CMED](https://www.gov.br/anvisa/pt-br/assuntos/medicamentos/cmed/precos) | ANVISA / CMED | Preço Máximo ao Consumidor (PMC) | XLS |
 
 > Os dados são públicos e abertos. O Remedin **cita a fonte** e exibe a informação como derivada dos dados oficiais, sem se apresentar como fonte oficial.
+
+📊 A análise de estrutura, volume e qualidade de cada base está em [`docs/`](docs/).
 
 ---
 
@@ -40,12 +42,14 @@ A partir de **fontes públicas oficiais**, o cidadão pode pesquisar um medicame
 
 O núcleo técnico do projeto é a **engenharia de dados**: pipelines de ETL coletam, limpam, normalizam e **cruzam** bases públicas de formatos diferentes, unificando-as num catálogo consultável.
 
+🔑 O cruzamento entre **registro** e **preço** é feito pelo número de registro da ANVISA, que aparece nos 9 primeiros dígitos do código de 13 dígitos usado pela CMED — com **99,96% de cobertura** das linhas de preço ([análise completa](docs/analise-dados-cmed.md)).
+
 ```mermaid
 flowchart LR
     subgraph Fontes["🏛️ Fontes Oficiais"]
         direction TB
         A["📄 ANVISA<br/>Registro (CSV)"]
-        B["💰 CMED<br/>Preço (XLS)"]
+        B["💰 CMED<br/>Preço (CSV)"]
         C["📋 Bulário<br/>Bula (PDF)"]
     end
 
@@ -97,7 +101,7 @@ Um monólito atenderia à função, mas acoplaria processos que têm razões ind
 
 ### Por que CQRS?
 
-A leitura (busca) é **frequente e pesada** e se beneficia de modelos de leitura otimizados; a escrita vem **apenas** dos pipelines de ETL. Separar os dois é exatamente o cenário que justifica CQRS.
+A leitura (busca) é **frequente e pesada** e se beneficia de modelos de leitura otimizados; a escrita vem **apenas** dos pipelines de ETL, em lote e fora do caminho da requisição. Os dois lados têm requisitos opostos de latência e volume.
 
 ---
 
@@ -117,9 +121,10 @@ A leitura (busca) é **frequente e pesada** e se beneficia de modelos de leitura
 
 ```
 remedin/
-├── docs/          # Diagramas, decisões de arquitetura (ADRs), protótipos
+├── docs/          # Análises das fontes, decisões de arquitetura (ADRs), diagramas
 ├── src/           # Código-fonte (serviços .NET, front-end React)
 ├── data/          # Amostras dos dados da ANVISA/CMED
+├── scripts/       # Scripts de exploração e perfil das bases
 ├── .github/       # Issue templates e workflows de CI
 └── README.md
 ```
