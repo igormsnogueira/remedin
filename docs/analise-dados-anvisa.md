@@ -42,7 +42,7 @@ Decisão: mostrar só Ativo por padrão e guardar Inativo marcado, para avisar q
 
 ## A chave: NUMERO_REGISTRO_PRODUTO
 
-Duas perguntas decidem o agregado `Medicamento` na issue #8: quantas linhas não têm número, e o que muda quando ele se repete.
+Duas perguntas decidem o desenho do agregado `Medicamento`: quantas linhas não têm número, e o que muda quando ele se repete.
 
 ### 25% da base não tem número
 
@@ -68,7 +68,7 @@ O padrão aponta para um lote antigo com dois defeitos juntos: categoria corromp
 
 ### O número se repete?
 
-32.629 linhas preenchidas, 32.626 valores distintos. Só 3 se repetem, e o caso que olhei (`116540035`, produto BIMOXIN) tem as 4 linhas idênticas em todas as colunas: é linha duplicada no arquivo.
+32.629 linhas preenchidas para 32.626 valores distintos: sobram 3 linhas. O caso que olhei (`116540035`, produto BIMOXIN) tem 4 linhas com o mesmo número, idênticas em todas as colunas — ou seja, 3 linhas excedentes. Esse único caso explica a diferença inteira: **exatamente um número de registro se repete em toda a base**, e a repetição é linha duplicada no arquivo, não produto diferente.
 
 Nesta base, cada linha válida é um produto completo. As apresentações existem, mas vêm da CMED: 2,88 por registro, cada uma com preço próprio (ver `analise-dados-cmed.md`). O agregado terá apresentações; elas não vêm daqui.
 
@@ -81,7 +81,8 @@ A seção 6 avisa que campos com zero à esquerda perdem o zero ao abrir o arqui
 ## Qualidade
 
 - 3.438 linhas duplicadas por inteiro (7,9%). Deduplicar antes de gravar.
-- Espaço sobrando em `NOME_PRODUTO`, `DATA_VENCIMENTO_REGISTRO`, `CLASSE_TERAPEUTICA`, `EMPRESA_DETENTORA_REGISTRO` e `PRINCIPIO_ATIVO`. Trim na transformação, senão o cruzamento por chave falha.
+- Espaço sobrando em `NOME_PRODUTO`, `DATA_VENCIMENTO_REGISTRO`, `CLASSE_TERAPEUTICA`, `EMPRESA_DETENTORA_REGISTRO` e `PRINCIPIO_ATIVO`. Trim na transformação: nenhuma delas é chave de cruzamento, mas espaço sobrando quebra agrupamento, deduplicação e comparação de texto, e aparece na tela.
+- 24 dos 32.629 números de registro não têm 9 dígitos (variam de 1 a 10). São 0,07% da base. Como o cruzamento com preço usa 9 dígitos, esses 24 nunca casam com preço de qualquer forma.
 - Letra acentuada trocada por `?` (`FITOTER?PICO`, `N?O DECLARADO`) em `CATEGORIA_REGULATORIA` e `NOME_PRODUTO`. O caractere se perdeu antes da publicação, então nenhum encoding recupera. Normalizar os casos frequentes com dicionário fixo.
 
 Não há mojibake — o defeito em que um acento vira dois caracteres, tipo `Ã§` no lugar de `ç`. Ele só aparece lendo o arquivo com o encoding errado.

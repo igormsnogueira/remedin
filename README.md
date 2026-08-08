@@ -125,7 +125,7 @@ remedin/
 ├── src/           # Código-fonte (serviços .NET, front-end React)
 ├── data/          # Amostras dos dados da ANVISA/CMED
 ├── scripts/       # Scripts de exploração e perfil das bases
-├── .github/       # Issue templates e workflows de CI
+├── .github/       # Issue templates
 └── README.md
 ```
 
