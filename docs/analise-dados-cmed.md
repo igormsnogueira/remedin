@@ -25,15 +25,36 @@ Existe uma lista "Governo" (PF + PMVG) para compras públicas. Fora do escopo.
 
 `SUBSTÂNCIA` tem valores com `;` dentro, entre aspas (`"21-ACETATO DE DEXAMETASONA;CLOTRIMAZOL"`). `split(';')` desalinha a linha inteira; precisa de parser de CSV.
 
+## Validação do arquivo antes de processar
+
+O ETL não confia no download. Três problemas apareceram durante este spike: URL errada devolvendo página HTML, cabeçalho fora da primeira linha, e coluna declarada no schema sem nenhum valor. As checagens abaixo rodam antes de qualquer linha ser transformada.
+
+| Checagem | Regra | Por quê |
+|---|---|---|
+| Tipo de conteúdo | Rejeitar se o corpo começar com `<!DOCTYPE` ou `<html` | Servidor devolve página de erro em HTML quando a URL está errada. Lido como CSV isso vira uma linha de lixo, sem erro. |
+| Tamanho mínimo | Abortar abaixo de 10 MB (a lista tem 15,8 MB) | Download truncado ou arquivo esvaziado na origem |
+| Encoding | Declarar explicitamente: `utf-8` na CMED, `latin1` na ANVISA | Detecção automática erra em silêncio, e o defeito só aparece na tela do usuário |
+| Cabeçalho | Localizar a linha com mais colunas preenchidas entre as 200 primeiras; abortar se não achar | Preâmbulo de tamanho variável |
+| Número de colunas | 74 esperadas; avisar se mudar | Coluna nova ou removida pela CMED quebra o mapeamento |
+| Colunas obrigatórias | `REGISTRO`, `CÓDIGO GGREM`, `PRODUTO` e `APRESENTAÇÃO` presentes | Sem elas não há o que gravar |
+| Volume | Faixa de 20 mil a 30 mil linhas; avisar fora dela | Publicação parcial na origem |
+| Idempotência | Hash do conteúdo comparado com o da carga anterior | Evita reprocessar a mesma lista |
+
+Abortar e avisar são coisas diferentes de propósito. Arquivo com tipo, tamanho ou cabeçalho errado não tem como ser processado. Número de colunas ou volume fora do esperado pode ser mudança legítima da fonte, e aí o certo é registrar e seguir, não derrubar a carga.
+
+A data de publicação, na segunda linha do preâmbulo, serve como versão legível da carga ao lado do hash.
+
 ## A chave e o cruzamento
 
-`REGISTRO` na CMED tem 13 dígitos, `NUMERO_REGISTRO_PRODUTO` na ANVISA tem 9. Os 9 primeiros são o mesmo número; os 4 finais são apresentação e dígito verificador.
+`REGISTRO` na CMED tem 13 dígitos, `NUMERO_REGISTRO_PRODUTO` na ANVISA tem 9. Os 9 primeiros são o mesmo número.
 
 ```
-CMED    1705600230032
-ANVISA  170560023 ----
-                  └ apresentação + dígito verificador
+REGISTRO (CMED)   1705600230032
+                  └───────┘
+                  9 primeiros = NUMERO_REGISTRO_PRODUTO (ANVISA)
 ```
+
+Os 4 dígitos finais não foram decodificados e não são usados. Eles não identificam a apresentação: `1018600330018` aparece em duas linhas com `CÓDIGO GGREM` e `SUBSTÂNCIA` diferentes. Quem identifica a apresentação é o `CÓDIGO GGREM`.
 
 | Medida | Valor |
 |---|---|
@@ -49,7 +70,7 @@ Na base da ANVISA o registro é 1 para 1 com a linha, e a issue #2 concluiu que 
 
 ## Cobertura
 
-8.933 dos 32.626 registros da ANVISA têm preço (27,4%). Esse denominador inclui os 60,2% de registros inativos, que não têm preço vigente.
+8.933 dos 32.626 registros da ANVISA têm preço (27,4%). Esse denominador inclui registro cancelado, que não tem preço vigente: dos 32.626 números de registro distintos, só 10.278 estão ativos, ou 31,5%.
 
 Só entre os ativos: **8.225 de 10.278 têm preço, ou 80%.**
 
@@ -96,14 +117,12 @@ Nenhuma linha duplicada e nenhum defeito de acentuação. O que precisa de trata
 - `-` no lugar de nulo em `EAN 2`, `EAN 3`, `TIPO DE PRODUTO` e `TARJA`. Sem conversão vira categoria fantasma no filtro. Na `TARJA` aparece como `- (*)` em 18,2% das linhas.
 - Espaço sobrando em `EAN 1/2/3`, `APRESENTAÇÃO`, `CLASSE TERAPÊUTICA`, `TIPO DE PRODUTO` e `TARJA`. Trim antes de comparar.
 - `DESTINAÇÃO COMERCIAL` é 100% vazia.
-- `1018600330018` aparece em duas linhas, com `CÓDIGO GGREM` diferente. Não quebra o cruzamento, mas é inconsistência da origem.
-- 24 dos 32.629 registros da ANVISA não têm 9 dígitos (variam de 1 a 10). Justifica validar o formato antes de gravar.
+- `1018600330018` aparece em duas linhas, com `CÓDIGO GGREM` e `SUBSTÂNCIA` diferentes. Não quebra o cruzamento, e mostra que o registro de 13 dígitos não identifica a apresentação sozinho: quem identifica é o `CÓDIGO GGREM`.
 
 ## Riscos e pendências
 
 - **Alíquota de ICMS a exibir**: em aberto, trava o modelo de persistência do preço.
-- **Preâmbulo de tamanho variável**: resolvido pela detecção do cabeçalho. Vale validar o número de colunas antes de processar.
-- **Data de publicação** está na linha 2 do preâmbulo (`Publicada em 21/07/2026 17h30min`). Serve como versão da carga, para não reprocessar a mesma lista. Não implementado.
+- **Validação do arquivo**: desenhada acima, ainda não implementada no ETL .NET. O script Python cobre só a detecção de cabeçalho e encoding.
 - **Sem data de vigência por item.** Histórico de preço, se entrar no escopo, terá que ser acumulado carga a carga.
 
 ## Como reproduzir

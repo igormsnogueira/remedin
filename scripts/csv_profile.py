@@ -237,7 +237,7 @@ def print_quality_checks(df):
         if len(df[c].dropna()) and (df[c].dropna() != df[c].dropna().str.strip()).any()
     ]
     if columns_with_spaces:
-        print(f"colunas com espaços sobrando (quebram cruzamento de chave): {columns_with_spaces}")
+        print(f"colunas com espaços sobrando (quebram agrupamento e comparação): {columns_with_spaces}")
 
     # Os dois defeitos de acento pedem tratamento diferente: mojibake dá pra
     # reverter reprocessando o encoding, "?" no lugar da letra não.
