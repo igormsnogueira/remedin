@@ -116,11 +116,40 @@ A separação entre API e worker já entrega o isolamento que importa: a carga r
 remedin/
 ├── docs/               # Análises das fontes, ADRs, diagramas C4
 ├── src/                # Código-fonte (.NET e front-end)
-├── db/                 # Extensões do PostgreSQL e protótipo da busca
+├── tests/              # Testes de domínio e de arquitetura
 ├── data/               # Amostras dos dados da ANVISA/CMED
 ├── scripts/            # Exploração e perfil das bases
 ├── .github/            # Issue templates
 └── docker-compose.yml  # PostgreSQL local
+```
+
+---
+
+## ▶️ Rodando localmente
+
+Requisitos: .NET 9 e Docker.
+
+```bash
+docker compose up -d
+dotnet tool install --global dotnet-ef --version "9.0.*"
+dotnet ef database update -p src/Remedin.Infrastructure -s src/Remedin.Api
+dotnet run --project src/Remedin.Api
+```
+
+O banco sobe na porta **5433** do host, e não na 5432, para não disputar a
+porta com um PostgreSQL instalado na máquina. Esse conflito se manifesta como
+`role "remedin" does not exist`, que aponta para o lugar errado: a conexão foi
+parar no PostgreSQL local, que não conhece esse usuário.
+
+As extensões `unaccent` e `pg_trgm` são criadas pela migration, e não por
+script de inicialização do container, para que o mesmo schema valha em
+desenvolvimento e em produção.
+
+Verificação: `curl http://localhost:<porta>/health` responde `Healthy`, e
+responde 503 se o banco estiver fora do ar.
+
+```bash
+dotnet test    # testes de domínio e de arquitetura
 ```
 
 ---
