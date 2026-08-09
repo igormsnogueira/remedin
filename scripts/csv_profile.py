@@ -21,6 +21,7 @@ SEPARATORS = [";", ",", "\t", "|"]
 
 HEADER_SCAN_LINES = 200
 SEPARATOR_SAMPLE_BYTES = 64 * 1024
+REPEATED_ROWS_SHOWN = 5
 
 # Sequencia tipica de UTF-8 lido como latin1 ("Ã§", "Ã£"): a letra acentuada
 # virou dois caracteres. Nao basta procurar "Ã" sozinho, que e letra valida
@@ -220,8 +221,10 @@ def print_key_analysis(df, candidates, sample_columns_limit=8):
                 example = repeated.index[0]
                 qty = repeated.iloc[0]
                 print(f"  exemplo repetido: {example} ({qty} linhas)")
+                # head: valor de preenchimento como "-" repete dezenas de
+                # milhares de vezes, e o dump inteiro nao acrescenta nada.
                 sample_columns = df.columns[: min(sample_columns_limit, total_columns)]
-                print(df[df[col] == example][sample_columns].to_string(index=False))
+                print(df[df[col] == example][sample_columns].head(REPEATED_ROWS_SHOWN).to_string(index=False))
 
 
 def print_quality_checks(df):
