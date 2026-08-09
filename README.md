@@ -114,12 +114,13 @@ A separação entre API e worker já entrega o isolamento que importa: a carga r
 
 ```
 remedin/
-├── docs/          # Análises das fontes, decisões de arquitetura (ADRs), diagramas
-├── src/           # Código-fonte (serviços .NET, front-end React)
-├── data/          # Amostras dos dados da ANVISA/CMED
-├── scripts/       # Scripts de exploração e perfil das bases
-├── .github/       # Issue templates
-└── README.md
+├── docs/               # Análises das fontes, ADRs, diagramas C4
+├── src/                # Código-fonte (.NET e front-end)
+├── db/                 # Extensões do PostgreSQL e protótipo da busca
+├── data/               # Amostras dos dados da ANVISA/CMED
+├── scripts/            # Exploração e perfil das bases
+├── .github/            # Issue templates
+└── docker-compose.yml  # PostgreSQL local
 ```
 
 ---

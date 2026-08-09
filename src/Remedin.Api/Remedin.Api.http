@@ -1,0 +1,6 @@
+@Remedin.Api_HostAddress = http://localhost:5032
+
+GET {{Remedin.Api_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
