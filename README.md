@@ -30,7 +30,7 @@ A partir de **fontes públicas oficiais**, o cidadão pode pesquisar um medicame
 |-------|-------|----------|---------|
 | [Medicamentos Registrados no Brasil](https://dados.gov.br/dataset/medicamentos-registrados-no-brasil) | ANVISA (Datavisa) | Registro e situação do medicamento | CSV |
 | [Preço de Medicamentos — Consumidor](https://dados.gov.br/dados/conjuntos-dados/preco-de-medicamentos-no-brasil-consumidor) | ANVISA / CMED | Preço Fábrica (PF) e Preço Máximo ao Consumidor (PMC) | CSV |
-| [Bulário Eletrônico](https://www.gov.br/anvisa/pt-br/sistemas/bulario-eletronico) | ANVISA | Indicações, tarja, exigência de receita | PDF |
+| [Bulário Eletrônico](https://www.gov.br/anvisa/pt-br/sistemas/bulario-eletronico) | ANVISA | Bula completa, linkada na ficha | PDF, um por produto |
 
 > Os dados são públicos e abertos. O Remedin **cita a fonte** e exibe a informação como derivada dos dados oficiais, sem se apresentar como fonte oficial.
 
@@ -49,59 +49,52 @@ flowchart LR
     subgraph Fontes["🏛️ Fontes Oficiais"]
         direction TB
         A["📄 ANVISA<br/>Registro (CSV)"]
-        B["💰 CMED<br/>Preço (CSV)"]
-        C["📋 Bulário<br/>Bula (PDF)"]
+        B["💰 CMED<br/>Preço + informação clínica (CSV)"]
     end
 
-    subgraph Ingestao["⚙️ Serviços de Ingestão (ETL)"]
+    subgraph Remedin["💊 Remedin"]
         direction TB
-        IR["Ingestão de Registro"]
-        IP["Ingestão de Preço"]
-        IB["Ingestão de Bula"]
-    end
-
-    subgraph Nucleo["🧠 Núcleo"]
+        W["⚙️ Remedin.Worker<br/>comandos: baixa, valida e carrega"]
         DB[("🐘 PostgreSQL<br/>catálogo unificado<br/>+ full-text search")]
-        CB["🔎 Catálogo / Busca<br/>API + CQRS"]
+        API["🔎 Remedin.Api<br/>consultas: busca e ficha"]
     end
 
-    FE["💻 Front-end React"]
+    FE["💻 Front-end"]
     U(("👤 Cidadão"))
+    BUL["📋 Bulário<br/>bula completa"]
 
-    A --> IR
-    B --> IP
-    C --> IB
-    IR --> DB
-    IP --> DB
-    IB --> DB
-    DB --> CB
-    CB --> FE
+    A --> W
+    B --> W
+    W --> DB
+    DB --> API
+    API --> FE
     U --> FE
+    FE -.->|"link"| BUL
 
     classDef fonte fill:#E8F0FE,stroke:#1F6FB2,stroke-width:2px,color:#1A2733;
     classDef etl fill:#FFF4E5,stroke:#B26B00,stroke-width:2px,color:#1A2733;
     classDef nucleo fill:#E9F7EF,stroke:#2E7D46,stroke-width:2px,color:#1A2733;
     classDef ui fill:#F3E8FD,stroke:#7B2CBF,stroke-width:2px,color:#1A2733;
 
-    class A,B,C fonte;
-    class IR,IP,IB etl;
-    class DB,CB nucleo;
+    class A,B,BUL fonte;
+    class W etl;
+    class DB,API nucleo;
     class FE,U ui;
 ```
 
-### Por que microsserviços e não um monólito?
+Diagramas C4 detalhados em [`docs/arquitetura-c4.md`](docs/arquitetura-c4.md).
 
-A separação segue as **fronteiras de domínio** e as diferentes **cadências de atualização** de cada fonte:
+### Clean Architecture, DDD e CQRS
 
-- 💰 **Preço (CMED)** muda mensalmente;
-- 📄 **Registro (ANVISA)** muda de forma contínua e irregular;
-- 📋 **Bula** muda quando cada fabricante peticiona.
+Quatro camadas com a regra de dependência apontando para dentro: `Domain` não referencia nada, `Application` referencia `Domain`, `Infrastructure` implementa as interfaces declaradas em `Application`, e os pontos de entrada compõem tudo. A regra é **verificada por teste de arquitetura** — o build quebra se `Domain` referenciar infraestrutura.
 
-Um monólito atenderia à função, mas acoplaria processos que têm razões independentes para **mudar, escalar e falhar**. Separar a ingestão (batch, pesada) da busca (online, de baixa latência) também isola a carga — um reprocessamento pesado não degrada as consultas do usuário.
+CQRS na camada de aplicação: os comandos (`ImportRegistrySnapshot`, `ImportPriceList`) vêm do agendador e passam pelo agregado validando invariantes; as consultas (`SearchMedicines`, `GetMedicineDetail`) leem uma projeção desnormalizada com `tsvector`, sem passar pelo domínio ([ADR 0004](docs/adr/0004-clean-architecture-e-cqrs.md)).
 
-### Por que CQRS?
+### Por que duas unidades e não microsserviços
 
-A leitura (busca) é **frequente e pesada** e se beneficia de modelos de leitura otimizados; a escrita vem **apenas** dos pipelines de ETL, em lote e fora do caminho da requisição. Os dois lados têm requisitos opostos de latência e volume.
+As fontes carregam em segundos e mudam uma vez por mês. Serviços de ingestão separados escreveriam nas mesmas tabelas do mesmo PostgreSQL, o que anula o deploy independente e deixa só o custo de operar processos separados ([ADR 0003](docs/adr/0003-monolito-modular.md)).
+
+A separação entre API e worker já entrega o isolamento que importa: a carga roda agendada, sob demanda quando preciso, e uma falha nela não afeta a busca porque é outro processo.
 
 ---
 
@@ -109,7 +102,7 @@ A leitura (busca) é **frequente e pesada** e se beneficia de modelos de leitura
 
 | Camada | Tecnologia |
 |--------|-----------|
-| **Back-end** | .NET (C#) com DDD e CQRS |
+| **Back-end** | .NET (C#) com Clean Architecture, DDD e CQRS |
 | **Banco de dados** | PostgreSQL (com full-text search) |
 | **Front-end** | React |
 | **Ingestão** | Pipelines de ETL |

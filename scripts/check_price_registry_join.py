@@ -66,7 +66,7 @@ def report_coverage(label, keys, reference):
     matched = keys.isin(reference_set)
     rate = matched.mean() * 100 if len(keys) else 0.0
     print(
-        f"{label}: {matched.sum():,} de {len(keys):,} ({rate:.1f}%)".replace(",", ".")
+        f"{label}: {matched.sum():,} de {len(keys):,} ({rate:.2f}%)".replace(",", ".")
     )
     missing = keys[~matched]
     if not missing.empty:

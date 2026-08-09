@@ -68,13 +68,41 @@ Onze linhas ficam sem par, de dois registros (`110390172` e `110390173`). Dispen
 
 Na base da ANVISA o registro é 1 para 1 com a linha, e a issue #2 concluiu que `Medicamento` não precisava de coleção de apresentações. A CMED mostra o contrário: 2,88 apresentações por registro, cada uma com preço próprio, identificadas por `CÓDIGO GGREM`. O agregado passa a ter apresentações, alimentadas pela CMED.
 
-## Cobertura
+## Cobertura: o tamanho real do catálogo
 
-8.933 dos 32.626 registros da ANVISA têm preço (27,4%). Esse denominador inclui registro cancelado, que não tem preço vigente: dos 32.626 números de registro distintos, só 10.278 estão ativos, ou 31,5%.
+A base de registro tem 43.397 linhas, e o produto não mostra nem um quarto disso. O funil:
 
-Só entre os ativos: **8.225 de 10.278 têm preço, ou 80%.**
+| Etapa | Restam | % do anterior |
+|---|---|---|
+| Linhas na base de registro | 43.397 | |
+| Com número de registro | 32.629 | 75,2% |
+| Registros distintos | 32.626 | 100,0% |
+| Registros ativos | 10.278 | 31,5% |
+| Ativos com preço publicado | 8.225 | 80,0% |
+| Com ao menos uma apresentação de balcão | 6.894 | 83,8% |
+| E comercializada no último ano | 5.021 | 72,8% |
 
-Os outros 20% precisam de tratamento na interface: mostrar o medicamento e dizer que não há preço publicado.
+**O catálogo efetivo tem 5.021 medicamentos.** É o conjunto com preço vigente, vendido em farmácia e declarado como comercializado.
+
+Duas perdas grandes acontecem depois do preço: 1.331 registros só têm apresentação de uso hospitalar, e 1.873 não foram comercializados no último ano.
+
+Três achados do mesmo cruzamento:
+
+- **708 registros têm preço publicado pela CMED e estão marcados como `Inativo` na ANVISA.** As duas fontes discordam sobre o produto estar em vigência.
+- **2.053 registros ativos não têm preço.** Como a informação clínica também vem da CMED, eles ficam só com nome e fabricante.
+- **Os 24 números fora do padrão de 9 dígitos são lixo**, não zero à esquerda perdido: preencher com zero não fez nenhum passar a casar com preço.
+
+## Cobertura da informação clínica
+
+Dentro do catálogo efetivo, nas 10.374 linhas de preço correspondentes:
+
+| Campo | Com valor útil |
+|---|---|
+| `SUBSTÂNCIA` | 100% |
+| `CLASSE TERAPÊUTICA` | 100% |
+| `TARJA` | 78,6% |
+
+Princípio ativo e finalidade estão completos. "Exige receita" falta em 21,4% do catálogo, onde a `TARJA` vem como `- (*)`. A ficha precisa dizer que a informação não está disponível, em vez de omitir o campo.
 
 ## As 52 colunas de preço
 
@@ -131,6 +159,7 @@ Nenhuma linha duplicada e nenhum defeito de acentuação. O que precisa de trata
 pip install pandas
 python scripts/analyze_price.py caminho/TA_PRECO_MEDICAMENTO.csv
 python scripts/check_price_registry_join.py caminho/DADOS_ABERTOS_MEDICAMENTOS.csv caminho/TA_PRECO_MEDICAMENTO.csv
+python scripts/measure_catalog_funnel.py caminho/DADOS_ABERTOS_MEDICAMENTOS.csv caminho/TA_PRECO_MEDICAMENTO.csv
 ```
 
 Saída bruta em `docs/output/`, amostra de 100 linhas em `data/samples/preco-sample.csv`.
