@@ -80,7 +80,7 @@ A seção 6 avisa que campos com zero à esquerda perdem o zero ao abrir o arqui
 
 ## Qualidade
 
-- 3.438 linhas duplicadas por inteiro (7,9%). Deduplicar antes de gravar.
+- 3.438 linhas duplicadas por inteiro (7,9%), mas quase todas entre as linhas sem número de registro, que já saem pelo filtro de escopo. A primeira carga real confirmou: sobram 3 duplicatas por número de registro, e são as do caso BIMOXIN. A deduplicação continua necessária, só é menor do que o número bruto sugere.
 - Espaço sobrando em `NOME_PRODUTO`, `DATA_VENCIMENTO_REGISTRO`, `CLASSE_TERAPEUTICA`, `EMPRESA_DETENTORA_REGISTRO` e `PRINCIPIO_ATIVO`. Trim na transformação: nenhuma delas é chave de cruzamento, mas espaço sobrando quebra agrupamento, deduplicação e comparação de texto, e aparece na tela.
 - 24 dos 32.629 números de registro não têm 9 dígitos (variam de 1 a 10). São 0,07% da base. Como o cruzamento com preço usa 9 dígitos, esses 24 nunca casam com preço de qualquer forma.
 - Letra acentuada trocada por `?` (`FITOTER?PICO`, `N?O DECLARADO`) em `CATEGORIA_REGULATORIA` e `NOME_PRODUTO`. O caractere se perdeu antes da publicação, então nenhum encoding recupera. Normalizar os casos frequentes com dicionário fixo.

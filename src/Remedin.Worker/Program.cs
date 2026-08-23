@@ -1,7 +1,15 @@
+using Remedin.Application;
+using Remedin.Infrastructure;
 using Remedin.Worker;
 
 var builder = Host.CreateApplicationBuilder(args);
-builder.Services.AddHostedService<Worker>();
+
+var connectionString = builder.Configuration.GetConnectionString("Remedin")
+    ?? throw new InvalidOperationException("Connection string 'Remedin' não configurada.");
+
+builder.Services.AddInfrastructure(connectionString);
+builder.Services.AddApplication();
+builder.Services.AddHostedService<RegistryIngestionWorker>();
 
 var host = builder.Build();
 host.Run();
