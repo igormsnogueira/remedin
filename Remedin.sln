@@ -19,6 +19,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Remedin.Architecture.Tests"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Remedin.Domain.Tests", "tests\Remedin.Domain.Tests\Remedin.Domain.Tests.csproj", "{2856EB3E-D3E5-40DD-BF78-9C941E89B636}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{0AB3BF05-4346-4AA6-1389-037BE0695223}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Remedin.Infrastructure.Tests", "tests\Remedin.Infrastructure.Tests\Remedin.Infrastructure.Tests.csproj", "{06382712-F6E3-4463-8FD0-AD30CA8EAE22}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -113,6 +117,18 @@ Global
 		{2856EB3E-D3E5-40DD-BF78-9C941E89B636}.Release|x64.Build.0 = Release|Any CPU
 		{2856EB3E-D3E5-40DD-BF78-9C941E89B636}.Release|x86.ActiveCfg = Release|Any CPU
 		{2856EB3E-D3E5-40DD-BF78-9C941E89B636}.Release|x86.Build.0 = Release|Any CPU
+		{06382712-F6E3-4463-8FD0-AD30CA8EAE22}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{06382712-F6E3-4463-8FD0-AD30CA8EAE22}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{06382712-F6E3-4463-8FD0-AD30CA8EAE22}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{06382712-F6E3-4463-8FD0-AD30CA8EAE22}.Debug|x64.Build.0 = Debug|Any CPU
+		{06382712-F6E3-4463-8FD0-AD30CA8EAE22}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{06382712-F6E3-4463-8FD0-AD30CA8EAE22}.Debug|x86.Build.0 = Debug|Any CPU
+		{06382712-F6E3-4463-8FD0-AD30CA8EAE22}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{06382712-F6E3-4463-8FD0-AD30CA8EAE22}.Release|Any CPU.Build.0 = Release|Any CPU
+		{06382712-F6E3-4463-8FD0-AD30CA8EAE22}.Release|x64.ActiveCfg = Release|Any CPU
+		{06382712-F6E3-4463-8FD0-AD30CA8EAE22}.Release|x64.Build.0 = Release|Any CPU
+		{06382712-F6E3-4463-8FD0-AD30CA8EAE22}.Release|x86.ActiveCfg = Release|Any CPU
+		{06382712-F6E3-4463-8FD0-AD30CA8EAE22}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -125,5 +141,6 @@ Global
 		{6F2AACE5-B2FE-4424-9D7B-0A1C6B7CB653} = {827E0CD3-B72D-47B6-A68D-7590B98EB39B}
 		{6AC1C5D2-D0F1-45B0-A0F8-B0204B9CD9E6} = {827E0CD3-B72D-47B6-A68D-7590B98EB39B}
 		{2856EB3E-D3E5-40DD-BF78-9C941E89B636} = {827E0CD3-B72D-47B6-A68D-7590B98EB39B}
+		{06382712-F6E3-4463-8FD0-AD30CA8EAE22} = {0AB3BF05-4346-4AA6-1389-037BE0695223}
 	EndGlobalSection
 EndGlobal
