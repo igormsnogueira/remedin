@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Remedin.Application.Catalog.Ingestion;
+using Remedin.Application.Catalog.Search;
 using Remedin.Infrastructure.Ingestion.Anvisa;
 using Remedin.Infrastructure.Persistence;
 
@@ -33,6 +34,7 @@ public static class DependencyInjection
 
         services.AddScoped<IMedicineCatalog, MedicineCatalog>();
         services.AddScoped<IIngestionJournal, IngestionJournal>();
+        services.AddScoped<IMedicineSearch, PostgresMedicineSearch>();
 
         services.AddSingleton<AnvisaRegistryReader>();
         services.AddHttpClient<IRegistrySnapshotSource, AnvisaRegistrySnapshotSource>(client =>

@@ -111,3 +111,4 @@ Os contextos delimitados são pastas dentro de cada camada, não projetos. `Appl
 | Fonte da informação clínica | [0005](adr/0005-fonte-da-informacao-clinica.md) |
 | Preço por alíquota de ICMS | [0006](adr/0006-preco-por-aliquota-de-icms.md) |
 | Recorte do catálogo e da busca | [0007](adr/0007-recorte-do-catalogo.md) |
+| Relevância da busca | [0008](adr/0008-relevancia-da-busca.md) |
