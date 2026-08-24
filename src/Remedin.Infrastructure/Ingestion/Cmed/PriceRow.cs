@@ -2,17 +2,8 @@ using Remedin.Domain.Medicines;
 
 namespace Remedin.Infrastructure.Ingestion.Cmed;
 
-public enum PriceKind
-{
-    /// <summary>Preço Fábrica: teto que a indústria cobra da farmácia.</summary>
-    Factory = 0,
-
-    /// <summary>Preço Máximo ao Consumidor: teto que a farmácia cobra do cliente.</summary>
-    Consumer = 1,
-}
-
 /// <summary>
-/// Um dos 52 preços publicados por apresentação.
+/// Um dos 52 preços publicados por apresentação, ainda como veio do arquivo.
 ///
 /// O teto legal depende da alíquota de ICMS do estado onde o medicamento é
 /// vendido, então guardar um só faria o site exibir valor abaixo do legal em
