@@ -1,4 +1,5 @@
 using System.Text;
+using Remedin.Domain.Medicines;
 using Remedin.Infrastructure.Ingestion.Cmed;
 
 namespace Remedin.Infrastructure.Tests.Ingestion.Cmed;

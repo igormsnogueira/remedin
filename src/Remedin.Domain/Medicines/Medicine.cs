@@ -42,16 +42,20 @@ public sealed class Medicine
     /// Medicamento sem apresentação é estado válido: a carga de preço pode não
     /// ter rodado, e parte dos registros ativos não tem preço publicado.
     /// </summary>
-    public bool HasPrice => _presentations.Any(p => p.ConsumerPrice is not null || p.FactoryPrice is not null);
+    public bool HasPrice => _presentations.Any(presentation => presentation.HasPrice);
 
-    public bool IsSoldInPharmacy => _presentations.Any(p => !p.HospitalOnly);
+    public bool IsSoldInPharmacy => _presentations.Any(presentation => !presentation.HospitalOnly);
 
-    public bool WasSoldRecently => _presentations.Any(p => p.SoldRecently);
+    public bool WasSoldRecently => _presentations.Any(presentation => presentation.SoldRecently);
 
-    /// <summary>Menor preço ao consumidor entre as apresentações de balcão.</summary>
-    public decimal? CheapestConsumerPrice => _presentations
-        .Where(p => !p.HospitalOnly)
-        .Select(p => p.ConsumerPrice)
+    /// <summary>
+    /// Menor preço ao consumidor entre as apresentações de balcão, no estado
+    /// pedido. Apresentação hospitalar fica de fora porque não vai à farmácia,
+    /// e o preço dela induziria a erro.
+    /// </summary>
+    public decimal? CheapestConsumerPriceIn(string state) => _presentations
+        .Where(presentation => !presentation.HospitalOnly)
+        .Select(presentation => presentation.ConsumerPriceIn(state))
         .Where(price => price is not null)
         .Min();
 
