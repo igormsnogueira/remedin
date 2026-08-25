@@ -33,6 +33,10 @@ public class ImportRegistrySnapshotTests
             Saved = medicines;
             return Task.CompletedTask;
         }
+
+        public Task<IReadOnlySet<string>> RegistrationNumbersAsync(CancellationToken cancellationToken) =>
+            Task.FromResult<IReadOnlySet<string>>(
+                (Saved ?? []).Select(medicine => medicine.RegistrationNumber.Value).ToHashSet());
     }
 
     private sealed class FakeJournal(string? lastHash = null) : IIngestionJournal
@@ -136,5 +140,8 @@ public class ImportRegistrySnapshotTests
     {
         public Task ReplaceAllAsync(IReadOnlyList<Medicine> medicines, CancellationToken cancellationToken) =>
             throw new InvalidOperationException("banco indisponível");
+
+        public Task<IReadOnlySet<string>> RegistrationNumbersAsync(CancellationToken cancellationToken) =>
+            Task.FromResult<IReadOnlySet<string>>(new HashSet<string>());
     }
 }
