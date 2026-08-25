@@ -26,4 +26,14 @@ public sealed class MedicineCatalog(RemedinDbContext context) : IMedicineCatalog
 
         await transaction.CommitAsync(cancellationToken);
     }
+
+    public async Task<IReadOnlySet<string>> RegistrationNumbersAsync(CancellationToken cancellationToken)
+    {
+        var numbers = await context.Medicines
+            .AsNoTracking()
+            .Select(medicine => medicine.RegistrationNumber.Value)
+            .ToListAsync(cancellationToken);
+
+        return numbers.ToHashSet(StringComparer.Ordinal);
+    }
 }

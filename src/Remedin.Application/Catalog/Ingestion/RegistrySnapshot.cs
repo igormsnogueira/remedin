@@ -27,6 +27,12 @@ public interface IMedicineCatalog
     /// completa, e falha no meio não pode deixar metade dos medicamentos.
     /// </summary>
     Task ReplaceAllAsync(IReadOnlyList<Medicine> medicines, CancellationToken cancellationToken);
+
+    /// <summary>
+    /// Números de registro já no catálogo, para medir a cobertura do
+    /// cruzamento com a lista de preço antes de gravar.
+    /// </summary>
+    Task<IReadOnlySet<string>> RegistrationNumbersAsync(CancellationToken cancellationToken);
 }
 
 public interface IIngestionJournal

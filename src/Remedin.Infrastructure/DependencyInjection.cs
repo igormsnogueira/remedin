@@ -3,6 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Remedin.Application.Catalog.Ingestion;
 using Remedin.Application.Catalog.Search;
 using Remedin.Infrastructure.Ingestion.Anvisa;
+using Remedin.Infrastructure.Ingestion.Cmed;
 using Remedin.Infrastructure.Persistence;
 
 namespace Remedin.Infrastructure;
@@ -36,13 +37,20 @@ public static class DependencyInjection
         services.AddScoped<IIngestionJournal, IngestionJournal>();
         services.AddScoped<IMedicineSearch, PostgresMedicineSearch>();
 
+        services.AddScoped<IMedicinePriceStore, MedicinePriceStore>();
+
         services.AddSingleton<AnvisaRegistryReader>();
-        services.AddHttpClient<IRegistrySnapshotSource, AnvisaRegistrySnapshotSource>(client =>
-        {
-            client.DefaultRequestHeaders.UserAgent.ParseAdd(UserAgent);
-            client.Timeout = DownloadTimeout;
-        });
+        services.AddSingleton<CmedPriceReader>();
+
+        services.AddHttpClient<IRegistrySnapshotSource, AnvisaRegistrySnapshotSource>(ConfigureDownload);
+        services.AddHttpClient<IPriceSnapshotSource, CmedPriceSnapshotSource>(ConfigureDownload);
 
         return services;
+    }
+
+    private static void ConfigureDownload(HttpClient client)
+    {
+        client.DefaultRequestHeaders.UserAgent.ParseAdd(UserAgent);
+        client.Timeout = DownloadTimeout;
     }
 }

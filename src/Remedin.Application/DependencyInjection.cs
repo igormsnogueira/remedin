@@ -9,6 +9,7 @@ public static class DependencyInjection
     {
         services.TryAddTimeProvider();
         services.AddScoped<ImportRegistrySnapshot>();
+        services.AddScoped<ImportPriceList>();
 
         return services;
     }
