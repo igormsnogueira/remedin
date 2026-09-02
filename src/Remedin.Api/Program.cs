@@ -1,4 +1,5 @@
 using Remedin.Application.Catalog.Search;
+using Remedin.Domain.Medicines;
 using Remedin.Infrastructure;
 using Remedin.Infrastructure.Persistence;
 
@@ -21,6 +22,7 @@ app.MapGet("/medicamentos", async (
     string? q,
     IMedicineSearch search,
     CancellationToken cancellationToken,
+    string uf = IcmsRates.DefaultState,
     int limite = 20) =>
 {
     if (string.IsNullOrWhiteSpace(q))
@@ -28,9 +30,39 @@ app.MapGet("/medicamentos", async (
         return Results.BadRequest(new { erro = "Informe o termo de busca em 'q'." });
     }
 
-    var results = await search.SearchAsync(q, Math.Clamp(limite, 1, 50), cancellationToken);
+    if (!IcmsRates.TryGet(uf, out var rate))
+    {
+        return InvalidState(uf);
+    }
 
-    return Results.Ok(new { termo = q, total = results.Count, resultados = results });
+    var results = await search.SearchAsync(q, uf, Math.Clamp(limite, 1, 50), cancellationToken);
+
+    return Results.Ok(new SearchResults(q, uf.ToUpperInvariant(), rate, results));
+});
+
+app.MapGet("/medicamentos/{registro}", async (
+    string registro,
+    IMedicineDetails details,
+    CancellationToken cancellationToken,
+    string uf = IcmsRates.DefaultState) =>
+{
+    if (!IcmsRates.TryGet(uf, out _))
+    {
+        return InvalidState(uf);
+    }
+
+    var medicine = await details.FindAsync(registro, uf, cancellationToken);
+
+    return medicine is null ? Results.NotFound() : Results.Ok(medicine);
 });
 
 app.Run();
+
+static IResult InvalidState(string uf) =>
+    Results.BadRequest(new
+    {
+        erro = $"Unidade da federação desconhecida: '{uf}'.",
+        // O preço-teto depende do ICMS estadual, então chutar um padrão
+        // publicaria valor errado para quem digitou a sigla errada.
+        aceitos = IcmsRates.States.Order(),
+    });

@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Npgsql;
 using NpgsqlTypes;
 using Remedin.Application.Catalog.Search;
+using Remedin.Domain.Medicines;
 
 namespace Remedin.Infrastructure.Persistence;
 
@@ -14,6 +15,8 @@ namespace Remedin.Infrastructure.Persistence;
 ///   busca textual  encontra palavra inteira, com radical em português, de
 ///                  modo que "analgésicos" acha "analgésico"
 ///   trigrama       encontra grafia aproximada, tolerando erro de digitação
+///
+/// Os pesos da relevância estão na ADR 0008.
 ///
 /// SQL direto em vez de LINQ: as duas estratégias combinadas não têm tradução
 /// natural, e a consulta é o coração do produto — vale poder lê-la inteira.
@@ -50,18 +53,37 @@ public sealed class PostgresMedicineSearch(RemedinDbContext context) : IMedicine
             WHERE m.search_vector @@ i.query
                OR immutable_unaccent(m.name) % i.plain
                OR immutable_unaccent(coalesce(m.active_ingredient, '')) % i.plain
+        ),
+        ranked AS (
+            SELECT *
+            FROM scored
+            -- Registro ativo vem antes: produto fora do mercado é resposta
+            -- pior para o mesmo grau de relevância.
+            ORDER BY (status = 'Active') DESC, score DESC, name ASC
+            LIMIT @limit
         )
-        SELECT registration_number, name, active_ingredient, manufacturer,
-               therapeutic_class_name, status
-        FROM scored
-        -- Registro ativo vem antes: produto fora do mercado é resposta pior
-        -- para o mesmo grau de relevância.
-        ORDER BY (status = 'Active') DESC, score DESC, name ASC
-        LIMIT @limit;
+        SELECT r.registration_number, r.name, r.active_ingredient, r.manufacturer,
+               r.therapeutic_class_name, r.status, cheapest.amount
+        FROM ranked r
+        -- O preço é buscado só para as linhas que vão sair, e não para as
+        -- milhares que a busca casou. Sem isso, procurar um princípio ativo
+        -- comum varreria centenas de milhares de preços à toa.
+        LEFT JOIN LATERAL (
+            SELECT min(pr.amount) AS amount
+            FROM presentations p
+            JOIN prices pr USING (registration_number, ggrem_code)
+            WHERE p.registration_number = r.registration_number
+              AND NOT p.hospital_only
+              AND pr.kind = 'Consumer'
+              AND pr.icms_rate = @rate
+              AND NOT pr.free_trade_zone
+        ) AS cheapest ON true
+        ORDER BY (r.status = 'Active') DESC, r.score DESC, r.name ASC;
         """;
 
     public async Task<IReadOnlyList<MedicineSummary>> SearchAsync(
         string term,
+        string state,
         int limit,
         CancellationToken cancellationToken)
     {
@@ -70,16 +92,13 @@ public sealed class PostgresMedicineSearch(RemedinDbContext context) : IMedicine
             return [];
         }
 
-        var connection = (NpgsqlConnection)context.Database.GetDbConnection();
-
-        if (connection.State != System.Data.ConnectionState.Open)
-        {
-            await connection.OpenAsync(cancellationToken);
-        }
+        var rate = IcmsRates.For(state);
+        var connection = await OpenAsync(context, cancellationToken);
 
         await using var command = new NpgsqlCommand(Sql, connection);
         command.Parameters.Add(new NpgsqlParameter("term", NpgsqlDbType.Text) { Value = term.Trim() });
         command.Parameters.Add(new NpgsqlParameter("limit", NpgsqlDbType.Integer) { Value = limit });
+        command.Parameters.Add(new NpgsqlParameter("rate", NpgsqlDbType.Numeric) { Value = rate });
 
         await using var reader = await command.ExecuteReaderAsync(cancellationToken);
 
@@ -93,9 +112,24 @@ public sealed class PostgresMedicineSearch(RemedinDbContext context) : IMedicine
                 ActiveIngredient: reader.IsDBNull(2) ? null : reader.GetString(2),
                 Manufacturer: reader.IsDBNull(3) ? null : reader.GetString(3),
                 TherapeuticClass: reader.IsDBNull(4) ? null : reader.GetString(4),
-                IsActive: reader.GetString(5) == "Active"));
+                IsActive: reader.GetString(5) == "Active",
+                CheapestConsumerPrice: reader.IsDBNull(6) ? null : reader.GetDecimal(6)));
         }
 
         return results;
+    }
+
+    internal static async Task<NpgsqlConnection> OpenAsync(
+        RemedinDbContext context,
+        CancellationToken cancellationToken)
+    {
+        var connection = (NpgsqlConnection)context.Database.GetDbConnection();
+
+        if (connection.State != System.Data.ConnectionState.Open)
+        {
+            await connection.OpenAsync(cancellationToken);
+        }
+
+        return connection;
     }
 }
