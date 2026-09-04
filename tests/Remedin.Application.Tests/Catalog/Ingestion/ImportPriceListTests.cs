@@ -12,6 +12,7 @@ public class ImportPriceListTests
     private static PricedMedicine Priced(string registrationNumber, int presentations = 1) =>
         new(
             RegistrationNumber.Parse(registrationNumber),
+            new ClinicalInformation("dipirona", "N2B", "ANALGÉSICOS NÃO NARCÓTICOS", "Tarja Vermelha"),
             [.. Enumerable.Range(0, presentations).Select(index =>
                 Presentation.Create(
                     $"{registrationNumber}{index:D6}",

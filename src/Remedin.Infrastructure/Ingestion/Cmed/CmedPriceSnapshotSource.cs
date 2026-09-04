@@ -38,8 +38,18 @@ public sealed class CmedPriceSnapshotSource(HttpClient http, CmedPriceReader rea
     [
         .. rows
             .GroupBy(row => row.Registration)
-            .Select(group => new PricedMedicine(group.Key, ToPresentations(group)))
+            .Select(group => new PricedMedicine(
+                group.Key,
+                ToClinicalInformation(group.First()),
+                ToPresentations(group)))
     ];
+
+    /// <summary>
+    /// A informação clínica se repete em todas as apresentações do mesmo
+    /// registro, então a primeira linha basta.
+    /// </summary>
+    private static ClinicalInformation ToClinicalInformation(PriceRow row) =>
+        new(row.Substance, row.TherapeuticClassCode, row.TherapeuticClassName, row.PrescriptionBand);
 
     private static List<Presentation> ToPresentations(IEnumerable<PriceRow> rows) =>
     [
