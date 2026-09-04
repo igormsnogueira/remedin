@@ -27,30 +27,30 @@ public sealed class MedicineConfiguration : IEntityTypeConfiguration<Medicine>
                 number => number.Value,
                 value => RegistrationNumber.Parse(value));
 
+        // Texto livre vindo das fontes fica sem limite de tamanho. Limitar não
+        // valida nada — a origem escreve o que quiser — e transforma variação
+        // normal do dado em carga quebrada. A CMED concatena os princípios
+        // ativos de uma associação e passa de mil caracteres.
         builder.Property(medicine => medicine.Name)
             .HasColumnName("name")
-            .HasMaxLength(300)
             .IsRequired();
 
         builder.Property(medicine => medicine.ActiveIngredient)
-            .HasColumnName("active_ingredient")
-            .HasMaxLength(1000);
+            .HasColumnName("active_ingredient");
 
         builder.Property(medicine => medicine.Manufacturer)
-            .HasColumnName("manufacturer")
-            .HasMaxLength(300);
+            .HasColumnName("manufacturer");
 
+        // Código tem forma definida, então o limite aqui é regra de verdade.
         builder.Property(medicine => medicine.TherapeuticClassCode)
             .HasColumnName("therapeutic_class_code")
             .HasMaxLength(20);
 
         builder.Property(medicine => medicine.TherapeuticClassName)
-            .HasColumnName("therapeutic_class_name")
-            .HasMaxLength(300);
+            .HasColumnName("therapeutic_class_name");
 
         builder.Property(medicine => medicine.PrescriptionBand)
-            .HasColumnName("prescription_band")
-            .HasMaxLength(50);
+            .HasColumnName("prescription_band");
 
         builder.Property(medicine => medicine.Status)
             .HasColumnName("status")
@@ -75,7 +75,6 @@ public sealed class MedicineConfiguration : IEntityTypeConfiguration<Medicine>
 
             presentation.Property(p => p.Description)
                 .HasColumnName("description")
-                .HasMaxLength(500)
                 .IsRequired();
 
             presentation.Property(p => p.HospitalOnly)
