@@ -95,7 +95,7 @@ public sealed class MedicinePriceStore(RemedinDbContext context) : IMedicinePric
         // coalesce preserva o valor da ANVISA quando a CMED não publica o
         // campo: os dois recortes não coincidem, e sobrescrever com nulo
         // apagaria informação boa.
-        await using var update = new NpgsqlCommand(
+        await using (var update = new NpgsqlCommand(
             """
             UPDATE medicines m
             SET active_ingredient      = coalesce(c.active_ingredient, m.active_ingredient),
@@ -105,9 +105,28 @@ public sealed class MedicinePriceStore(RemedinDbContext context) : IMedicinePric
             FROM clinical_information c
             WHERE m.registration_number = c.registration_number;
             """,
+            connection))
+        {
+            await update.ExecuteNonQueryAsync(cancellationToken);
+        }
+
+        // A marca de preço precisa refletir a carga inteira, inclusive quem
+        // saiu da lista e deixou de ter preço.
+        await using var markPriced = new NpgsqlCommand(
+            """
+            UPDATE medicines m
+            SET has_price = EXISTS (
+                SELECT 1 FROM clinical_information c
+                WHERE c.registration_number = m.registration_number
+            )
+            WHERE m.has_price <> EXISTS (
+                SELECT 1 FROM clinical_information c
+                WHERE c.registration_number = m.registration_number
+            );
+            """,
             connection);
 
-        await update.ExecuteNonQueryAsync(cancellationToken);
+        await markPriced.ExecuteNonQueryAsync(cancellationToken);
     }
 
     private static async Task WriteNullableAsync(

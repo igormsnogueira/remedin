@@ -16,9 +16,14 @@ public sealed record MedicineSummary(
     string Name,
     string? ActiveIngredient,
     string? Manufacturer,
+    string? TherapeuticClassCode,
     string? TherapeuticClass,
     bool IsActive,
-    decimal? CheapestConsumerPrice);
+    decimal? CheapestConsumerPrice)
+{
+    /// <summary>Para que serve, em linguagem comum.</summary>
+    public string? Purpose => Domain.Medicines.TherapeuticCategories.Describe(TherapeuticClassCode)?.Label;
+}
 
 public sealed record SearchResults(
     string Term,
