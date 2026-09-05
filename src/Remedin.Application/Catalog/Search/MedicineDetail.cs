@@ -35,6 +35,20 @@ public sealed record MedicineDetail(
     decimal IcmsRate,
     IReadOnlyList<PresentationDetail> Presentations)
 {
+    /// <summary>
+    /// Para que serve, em linguagem comum. Nulo quando não há tradução, e
+    /// nesse caso a interface mostra o nome técnico da fonte.
+    /// </summary>
+    public string? Purpose => Domain.Medicines.TherapeuticCategories.Describe(TherapeuticClassCode)?.Label;
+
+    /// <summary>Exigência de receita em linguagem comum.</summary>
+    public string? PrescriptionRule =>
+        Domain.Medicines.PrescriptionRules.Describe(PrescriptionBand)?.Label;
+
+    /// <summary>Nulo quando a fonte não informa, que é diferente de não exigir.</summary>
+    public bool? RequiresPrescription =>
+        Domain.Medicines.PrescriptionRules.Describe(PrescriptionBand)?.RequiresPrescription;
+
     public bool HasPrice => Presentations.Any(p => p.ConsumerPrice is not null || p.FactoryPrice is not null);
 
     public bool SoldInPharmacy => Presentations.Any(p => !p.HospitalOnly);

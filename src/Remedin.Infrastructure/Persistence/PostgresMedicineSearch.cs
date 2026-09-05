@@ -36,8 +36,10 @@ public sealed class PostgresMedicineSearch(RemedinDbContext context) : IMedicine
                    m.name,
                    m.active_ingredient,
                    m.manufacturer,
+                   m.therapeutic_class_code,
                    m.therapeutic_class_name,
                    m.status,
+                   m.has_price,
                    -- Quem digita "dipirona" procura primeiro o produto que se
                    -- chama assim, não os trezentos que têm esse princípio
                    -- ativo. Daí a escada: nome exato, nome que começa com o
@@ -57,13 +59,17 @@ public sealed class PostgresMedicineSearch(RemedinDbContext context) : IMedicine
         ranked AS (
             SELECT *
             FROM scored
-            -- Registro ativo vem antes: produto fora do mercado é resposta
-            -- pior para o mesmo grau de relevância.
-            ORDER BY (status = 'Active') DESC, score DESC, name ASC
+            -- Registro ativo e com preço vem antes: para o mesmo grau de
+            -- relevância, produto fora do mercado ou sem preço publicado é
+            -- resposta pior (ADR 0007). A marca de preço entra aqui, e não
+            -- depois, porque reordenar após o corte não traz de volta quem
+            -- ficou de fora.
+            ORDER BY (status = 'Active') DESC, score DESC, has_price DESC, name ASC
             LIMIT @limit
         )
         SELECT r.registration_number, r.name, r.active_ingredient, r.manufacturer,
-               r.therapeutic_class_name, r.status, cheapest.amount
+               r.therapeutic_class_code, r.therapeutic_class_name, r.status, cheapest.amount,
+               r.has_price
         FROM ranked r
         -- O preço é buscado só para as linhas que vão sair, e não para as
         -- milhares que a busca casou. Sem isso, procurar um princípio ativo
@@ -78,7 +84,11 @@ public sealed class PostgresMedicineSearch(RemedinDbContext context) : IMedicine
               AND pr.icms_rate = @rate
               AND NOT pr.free_trade_zone
         ) AS cheapest ON true
-        ORDER BY (r.status = 'Active') DESC, r.score DESC, r.name ASC;
+        -- O preço só desempata no fim, entre os que já foram escolhidos: vários
+        -- laboratórios publicam o mesmo genérico com o mesmo nome, e mostrar o
+        -- mais caro primeiro contraria o motivo de o site existir.
+        ORDER BY (r.status = 'Active') DESC, r.score DESC, r.has_price DESC,
+                 r.name ASC, cheapest.amount ASC NULLS LAST;
         """;
 
     public async Task<IReadOnlyList<MedicineSummary>> SearchAsync(
@@ -111,9 +121,10 @@ public sealed class PostgresMedicineSearch(RemedinDbContext context) : IMedicine
                 Name: reader.GetString(1),
                 ActiveIngredient: reader.IsDBNull(2) ? null : reader.GetString(2),
                 Manufacturer: reader.IsDBNull(3) ? null : reader.GetString(3),
-                TherapeuticClass: reader.IsDBNull(4) ? null : reader.GetString(4),
-                IsActive: reader.GetString(5) == "Active",
-                CheapestConsumerPrice: reader.IsDBNull(6) ? null : reader.GetDecimal(6)));
+                TherapeuticClassCode: reader.IsDBNull(4) ? null : reader.GetString(4),
+                TherapeuticClass: reader.IsDBNull(5) ? null : reader.GetString(5),
+                IsActive: reader.GetString(6) == "Active",
+                CheapestConsumerPrice: reader.IsDBNull(7) ? null : reader.GetDecimal(7)));
         }
 
         return results;
