@@ -37,6 +37,7 @@ public static class DependencyInjection
         services.AddScoped<IIngestionJournal, IngestionJournal>();
         services.AddScoped<IMedicineSearch, PostgresMedicineSearch>();
         services.AddScoped<IMedicineDetails, PostgresMedicineDetails>();
+        services.AddScoped<IMedicineAlternatives, PostgresMedicineAlternatives>();
 
         services.AddScoped<IMedicinePriceStore, MedicinePriceStore>();
 
