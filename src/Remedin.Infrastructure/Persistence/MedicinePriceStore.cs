@@ -61,6 +61,7 @@ public sealed class MedicinePriceStore(RemedinDbContext context) : IMedicinePric
             CREATE TEMP TABLE clinical_information (
                 registration_number    char(9) PRIMARY KEY,
                 active_ingredient      text,
+                substance_key          text,
                 therapeutic_class_code text,
                 therapeutic_class_name text,
                 prescription_band      text
@@ -73,7 +74,7 @@ public sealed class MedicinePriceStore(RemedinDbContext context) : IMedicinePric
 
         await using (var writer = await connection.BeginBinaryImportAsync(
             """
-            COPY clinical_information (registration_number, active_ingredient,
+            COPY clinical_information (registration_number, active_ingredient, substance_key,
                 therapeutic_class_code, therapeutic_class_name, prescription_band)
             FROM STDIN (FORMAT BINARY)
             """,
@@ -84,6 +85,10 @@ public sealed class MedicinePriceStore(RemedinDbContext context) : IMedicinePric
                 await writer.StartRowAsync(cancellationToken);
                 await writer.WriteAsync(medicine.Registration.Value, NpgsqlDbType.Char, cancellationToken);
                 await WriteNullableAsync(writer, medicine.Clinical.ActiveIngredient, cancellationToken);
+                // A chave vem do domínio, num lugar só: calcular em SQL aqui
+                // duplicaria a regra e as duas cópias divergiriam.
+                await WriteNullableAsync(
+                    writer, SubstanceKey.From(medicine.Clinical.ActiveIngredient), cancellationToken);
                 await WriteNullableAsync(writer, medicine.Clinical.TherapeuticClassCode, cancellationToken);
                 await WriteNullableAsync(writer, medicine.Clinical.TherapeuticClassName, cancellationToken);
                 await WriteNullableAsync(writer, medicine.Clinical.PrescriptionBand, cancellationToken);
@@ -99,6 +104,7 @@ public sealed class MedicinePriceStore(RemedinDbContext context) : IMedicinePric
             """
             UPDATE medicines m
             SET active_ingredient      = coalesce(c.active_ingredient, m.active_ingredient),
+                substance_key          = c.substance_key,
                 therapeutic_class_code = c.therapeutic_class_code,
                 therapeutic_class_name = coalesce(c.therapeutic_class_name, m.therapeutic_class_name),
                 prescription_band      = c.prescription_band

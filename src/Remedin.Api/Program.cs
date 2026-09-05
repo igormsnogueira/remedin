@@ -56,6 +56,22 @@ app.MapGet("/medicamentos/{registro}", async (
     return medicine is null ? Results.NotFound() : Results.Ok(medicine);
 });
 
+app.MapGet("/medicamentos/{registro}/alternativas", async (
+    string registro,
+    IMedicineAlternatives alternatives,
+    CancellationToken cancellationToken,
+    string uf = IcmsRates.DefaultState) =>
+{
+    if (!IcmsRates.TryGet(uf, out _))
+    {
+        return InvalidState(uf);
+    }
+
+    var result = await alternatives.FindAsync(registro, uf, cancellationToken);
+
+    return result is null ? Results.NotFound() : Results.Ok(result);
+});
+
 app.Run();
 
 static IResult InvalidState(string uf) =>
