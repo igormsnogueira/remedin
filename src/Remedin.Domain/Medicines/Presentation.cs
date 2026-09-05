@@ -33,6 +33,13 @@ public sealed class Presentation
 
     public bool HasPrice => _prices.Count > 0;
 
+    /// <summary>
+    /// Dosagem e quantidade lidas da descrição, quando legíveis. Sem elas não
+    /// há preço por unidade, e a comparação entre embalagens de tamanhos
+    /// diferentes não é feita (ADR 0010).
+    /// </summary>
+    public Packaging Packaging => Packaging.Read(Description);
+
     public static Presentation Create(
         string ggremCode,
         string description,

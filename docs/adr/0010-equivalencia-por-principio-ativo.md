@@ -39,11 +39,9 @@ Sal e sinônimo exigiriam um dicionário farmacêutico curado, e normalizar por 
 
 `DIPIRONA` e `DIPIRONA MONOIDRATADA` ficam em grupos separados, e a pessoa não vê uma como alternativa da outra. São 80 medicamentos onde a comparação seria útil e não aparece.
 
-A comparação é por princípio ativo, não por dosagem nem por quantidade: a CMED descreve as duas dentro do texto da apresentação, sem campo próprio. A lista de OMEPRAZOL traz 10 MG, 20 MG e 40 MG lado a lado, e embalagens de 7 e de 28 cápsulas.
+A chave agrupa por princípio ativo, e não por dosagem nem por quantidade. A CMED descreve as duas dentro do texto da apresentação, sem campo próprio, e a lista de OMEPRAZOL traz 10 MG, 20 MG e 40 MG lado a lado, em embalagens de 7 e de 28 cápsulas. Comparar preço de caixa nessas condições dá um número errado — e número que o site afirma a pessoa acredita, diferente da lista, onde ela vê a apresentação. A ADR 0011 trata disso.
 
-Por isso **a resposta não traz cálculo de economia**. Subtrair o preço de uma caixa de 7 do preço de uma caixa de 28 dá um número errado, e número que o site afirma a pessoa acredita — diferente da lista, onde ela vê a apresentação e compara. A lista vem acompanhada de aviso para conferir dosagem e quantidade, e para confirmar a troca com o farmacêutico.
-
-Comparar por unidade exige extrair dosagem e quantidade do texto. O padrão parece regular (`20 MG ... X 28`), mas precisa ser medido sobre as 25.691 apresentações antes de virar código: extração que falha em silêncio produziria um preço por unidade errado, que é pior que não ter.
+A lista vem acompanhada de aviso para conferir dosagem e quantidade, e para confirmar a troca com o farmacêutico.
 
 A chave é calculada na carga e guardada em coluna própria, com índice. Calcular na consulta exigiria processar o texto de 8.933 medicamentos a cada busca.
 
