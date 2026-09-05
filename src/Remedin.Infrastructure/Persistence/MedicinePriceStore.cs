@@ -157,7 +157,8 @@ public sealed class MedicinePriceStore(RemedinDbContext context) : IMedicinePric
     {
         await using var writer = await connection.BeginBinaryImportAsync(
             """
-            COPY presentations (registration_number, ggrem_code, description, hospital_only, sold_recently)
+            COPY presentations (registration_number, ggrem_code, description, hospital_only,
+                sold_recently, dosage_mg, unit_count)
             FROM STDIN (FORMAT BINARY)
             """,
             cancellationToken);
@@ -166,12 +167,33 @@ public sealed class MedicinePriceStore(RemedinDbContext context) : IMedicinePric
         {
             foreach (var presentation in medicine.Presentations)
             {
+                var packaging = presentation.Packaging;
+
                 await writer.StartRowAsync(cancellationToken);
                 await writer.WriteAsync(medicine.Registration.Value, NpgsqlDbType.Char, cancellationToken);
                 await writer.WriteAsync(presentation.GgremCode, NpgsqlDbType.Varchar, cancellationToken);
-                await writer.WriteAsync(presentation.Description, NpgsqlDbType.Varchar, cancellationToken);
+                await writer.WriteAsync(presentation.Description, NpgsqlDbType.Text, cancellationToken);
                 await writer.WriteAsync(presentation.HospitalOnly, NpgsqlDbType.Boolean, cancellationToken);
                 await writer.WriteAsync(presentation.SoldRecently, NpgsqlDbType.Boolean, cancellationToken);
+
+                if (packaging.DosageInMilligrams is null)
+                {
+                    await writer.WriteNullAsync(cancellationToken);
+                }
+                else
+                {
+                    await writer.WriteAsync(
+                        packaging.DosageInMilligrams.Value, NpgsqlDbType.Numeric, cancellationToken);
+                }
+
+                if (packaging.UnitCount is null)
+                {
+                    await writer.WriteNullAsync(cancellationToken);
+                }
+                else
+                {
+                    await writer.WriteAsync(packaging.UnitCount.Value, NpgsqlDbType.Integer, cancellationToken);
+                }
             }
         }
 

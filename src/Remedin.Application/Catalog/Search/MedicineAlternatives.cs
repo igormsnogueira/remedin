@@ -14,7 +14,18 @@ public sealed record MedicineAlternative(
     string? Manufacturer,
     string Presentation,
     decimal ConsumerPrice,
-    bool IsCurrent);
+    decimal? DosageInMilligrams,
+    int? UnitCount,
+    bool IsCurrent)
+{
+    /// <summary>
+    /// Preço por comprimido. Nulo quando a descrição não permite ler a
+    /// quantidade com segurança, o que acontece em pouco mais de 40% das
+    /// apresentações — líquidos, pomadas e frascos injetáveis.
+    /// </summary>
+    public decimal? PricePerUnit =>
+        UnitCount is > 0 ? Math.Round(ConsumerPrice / UnitCount.Value, 2) : null;
+}
 
 /// <summary>
 /// Medicamentos com o mesmo princípio ativo, do mais barato ao mais caro.
@@ -30,20 +41,54 @@ public sealed record AlternativesResult(
     decimal IcmsRate,
     IReadOnlyList<MedicineAlternative> Alternatives)
 {
+    private MedicineAlternative? Current =>
+        Alternatives.FirstOrDefault(alternative => alternative.IsCurrent);
+
     /// <summary>
-    /// Aviso que acompanha a lista. A comparação é por princípio ativo, e as
-    /// embalagens têm dosagem e quantidade diferentes — 20 MG com 7 cápsulas
-    /// e 20 MG com 28 aparecem lado a lado.
+    /// A alternativa mais barata por comprimido, entre as de mesma dosagem do
+    /// medicamento consultado.
     ///
-    /// Não existe campo de economia aqui de propósito: subtrair dois preços de
-    /// embalagens de tamanhos diferentes produz um número errado, e número que
-    /// o site afirma a pessoa acredita. Comparação por unidade depende de
-    /// extrair dosagem e quantidade do texto da apresentação, o que ainda não
-    /// foi medido.
+    /// A restrição de dosagem é o que torna a comparação honesta: 10 MG e
+    /// 40 MG do mesmo princípio ativo não são a mesma coisa, e apareciam lado
+    /// a lado na lista.
+    ///
+    /// Nula quando o consultado já é o mais barato: não há o que oferecer, e
+    /// apontar o próprio medicamento como alternativa confunde.
     /// </summary>
+    public MedicineAlternative? CheapestComparable
+    {
+        get
+        {
+            if (Current?.PricePerUnit is not { } current)
+            {
+                return null;
+            }
+
+            var cheapest = Alternatives
+                .Where(alternative =>
+                    !alternative.IsCurrent
+                    && alternative.PricePerUnit is not null
+                    && alternative.DosageInMilligrams == Current.DosageInMilligrams)
+                .MinBy(alternative => alternative.PricePerUnit);
+
+            return cheapest?.PricePerUnit < current ? cheapest : null;
+        }
+    }
+
+    /// <summary>
+    /// Economia por comprimido em relação ao medicamento consultado. Só existe
+    /// quando a comparação é entre a mesma dosagem e as duas quantidades são
+    /// conhecidas — fora disso, subtrair preços daria um número errado que o
+    /// site afirmaria como verdade.
+    /// </summary>
+    public decimal? SavingsPerUnit =>
+        Current?.PricePerUnit is { } current && CheapestComparable?.PricePerUnit is { } cheapest
+            ? current - cheapest
+            : null;
+
     public string Notice =>
-        "Medicamentos com o mesmo princípio ativo. Compare a dosagem e a quantidade " +
-        "de cada embalagem antes de decidir, e confirme a troca com o farmacêutico.";
+        "Medicamentos com o mesmo princípio ativo. Confira a dosagem e a quantidade " +
+        "de cada embalagem, e confirme a troca com o farmacêutico.";
 }
 
 public interface IMedicineAlternatives

@@ -6,41 +6,59 @@ using Remedin.Domain.Medicines;
 namespace Remedin.Infrastructure.Persistence;
 
 /// <summary>
-/// Lista os medicamentos com o mesmo princípio ativo, do mais barato ao mais
-/// caro, com o preço do estado consultado.
+/// Lista os medicamentos com o mesmo princípio ativo, do mais barato por
+/// comprimido ao mais caro, com o preço do estado consultado.
 /// </summary>
 public sealed class PostgresMedicineAlternatives(RemedinDbContext context) : IMedicineAlternatives
 {
-    private const string Sql = """
+    /// <summary>
+    /// Preço por comprimido quando a quantidade é conhecida, e pela caixa
+    /// quando não é. Comparar caixas premia a embalagem pequena, que custa
+    /// menos e rende menos.
+    /// </summary>
+    private const string PricePerUnit = "pr.amount / coalesce(nullif(p.unit_count, 0), 1)";
+
+    /// <summary>A apresentação de balcão mais barata por comprimido.</summary>
+    private const string CheapestPresentation = $"""
+        SELECT p.description, p.dosage_mg, p.unit_count, pr.amount,
+               {PricePerUnit} AS price_per_unit
+        FROM presentations p
+        JOIN prices pr USING (registration_number, ggrem_code)
+        WHERE p.registration_number = source.registration_number
+          AND NOT p.hospital_only
+          AND pr.kind = 'Consumer'
+          AND pr.icms_rate = @rate
+          AND NOT pr.free_trade_zone
+        ORDER BY price_per_unit ASC, pr.amount ASC
+        LIMIT 1
+        """;
+
+    private const string Sql = $"""
         WITH target AS (
-            SELECT registration_number, active_ingredient, substance_key
-            FROM medicines
-            WHERE registration_number = @registration
+            SELECT source.registration_number, source.active_ingredient, source.substance_key,
+                   chosen.dosage_mg
+            FROM medicines source
+            LEFT JOIN LATERAL ({CheapestPresentation}) AS chosen ON true
+            WHERE source.registration_number = @registration
         )
         SELECT t.active_ingredient,
-               m.registration_number,
-               m.name,
-               m.manufacturer,
-               cheapest.description,
-               cheapest.amount
+               source.registration_number,
+               source.name,
+               source.manufacturer,
+               chosen.description,
+               chosen.amount,
+               chosen.dosage_mg,
+               chosen.unit_count
         FROM target t
-        JOIN medicines m ON m.substance_key = t.substance_key AND m.has_price
-        -- Uma linha por medicamento: a apresentação de balcão mais barata,
-        -- que é o que a comparação precisa mostrar.
-        JOIN LATERAL (
-            SELECT p.description, pr.amount
-            FROM presentations p
-            JOIN prices pr USING (registration_number, ggrem_code)
-            WHERE p.registration_number = m.registration_number
-              AND NOT p.hospital_only
-              AND pr.kind = 'Consumer'
-              AND pr.icms_rate = @rate
-              AND NOT pr.free_trade_zone
-            ORDER BY pr.amount ASC
-            LIMIT 1
-        ) AS cheapest ON true
+        JOIN medicines source
+          ON source.substance_key = t.substance_key AND source.has_price
+        JOIN LATERAL ({CheapestPresentation}) AS chosen ON true
         WHERE t.substance_key IS NOT NULL
-        ORDER BY cheapest.amount ASC, m.name ASC
+        -- Mesma dosagem primeiro: 10 MG e 40 MG do mesmo princípio ativo não
+        -- são alternativas um do outro, e apareciam misturados.
+        ORDER BY (chosen.dosage_mg IS NOT DISTINCT FROM t.dosage_mg) DESC,
+                 chosen.price_per_unit ASC,
+                 source.name ASC
         LIMIT @limit;
         """;
 
@@ -87,6 +105,8 @@ public sealed class PostgresMedicineAlternatives(RemedinDbContext context) : IMe
                 Manufacturer: reader.IsDBNull(3) ? null : reader.GetString(3),
                 Presentation: reader.GetString(4),
                 ConsumerPrice: reader.GetDecimal(5),
+                DosageInMilligrams: reader.IsDBNull(6) ? null : reader.GetDecimal(6),
+                UnitCount: reader.IsDBNull(7) ? null : reader.GetInt32(7),
                 IsCurrent: number == registration.Value));
         }
 
