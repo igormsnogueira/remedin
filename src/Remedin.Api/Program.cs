@@ -14,9 +14,23 @@ builder.Services.AddInfrastructure(connectionString);
 // o oposto do que um health check serve para dizer.
 builder.Services.AddHealthChecks().AddDbContextCheck<RemedinDbContext>("postgres");
 
+// O front-end roda em outra porta, e o navegador bloqueia a chamada sem isso.
+// A lista vem de configuração porque o endereço muda entre a máquina de
+// desenvolvimento e o ambiente publicado.
+const string FrontendCors = "frontend";
+var allowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>() ?? [];
+
+builder.Services.AddCors(options => options.AddPolicy(
+    FrontendCors,
+    policy => policy.WithOrigins(allowedOrigins).AllowAnyHeader().AllowAnyMethod()));
+
 var app = builder.Build();
 
+app.UseCors(FrontendCors);
+
 app.MapHealthChecks("/health");
+
+app.MapGet("/estados", () => StateOptions.All);
 
 app.MapGet("/medicamentos", async (
     string? q,
