@@ -1,0 +1,26 @@
+@layer components {
+  .notice {
+    padding-block: var(--space-xs);
+    padding-inline: var(--space-sm);
+
+    border: var(--border-thin);
+    border-inline-start-width: 4px;
+    border-radius: var(--radius-md);
+
+    background-color: var(--color-surface);
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+  }
+
+  .info {
+    border-inline-start-color: var(--color-accent);
+  }
+
+  .warning {
+    border-inline-start-color: var(--color-warning);
+  }
+
+  .danger {
+    border-inline-start-color: var(--color-danger);
+  }
+}

@@ -1,0 +1,80 @@
+@layer components {
+  .card {
+    /* Consulta de contêiner: o cartão responde ao espaço que ele tem, não ao
+       tamanho da janela. O mesmo componente serve numa lista estreita e numa
+       coluna larga sem media query. */
+    container-type: inline-size;
+
+    display: block;
+    padding: var(--space-sm);
+
+    border: var(--border-thin);
+    border-radius: var(--radius-md);
+    background-color: var(--color-surface);
+
+    color: inherit;
+    text-decoration: none;
+    transition: background-color var(--transition-fast), box-shadow var(--transition-fast);
+  }
+
+  .card:hover {
+    background-color: var(--color-surface-hover);
+    box-shadow: var(--shadow-sm);
+  }
+
+  .layout {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2xs);
+  }
+
+  @container (min-width: 30rem) {
+    .layout {
+      flex-direction: row;
+      align-items: start;
+      justify-content: space-between;
+      gap: var(--space-md);
+    }
+
+    .price {
+      text-align: end;
+    }
+  }
+
+  .name {
+    font-size: var(--text-lg);
+    font-weight: 650;
+  }
+
+  .manufacturer {
+    color: var(--color-text-muted);
+    font-size: var(--text-sm);
+  }
+
+  .purpose {
+    font-size: var(--text-sm);
+    max-inline-size: var(--measure);
+  }
+
+  .tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3xs);
+    margin-block-start: var(--space-3xs);
+  }
+
+  .price {
+    white-space: nowrap;
+  }
+
+  .amount {
+    font-size: var(--text-lg);
+    font-weight: 650;
+  }
+
+  .priceLabel {
+    display: block;
+    color: var(--color-text-muted);
+    font-size: var(--text-xs);
+  }
+}
