@@ -1,0 +1,13 @@
+/*
+ * Ordem da cascata declarada uma vez, aqui.
+ *
+ * Com as camadas nomeadas nesta ordem, um seletor de `components` sempre vence
+ * um de `base`, independente de especificidade. É o que dispensa `!important`
+ * e seletores encadeados escritos só para ganhar peso.
+ */
+@layer reset, tokens, base, layout, components, utilities;
+
+@import './reset.css';
+@import './tokens.css';
+@import './base.css';
+@import './utilities.css';

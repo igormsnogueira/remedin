@@ -152,6 +152,21 @@ responde 503 se o banco estiver fora do ar.
 dotnet test    # testes de domínio e de arquitetura
 ```
 
+### Interface
+
+Requisitos: Node 22.
+
+```bash
+cd src/Remedin.Web
+npm install
+npm run dev
+```
+
+Abre em `http://localhost:5173` e consome a API pelo endereço de
+`.env.development`. A API precisa estar rodando, e a origem do front tem que
+constar em `Cors:AllowedOrigins` — sem isso o navegador bloqueia as chamadas
+sem registrar erro no lado da API.
+
 ---
 
 ## 📜 Licença
