@@ -1,0 +1,57 @@
+@layer components {
+  .heading {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: end;
+    justify-content: space-between;
+    gap: var(--space-sm);
+    margin-block-end: var(--space-2xs);
+  }
+
+  .state {
+    min-inline-size: 12rem;
+  }
+
+  .list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2xs);
+  }
+
+  .item {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--space-2xs);
+
+    padding: var(--space-xs) var(--space-sm);
+    border: var(--border-thin);
+    border-radius: var(--radius-md);
+    background-color: var(--color-surface);
+  }
+
+  .description {
+    font-size: var(--text-sm);
+  }
+
+  .amount {
+    font-weight: 650;
+    white-space: nowrap;
+  }
+
+  .missing {
+    color: var(--color-text-muted);
+    font-size: var(--text-sm);
+    white-space: nowrap;
+  }
+
+  .hospital {
+    margin-block-start: var(--space-md);
+  }
+
+  .hospitalTitle {
+    font-size: var(--text-base);
+    margin-block-end: var(--space-2xs);
+  }
+}
