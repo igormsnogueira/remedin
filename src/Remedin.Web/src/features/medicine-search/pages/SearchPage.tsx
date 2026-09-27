@@ -3,6 +3,7 @@ import { useSearchParams } from 'react-router-dom'
 import { useSelectedState } from '@/app/providers/useSelectedState'
 import { useQuery } from '@/shared/api/useQuery'
 import type { SearchResults } from '@/shared/api/types'
+import { useDocumentTitle } from '@/shared/hooks/useDocumentTitle'
 import { Notice } from '@/shared/ui/Notice/Notice'
 import { Spinner } from '@/shared/ui/Spinner/Spinner'
 
@@ -19,6 +20,8 @@ export function SearchPage() {
   const term = params.get('q') ?? ''
 
   const { state } = useSelectedState()
+
+  useDocumentTitle(term ? `${term} — busca` : null)
 
   const results = useQuery<SearchResults>(
     term ? (signal) => searchMedicines(term, state, signal) : null,

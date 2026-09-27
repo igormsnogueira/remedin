@@ -1,0 +1,23 @@
+@layer components {
+  .header {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3xs);
+  }
+
+  .manufacturer {
+    color: var(--color-text-muted);
+  }
+
+  .registration {
+    color: var(--color-text-muted);
+    font-size: var(--text-sm);
+  }
+
+  .tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3xs);
+    margin-block-start: var(--space-2xs);
+  }
+}

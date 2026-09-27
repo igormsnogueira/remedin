@@ -11,7 +11,7 @@ import { fetchStates } from '../api/fetchStates'
  * Enquanto a lista não chega, mostra só a sigla já escolhida: um seletor vazio
  * pareceria defeito, e a escolha anterior continua válida.
  */
-export function StateSelect() {
+export function StateSelect({ className }: { className?: string }) {
   const { state, setState } = useSelectedState()
   const states = useQuery<StateOption[]>(fetchStates, [])
 
@@ -19,6 +19,7 @@ export function StateSelect() {
 
   return (
     <SelectField
+      className={className}
       label="Estado"
       value={state}
       onChange={(event) => setState(event.target.value)}
