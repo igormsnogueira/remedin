@@ -1,0 +1,13 @@
+@layer components {
+  .section {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+  }
+
+  .list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2xs);
+  }
+}
