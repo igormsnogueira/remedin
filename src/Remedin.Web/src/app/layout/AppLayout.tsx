@@ -1,6 +1,7 @@
 import { Link, Outlet } from 'react-router-dom'
 
 import styles from './AppLayout.module.css'
+import { useFocusOnNavigation } from './useFocusOnNavigation'
 
 /**
  * A moldura de todas as telas: cabeçalho, conteúdo e rodapé.
@@ -9,6 +10,8 @@ import styles from './AppLayout.module.css'
  * máxima nem das margens laterais.
  */
 export function AppLayout() {
+  const main = useFocusOnNavigation<HTMLElement>()
+
   return (
     <div className={styles.shell}>
       <a className={styles.skip} href="#conteudo">
@@ -23,7 +26,14 @@ export function AppLayout() {
         </div>
       </header>
 
-      <main className={`${styles.main} ${styles.container}`} id="conteudo">
+      <main
+        className={`${styles.main} ${styles.container}`}
+        id="conteudo"
+        ref={main}
+        // -1 aceita foco por código sem entrar na ordem do Tab, que é o que
+        // permite mover o foco para cá na troca de rota.
+        tabIndex={-1}
+      >
         <Outlet />
       </main>
 
