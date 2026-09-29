@@ -1,6 +1,7 @@
 import { Link, useParams } from 'react-router-dom'
 
 import { useSelectedState } from '@/app/providers/useSelectedState'
+import { AlternativesSection } from '@/features/medicine-alternatives/components/AlternativesSection'
 import { ApiError } from '@/shared/api/client'
 import { useQuery } from '@/shared/api/useQuery'
 import type { MedicineDetail } from '@/shared/api/types'
@@ -50,6 +51,7 @@ export function MedicineDetailPage() {
       <PurposeSection medicine={medicine.data} />
       <PrescriptionSection medicine={medicine.data} />
       <PriceSection medicine={medicine.data} />
+      <AlternativesSection registrationNumber={medicine.data.registrationNumber} />
 
       <Link to="/">Voltar para a busca</Link>
     </article>
