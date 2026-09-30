@@ -7,7 +7,7 @@ import { useDocumentTitle } from '@/shared/hooks/useDocumentTitle'
 import { Notice } from '@/shared/ui/Notice/Notice'
 import { Spinner } from '@/shared/ui/Spinner/Spinner'
 
-import { searchMedicines } from '../api/searchMedicines'
+import { SEARCH_LIMIT, searchMedicines } from '../api/searchMedicines'
 import { ResultCard } from '../components/ResultCard'
 import { SearchForm } from '../components/SearchForm'
 
@@ -55,13 +55,22 @@ export function SearchPage() {
           </Notice>
         ) : (
           <section className={styles.results}>
-            <p className={styles.count}>
+            {/* polite anuncia a contagem quando a lista muda, sem interromper
+                quem está digitando. */}
+            <p className={styles.count} aria-live="polite">
               {results.data.medicines.length} resultados · preço para {results.data.state}
             </p>
 
             {results.data.medicines.map((medicine) => (
               <ResultCard key={medicine.registrationNumber} medicine={medicine} />
             ))}
+
+            {results.data.medicines.length === SEARCH_LIMIT && (
+              <Notice>
+                A lista mostra os {SEARCH_LIMIT} mais relevantes. Se o seu medicamento não está
+                aqui, busque pelo nome do produto em vez do princípio ativo.
+              </Notice>
+            )}
           </section>
         ))}
     </div>

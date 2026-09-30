@@ -36,6 +36,12 @@
     padding-block: var(--space-lg) var(--space-2xl);
   }
 
+  /* O foco vai para cá na troca de rota, e o anel em volta do conteúdo
+     inteiro não ajuda ninguém a se localizar. */
+  .main:focus {
+    outline: none;
+  }
+
   .brand {
     font-size: var(--text-lg);
     font-weight: 700;
