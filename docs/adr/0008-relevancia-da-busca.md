@@ -10,7 +10,17 @@ A primeira versão tratava os quatro campos pesquisáveis como iguais e usava o 
 
 ## Decisão
 
-O índice textual usa os quatro níveis de peso do PostgreSQL: nome comercial em A, princípio ativo em B, classe terapêutica em C, fabricante em D.
+O índice textual usa os quatro níveis de peso do PostgreSQL:
+
+| Campo | Peso |
+|---|---|
+| Nome comercial | A |
+| Princípio ativo | B |
+| Finalidade em linguagem comum | B |
+| Classe terapêutica, como a fonte escreve | C |
+| Fabricante | D |
+
+A finalidade divide o peso B com o princípio ativo porque é o único campo escrito na língua de quem procura. Acerto nela significa "este remédio serve para isso", que informa mais que coincidir com o nome do laboratório ou com o jargão da classe.
 
 A nota soma sinais em vez de pegar o maior:
 
@@ -41,6 +51,8 @@ Os pesos são um chute calibrado, não uma verdade. Ficam em números legíveis 
 A consulta é SQL escrito à mão, não LINQ. As duas estratégias combinadas não têm tradução natural, e essa consulta define a qualidade do produto — vale poder lê-la inteira num lugar só.
 
 Alterar o peso de um campo exige recriar a coluna gerada, porque ela é materializada. Com 32 mil linhas isso leva segundos.
+
+O radicalizador do português pode igualar um sintoma a um nome de marca. `azia` reduz para `azi`, que é o nome de uma azitromicina: o antibiótico casa no nome, peso A, e aparece antes dos antiácidos. O acerto é correto do ponto de vista do índice, e mexer nos pesos até esse caso passar seria calibrar a régua para uma consulta só. Fica registrado, sem correção.
 
 Buscar um princípio ativo comum devolve muitos produtos com o mesmo nome, de fabricantes diferentes. São registros distintos e a lista está correta, mas visualmente parece repetição: `dipirona` traz cinco linhas escritas "DIPIRONA".
 
