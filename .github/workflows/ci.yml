@@ -7,7 +7,14 @@ on:
     branches: [main]
 
 jobs:
-  build:
+  # Dois jobs em paralelo, e não passos de um só: quebram por motivos
+  # diferentes, e no pull request dá para ver qual lado falhou sem abrir o log.
+  #
+  # Sem filtro por caminho de propósito. Filtrar parece economia, mas com
+  # verificação obrigatória na branch o job que não executa deixa o merge
+  # travado sem explicação.
+  backend:
+    name: .NET
     runs-on: ubuntu-latest
 
     steps:
@@ -25,3 +32,40 @@ jobs:
 
       - name: Testar
         run: dotnet test --no-build --configuration Release --verbosity normal
+
+  frontend:
+    name: Front-end
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: src/Remedin.Web
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: src/Remedin.Web/package-lock.json
+
+      # npm ci instala exatamente o que está no lock e falha se ele estiver
+      # fora de sincronia com o package.json, que é o comportamento que se quer
+      # em integração contínua.
+      - name: Instalar dependências
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      # O script de build roda tsc antes do empacotamento, então erro de tipo
+      # quebra aqui.
+      #
+      # vite build roda em modo produção e não lê o .env.development, então sem
+      # esta variável o pacote sairia apontando para lugar nenhum. O valor aqui
+      # é só para o build fechar; o endereço real entra no deploy.
+      - name: Compilar
+        run: npm run build
+        env:
+          VITE_API_URL: http://localhost:5032
