@@ -64,6 +64,7 @@ public sealed class MedicinePriceStore(RemedinDbContext context) : IMedicinePric
                 substance_key          text,
                 therapeutic_class_code text,
                 therapeutic_class_name text,
+                purpose_label          text,
                 prescription_band      text
             ) ON COMMIT DROP;
             """,
@@ -75,7 +76,7 @@ public sealed class MedicinePriceStore(RemedinDbContext context) : IMedicinePric
         await using (var writer = await connection.BeginBinaryImportAsync(
             """
             COPY clinical_information (registration_number, active_ingredient, substance_key,
-                therapeutic_class_code, therapeutic_class_name, prescription_band)
+                therapeutic_class_code, therapeutic_class_name, purpose_label, prescription_band)
             FROM STDIN (FORMAT BINARY)
             """,
             cancellationToken))
@@ -91,6 +92,13 @@ public sealed class MedicinePriceStore(RemedinDbContext context) : IMedicinePric
                     writer, SubstanceKey.From(medicine.Clinical.ActiveIngredient), cancellationToken);
                 await WriteNullableAsync(writer, medicine.Clinical.TherapeuticClassCode, cancellationToken);
                 await WriteNullableAsync(writer, medicine.Clinical.TherapeuticClassName, cancellationToken);
+                // A tradução para linguagem comum é a mesma que a ficha exibe.
+                // Gravar aqui é o que a torna pesquisável: traduzir em SQL
+                // duplicaria a tabela de categorias dentro de uma migration.
+                await WriteNullableAsync(
+                    writer,
+                    TherapeuticCategories.Describe(medicine.Clinical.TherapeuticClassCode)?.Label,
+                    cancellationToken);
                 await WriteNullableAsync(writer, medicine.Clinical.PrescriptionBand, cancellationToken);
             }
 
@@ -107,6 +115,7 @@ public sealed class MedicinePriceStore(RemedinDbContext context) : IMedicinePric
                 substance_key          = c.substance_key,
                 therapeutic_class_code = c.therapeutic_class_code,
                 therapeutic_class_name = coalesce(c.therapeutic_class_name, m.therapeutic_class_name),
+                purpose_label          = c.purpose_label,
                 prescription_band      = c.prescription_band
             FROM clinical_information c
             WHERE m.registration_number = c.registration_number;
