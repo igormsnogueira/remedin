@@ -35,6 +35,20 @@ export interface SearchResults {
   medicines: MedicineSummary[]
 }
 
+export interface PurposeSummary {
+  code: string
+  label: string
+  medicineCount: number
+}
+
+export interface PurposeMedicines {
+  code: string
+  label: string
+  state: string
+  icmsRate: number
+  medicines: MedicineSummary[]
+}
+
 export interface PresentationDetail {
   ggremCode: string
   description: string

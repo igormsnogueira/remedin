@@ -1,4 +1,4 @@
-import { useSearchParams } from 'react-router-dom'
+import { Link, useSearchParams } from 'react-router-dom'
 
 import { useSelectedState } from '@/app/providers/useSelectedState'
 import { useQuery } from '@/shared/api/useQuery'
@@ -42,6 +42,10 @@ export function SearchPage() {
         initialTerm={term}
         onSearch={(value) => setParams(value ? { q: value } : {})}
       />
+
+      <p className={styles.browse}>
+        Não sabe o nome? <Link to="/finalidades">Veja por finalidade</Link>.
+      </p>
 
       {results.status === 'loading' && <Spinner label="Buscando medicamentos" />}
 
