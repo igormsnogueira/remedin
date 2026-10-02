@@ -70,6 +70,28 @@ app.MapGet("/medicamentos/{registro}", async (
     return medicine is null ? Results.NotFound() : Results.Ok(medicine);
 });
 
+app.MapGet("/finalidades", async (
+    IMedicinePurposes purposes,
+    CancellationToken cancellationToken) => await purposes.ListAsync(cancellationToken));
+
+app.MapGet("/finalidades/{codigo}", async (
+    string codigo,
+    IMedicinePurposes purposes,
+    CancellationToken cancellationToken,
+    string uf = IcmsRates.DefaultState,
+    int limite = 20) =>
+{
+    if (!IcmsRates.TryGet(uf, out _))
+    {
+        return InvalidState(uf);
+    }
+
+    var result = await purposes.FindAsync(
+        codigo, uf, Math.Clamp(limite, 1, 50), cancellationToken);
+
+    return result is null ? Results.NotFound() : Results.Ok(result);
+});
+
 app.MapGet("/medicamentos/{registro}/alternativas", async (
     string registro,
     IMedicineAlternatives alternatives,
