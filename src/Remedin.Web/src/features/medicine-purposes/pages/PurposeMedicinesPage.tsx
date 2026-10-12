@@ -10,20 +10,23 @@ import { ApiError } from '@/shared/api/client'
 import { useQuery } from '@/shared/api/useQuery'
 import type { PurposeMedicines } from '@/shared/api/types'
 import { useDocumentTitle } from '@/shared/hooks/useDocumentTitle'
+import { usePageParam } from '@/shared/hooks/usePageParam'
 import { Notice } from '@/shared/ui/Notice/Notice'
+import { Pagination } from '@/shared/ui/Pagination/Pagination'
 import { Spinner } from '@/shared/ui/Spinner/Spinner'
 
-import { PURPOSE_LIMIT, fetchPurposeMedicines } from '../api/fetchPurposes'
+import { fetchPurposeMedicines } from '../api/fetchPurposes'
 
 import styles from './PurposeMedicinesPage.module.css'
 
 export function PurposeMedicinesPage() {
   const { code } = useParams()
+  const [page, goToPage] = usePageParam()
   const { state } = useSelectedState()
 
   const purpose = useQuery<PurposeMedicines>(
-    code ? (signal) => fetchPurposeMedicines(code, state, signal) : null,
-    [code, state],
+    code ? (signal) => fetchPurposeMedicines(code, state, page, signal) : null,
+    [code, state, page],
   )
 
   useDocumentTitle(purpose.status === 'success' ? purpose.data.label : null)
@@ -54,24 +57,24 @@ export function PurposeMedicinesPage() {
         <StateSelect className={styles.state} />
       </div>
 
-      {medicines.length === 0 ? (
-        <Notice>Nenhum medicamento desta finalidade tem preço publicado em {uf}.</Notice>
+      {medicines.items.length === 0 ? (
+        <Notice>
+          {page > 1
+            ? 'Não há mais medicamentos desta finalidade além desta página.'
+            : `Nenhum medicamento desta finalidade tem preço publicado em ${uf}.`}
+        </Notice>
       ) : (
         <section className={styles.list}>
           <p className={styles.count}>
-            Do mais barato ao mais caro · preço para {uf}
+            {medicines.total.toLocaleString('pt-BR')} medicamentos, do mais barato ao mais caro ·
+            preço para {uf}
           </p>
 
-          {medicines.map((medicine) => (
+          {medicines.items.map((medicine) => (
             <ResultCard key={medicine.registrationNumber} medicine={medicine} />
           ))}
 
-          {medicines.length === PURPOSE_LIMIT && (
-            <Notice>
-              A lista mostra os {PURPOSE_LIMIT} mais baratos. Para ver outros, busque pelo nome do
-              medicamento.
-            </Notice>
-          )}
+          <Pagination page={medicines} onChange={goToPage} busy={purpose.stale} />
         </section>
       )}
 

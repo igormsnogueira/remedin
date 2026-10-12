@@ -29,7 +29,7 @@ public sealed record SearchResults(
     string Term,
     string State,
     decimal IcmsRate,
-    IReadOnlyList<MedicineSummary> Medicines);
+    PagedResults<MedicineSummary> Medicines);
 
 public interface IMedicineSearch
 {
@@ -37,9 +37,9 @@ public interface IMedicineSearch
     /// Sigla da unidade da federação. O teto legal muda conforme o ICMS
     /// estadual, então não existe preço sem estado (ADR 0006).
     /// </param>
-    Task<IReadOnlyList<MedicineSummary>> SearchAsync(
+    Task<PagedResults<MedicineSummary>> SearchAsync(
         string term,
         string state,
-        int limit,
+        Page page,
         CancellationToken cancellationToken);
 }
