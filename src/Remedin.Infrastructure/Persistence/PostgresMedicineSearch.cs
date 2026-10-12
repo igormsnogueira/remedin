@@ -57,7 +57,10 @@ public sealed class PostgresMedicineSearch(RemedinDbContext context) : IMedicine
                OR immutable_unaccent(coalesce(m.active_ingredient, '')) % i.plain
         ),
         ranked AS (
-            SELECT *
+            -- A função de janela conta antes do corte, então o total da busca
+            -- sai desta mesma consulta. Um segundo SELECT count(*) repetindo os
+            -- filtros é o tipo de duplicação que diverge na primeira alteração.
+            SELECT *, count(*) OVER () AS total
             FROM scored
             -- Registro ativo e com preço vem antes: para o mesmo grau de
             -- relevância, produto fora do mercado ou sem preço publicado é
@@ -65,11 +68,11 @@ public sealed class PostgresMedicineSearch(RemedinDbContext context) : IMedicine
             -- depois, porque reordenar após o corte não traz de volta quem
             -- ficou de fora.
             ORDER BY (status = 'Active') DESC, score DESC, has_price DESC, name ASC
-            LIMIT @limit
+            LIMIT @limit OFFSET @offset
         )
         SELECT r.registration_number, r.name, r.active_ingredient, r.manufacturer,
                r.therapeutic_class_code, r.therapeutic_class_name, r.status, cheapest.amount,
-               r.has_price
+               r.total
         FROM ranked r
         -- O preço é buscado só para as linhas que vão sair, e não para as
         -- milhares que a busca casou. Sem isso, procurar um princípio ativo
@@ -91,15 +94,17 @@ public sealed class PostgresMedicineSearch(RemedinDbContext context) : IMedicine
                  r.name ASC, cheapest.amount ASC NULLS LAST;
         """;
 
-    public async Task<IReadOnlyList<MedicineSummary>> SearchAsync(
+    public async Task<PagedResults<MedicineSummary>> SearchAsync(
         string term,
         string state,
-        int limit,
+        Page page,
         CancellationToken cancellationToken)
     {
+        ArgumentNullException.ThrowIfNull(page);
+
         if (string.IsNullOrWhiteSpace(term) || term.Trim().Length < MinimumTermLength)
         {
-            return [];
+            return PagedResults<MedicineSummary>.Of([], 0, page);
         }
 
         var rate = IcmsRates.For(state);
@@ -107,12 +112,19 @@ public sealed class PostgresMedicineSearch(RemedinDbContext context) : IMedicine
 
         await using var command = new NpgsqlCommand(Sql, connection);
         command.Parameters.Add(new NpgsqlParameter("term", NpgsqlDbType.Text) { Value = term.Trim() });
-        command.Parameters.Add(new NpgsqlParameter("limit", NpgsqlDbType.Integer) { Value = limit });
+        command.Parameters.Add(new NpgsqlParameter("limit", NpgsqlDbType.Integer) { Value = page.Size });
+        command.Parameters.Add(new NpgsqlParameter("offset", NpgsqlDbType.Integer) { Value = page.Offset });
         command.Parameters.Add(new NpgsqlParameter("rate", NpgsqlDbType.Numeric) { Value = rate });
 
         await using var reader = await command.ExecuteReaderAsync(cancellationToken);
 
         var results = new List<MedicineSummary>();
+
+        // A contagem viaja em cada linha, então página vazia devolve total
+        // zero mesmo quando a busca tem resultados — é o caso de pedir uma
+        // página além do fim. A tela distingue pelo número da página pedida, e
+        // isso evita uma segunda consulta para um caso que quase não acontece.
+        var total = 0;
 
         while (await reader.ReadAsync(cancellationToken))
         {
@@ -125,9 +137,11 @@ public sealed class PostgresMedicineSearch(RemedinDbContext context) : IMedicine
                 TherapeuticClass: reader.IsDBNull(5) ? null : reader.GetString(5),
                 IsActive: reader.GetString(6) == "Active",
                 CheapestConsumerPrice: reader.IsDBNull(7) ? null : reader.GetDecimal(7)));
+
+            total = (int)reader.GetInt64(8);
         }
 
-        return results;
+        return PagedResults<MedicineSummary>.Of(results, total, page);
     }
 
     internal static async Task<NpgsqlConnection> OpenAsync(

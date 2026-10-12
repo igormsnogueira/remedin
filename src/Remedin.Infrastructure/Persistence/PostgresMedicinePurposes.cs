@@ -37,7 +37,9 @@ public sealed class PostgresMedicinePurposes(RemedinDbContext context) : IMedici
               AND upper(left(m.therapeutic_class_code, 1)) = @group
         )
         SELECT c.registration_number, c.name, c.active_ingredient, c.manufacturer,
-               c.therapeutic_class_code, c.therapeutic_class_name, cheapest.amount
+               c.therapeutic_class_code, c.therapeutic_class_name, cheapest.amount,
+               -- Conta antes do corte, na mesma consulta, como na busca.
+               count(*) OVER () AS total
         FROM chosen c
         LEFT JOIN LATERAL (
             SELECT min(pr.amount) AS amount
@@ -53,7 +55,7 @@ public sealed class PostgresMedicinePurposes(RemedinDbContext context) : IMedici
         -- relevância, e quem navega por finalidade veio ver o que cabe no bolso.
         -- Sem preço no estado vai para o fim, porque não responde a pergunta.
         ORDER BY cheapest.amount ASC NULLS LAST, c.name ASC
-        LIMIT @limit;
+        LIMIT @limit OFFSET @offset;
         """;
 
     public async Task<IReadOnlyList<PurposeSummary>> ListAsync(CancellationToken cancellationToken)
@@ -82,9 +84,11 @@ public sealed class PostgresMedicinePurposes(RemedinDbContext context) : IMedici
     public async Task<PurposeMedicines?> FindAsync(
         string code,
         string state,
-        int limit,
+        Page page,
         CancellationToken cancellationToken)
     {
+        ArgumentNullException.ThrowIfNull(page);
+
         var group = TherapeuticCategories.Groups
             .FirstOrDefault(category => string.Equals(category.Code, code, StringComparison.OrdinalIgnoreCase));
 
@@ -99,11 +103,13 @@ public sealed class PostgresMedicinePurposes(RemedinDbContext context) : IMedici
         await using var command = new NpgsqlCommand(MedicinesSql, connection);
         command.Parameters.Add(new NpgsqlParameter("group", NpgsqlDbType.Text) { Value = group.Code });
         command.Parameters.Add(new NpgsqlParameter("rate", NpgsqlDbType.Numeric) { Value = rate });
-        command.Parameters.Add(new NpgsqlParameter("limit", NpgsqlDbType.Integer) { Value = limit });
+        command.Parameters.Add(new NpgsqlParameter("limit", NpgsqlDbType.Integer) { Value = page.Size });
+        command.Parameters.Add(new NpgsqlParameter("offset", NpgsqlDbType.Integer) { Value = page.Offset });
 
         await using var reader = await command.ExecuteReaderAsync(cancellationToken);
 
         var medicines = new List<MedicineSummary>();
+        var total = 0;
 
         while (await reader.ReadAsync(cancellationToken))
         {
@@ -116,9 +122,15 @@ public sealed class PostgresMedicinePurposes(RemedinDbContext context) : IMedici
                 TherapeuticClass: reader.IsDBNull(5) ? null : reader.GetString(5),
                 IsActive: true,
                 CheapestConsumerPrice: reader.IsDBNull(6) ? null : reader.GetDecimal(6)));
+
+            total = (int)reader.GetInt64(7);
         }
 
         return new PurposeMedicines(
-            group.Code, group.Label, state.ToUpperInvariant(), rate, medicines);
+            group.Code,
+            group.Label,
+            state.ToUpperInvariant(),
+            rate,
+            PagedResults<MedicineSummary>.Of(medicines, total, page));
     }
 }

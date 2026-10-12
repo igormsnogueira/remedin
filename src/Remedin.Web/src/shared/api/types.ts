@@ -28,11 +28,24 @@ export interface MedicineSummary {
   purpose: string | null
 }
 
+/** Uma fatia de uma lista maior, com o total de que ela faz parte. */
+export interface PagedResults<T> {
+  items: T[]
+  total: number
+  pageNumber: number
+  pageSize: number
+  hasNext: boolean
+  hasPrevious: boolean
+  /** Zero quando a página veio vazia. */
+  firstPosition: number
+  lastPosition: number
+}
+
 export interface SearchResults {
   term: string
   state: string
   icmsRate: number
-  medicines: MedicineSummary[]
+  medicines: PagedResults<MedicineSummary>
 }
 
 export interface PurposeSummary {
@@ -46,7 +59,7 @@ export interface PurposeMedicines {
   label: string
   state: string
   icmsRate: number
-  medicines: MedicineSummary[]
+  medicines: PagedResults<MedicineSummary>
 }
 
 export interface PresentationDetail {

@@ -13,7 +13,7 @@ public sealed record PurposeMedicines(
     string Label,
     string State,
     decimal IcmsRate,
-    IReadOnlyList<MedicineSummary> Medicines);
+    PagedResults<MedicineSummary> Medicines);
 
 public interface IMedicinePurposes
 {
@@ -27,6 +27,6 @@ public interface IMedicinePurposes
     Task<PurposeMedicines?> FindAsync(
         string code,
         string state,
-        int limit,
+        Page page,
         CancellationToken cancellationToken);
 }

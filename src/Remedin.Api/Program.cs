@@ -37,7 +37,8 @@ app.MapGet("/medicamentos", async (
     IMedicineSearch search,
     CancellationToken cancellationToken,
     string uf = IcmsRates.DefaultState,
-    int limite = 20) =>
+    int pagina = 1,
+    int limite = Page.DefaultSize) =>
 {
     if (string.IsNullOrWhiteSpace(q))
     {
@@ -49,7 +50,7 @@ app.MapGet("/medicamentos", async (
         return InvalidState(uf);
     }
 
-    var results = await search.SearchAsync(q, uf, Math.Clamp(limite, 1, 50), cancellationToken);
+    var results = await search.SearchAsync(q, uf, Page.Of(pagina, limite), cancellationToken);
 
     return Results.Ok(new SearchResults(q, uf.ToUpperInvariant(), rate, results));
 });
@@ -79,15 +80,15 @@ app.MapGet("/finalidades/{codigo}", async (
     IMedicinePurposes purposes,
     CancellationToken cancellationToken,
     string uf = IcmsRates.DefaultState,
-    int limite = 20) =>
+    int pagina = 1,
+    int limite = Page.DefaultSize) =>
 {
     if (!IcmsRates.TryGet(uf, out _))
     {
         return InvalidState(uf);
     }
 
-    var result = await purposes.FindAsync(
-        codigo, uf, Math.Clamp(limite, 1, 50), cancellationToken);
+    var result = await purposes.FindAsync(codigo, uf, Page.Of(pagina, limite), cancellationToken);
 
     return result is null ? Results.NotFound() : Results.Ok(result);
 });

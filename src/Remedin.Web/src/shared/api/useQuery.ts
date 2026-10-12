@@ -11,7 +11,7 @@ import { useEffect, useState } from 'react'
 export type QueryState<T> =
   | { status: 'idle' }
   | { status: 'loading' }
-  | { status: 'success'; data: T }
+  | { status: 'success'; data: T; stale: boolean }
   | { status: 'error'; error: Error }
 
 type Settled<T> =
@@ -76,8 +76,15 @@ export function useQuery<T>(
   }
 
   if (settled?.key !== key) {
-    return { status: 'loading' }
+    // Mantém o resultado anterior visível enquanto o novo vem, marcado como
+    // vencido. Trocar de página apagando a lista faz o conteúdo pular embaixo
+    // do cursor de quem acabou de clicar.
+    return settled?.result.status === 'success'
+      ? { status: 'success', data: settled.result.data, stale: true }
+      : { status: 'loading' }
   }
 
-  return settled.result
+  return settled.result.status === 'success'
+    ? { status: 'success', data: settled.result.data, stale: false }
+    : settled.result
 }
