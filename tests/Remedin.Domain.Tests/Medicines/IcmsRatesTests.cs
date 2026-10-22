@@ -4,46 +4,44 @@ namespace Remedin.Domain.Tests.Medicines;
 
 public class IcmsRatesTests
 {
-    [Theory]
-    [InlineData("RJ", 20)]
-    [InlineData("RO", 17.5)]
-    [InlineData("SP", 18)]
-    [InlineData("MG", 18)]
-    [InlineData("AM", 18)]
-    [InlineData("SC", 17)]
-    [InlineData("DF", 17)]
-    [InlineData("AC", 17)]
-    public void Devolve_a_aliquota_do_estado(string state, decimal expected)
-    {
-        Assert.Equal(expected, IcmsRates.For(state));
-    }
-
     [Fact]
-    public void Aceita_a_sigla_em_minuscula()
+    public void As_aliquotas_servidas_sao_as_da_tabela_de_estados()
     {
-        Assert.Equal(20m, IcmsRates.For("rj"));
-    }
-
-    [Fact]
-    public void Cobre_as_vinte_e_sete_unidades_da_federacao()
-    {
-        // Sem isso, um estado esquecido cairia numa alíquota padrão silenciosa
-        // e o site publicaria teto errado para quem mora lá.
-        Assert.Equal(27, IcmsRates.States.Count);
+        // Quatro valores para 27 estados. É o que a carga usa para descartar
+        // as outras alíquotas publicadas pela CMED.
+        Assert.Equal([17m, 17.5m, 18m, 20m], IcmsRates.Served.Order());
     }
 
     [Theory]
-    [InlineData("XX")]
-    [InlineData("")]
-    [InlineData(null)]
-    public void Estado_desconhecido_nao_devolve_padrao(string? state)
+    [InlineData(18)]
+    [InlineData(20)]
+    public void Reconhece_aliquota_de_algum_estado(decimal rate)
     {
-        Assert.False(IcmsRates.TryGet(state, out _));
+        Assert.True(IcmsRates.Serves(rate));
+    }
+
+    [Theory]
+    [InlineData(12)]
+    [InlineData(23)]
+    [InlineData(0)]
+    public void Recusa_aliquota_que_nenhum_estado_usa(decimal rate)
+    {
+        Assert.False(IcmsRates.Serves(rate));
     }
 
     [Fact]
-    public void Estado_desconhecido_falha_alto_no_acesso_direto()
+    public void Recusa_preco_sem_imposto()
     {
-        Assert.Throws<ArgumentException>(() => IcmsRates.For("XX"));
+        // A coluna "sem impostos" da CMED chega com alíquota nula, e nenhuma
+        // consulta a alcança: em SQL, NULL = 18 não é verdadeiro.
+        Assert.False(IcmsRates.Serves(null));
+    }
+
+    [Fact]
+    public void Toda_aliquota_servida_pertence_a_algum_estado()
+    {
+        var fromStates = IcmsRates.States.Select(IcmsRates.For).Distinct();
+
+        Assert.Equal(IcmsRates.Served.Order(), fromStates.Order());
     }
 }

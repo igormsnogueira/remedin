@@ -37,6 +37,18 @@ public static class IcmsRates
 
     public static IReadOnlyCollection<string> States => ByState.Keys;
 
+    /// <summary>
+    /// As alíquotas que o catálogo consulta — hoje quatro, para 27 estados.
+    ///
+    /// Derivada da tabela acima, e não escrita à parte: é a mesma informação
+    /// vista do outro lado. A carga usa isto para descartar as alíquotas que a
+    /// CMED publica e nenhuma tela pede.
+    /// </summary>
+    public static IReadOnlySet<decimal> Served { get; } = ByState.Values.ToHashSet();
+
+    /// <summary>Se alguma unidade da federação usa esta alíquota.</summary>
+    public static bool Serves(decimal? rate) => rate is { } value && Served.Contains(value);
+
     public static decimal For(string state)
     {
         if (!TryGet(state, out var rate))

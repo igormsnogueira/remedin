@@ -63,8 +63,24 @@ public sealed class CmedPriceSnapshotSource(HttpClient http, CmedPriceReader rea
                 row.Presentation,
                 row.HospitalOnly,
                 row.SoldRecently,
-                row.Prices.Select(ToPrice)))
+                row.Prices.Where(IsServed).Select(ToPrice)))
     ];
+
+    /// <summary>
+    /// Mantém só o preço que alguma tela consegue mostrar.
+    ///
+    /// A CMED publica 14 alíquotas e as variantes de área de livre comércio, o
+    /// que dá 52 colunas de preço por linha. O catálogo consulta por estado, e
+    /// os 27 estados usam quatro alíquotas; a zona franca exigiria perguntar o
+    /// município, e nenhuma tela faz isso. O resto é dado que entra no banco e
+    /// nenhuma consulta alcança (ADR 0012).
+    ///
+    /// O descarte é aqui, na leitura, e não na gravação: montar 1,2 milhão de
+    /// objetos para jogar 85% fora custa memória que o processo de carga não
+    /// precisa gastar.
+    /// </summary>
+    private static bool IsServed(PriceQuote quote) =>
+        !quote.FreeTradeZone && IcmsRates.Serves(quote.Aliquot);
 
     private static Price ToPrice(PriceQuote quote) =>
         Price.Create(quote.Kind, quote.Aliquot, quote.FreeTradeZone, quote.Value);

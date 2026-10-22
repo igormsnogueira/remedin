@@ -115,3 +115,4 @@ Os contextos delimitados são pastas dentro de cada camada, não projetos. `Appl
 | Fonte de verdade por campo | [0009](adr/0009-fonte-de-verdade-por-campo.md) |
 | Equivalência por princípio ativo | [0010](adr/0010-equivalencia-por-principio-ativo.md) |
 | Comparação de preço por unidade | [0011](adr/0011-comparacao-por-unidade.md) |
+| Preço guardado por alíquota servida | [0012](adr/0012-preco-guardado-por-aliquota-servida.md) |
