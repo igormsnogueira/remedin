@@ -152,6 +152,19 @@ responde 503 se o banco estiver fora do ar.
 dotnet test    # testes de domínio e de arquitetura
 ```
 
+### Pelo Docker, sem SDK do .NET
+
+```bash
+docker compose up -d --build          # banco e API
+docker compose run --rm worker        # carga da ANVISA e da CMED, sob demanda
+```
+
+A API sobe em modo produção, com toda a configuração por variável de ambiente
+— o mesmo jeito que roda publicada. Ela usa a porta 5032, a mesma do
+`dotnet run`, então os dois não podem estar no ar ao mesmo tempo.
+
+O schema ainda é aplicado pelo `dotnet ef database update`, contra a porta 5433.
+
 ### Interface
 
 Requisitos: Node 22.

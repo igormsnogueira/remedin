@@ -16,5 +16,39 @@ services:
       timeout: 3s
       retries: 10
 
+  # Roda em modo produção, com a configuração inteira por variável de
+  # ambiente — o mesmo jeito que vai rodar fora daqui. Dentro da rede do
+  # Compose o banco atende como "db" na porta 5432, e não na 5433 do host.
+  api:
+    build:
+      context: .
+      target: api
+    container_name: remedin-api
+    environment:
+      ConnectionStrings__Remedin: Host=db;Port=5432;Database=remedin;Username=remedin;Password=remedin
+      Cors__AllowedOrigins__0: http://localhost:5173
+    ports:
+      # Mesma porta do dotnet run, para o .env.development do front continuar
+      # valendo. Os dois não podem rodar ao mesmo tempo.
+      - "5032:8080"
+    depends_on:
+      db:
+        condition: service_healthy
+
+  # Fora do "up" comum: a carga roda sob demanda e termina, como vai rodar no
+  # agendador.
+  #
+  #   docker compose run --rm worker
+  worker:
+    build:
+      context: .
+      target: worker
+    profiles: [carga]
+    environment:
+      ConnectionStrings__Remedin: Host=db;Port=5432;Database=remedin;Username=remedin;Password=remedin
+    depends_on:
+      db:
+        condition: service_healthy
+
 volumes:
   db-data:

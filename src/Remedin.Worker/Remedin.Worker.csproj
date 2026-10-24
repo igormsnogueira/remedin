@@ -14,4 +14,9 @@
   <ItemGroup>
     <ProjectReference Include="..\Remedin.Infrastructure\Remedin.Infrastructure.csproj" />
   </ItemGroup>
+
+  <!-- Mesmo motivo da API: a string de conexão local não vai para a imagem. -->
+  <ItemGroup>
+    <Content Update="appsettings.Development.json" CopyToPublishDirectory="Never" />
+  </ItemGroup>
 </Project>
