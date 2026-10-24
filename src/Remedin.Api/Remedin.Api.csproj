@@ -19,4 +19,11 @@
     <ProjectReference Include="..\Remedin.Infrastructure\Remedin.Infrastructure.csproj" />
   </ItemGroup>
 
+  <!-- O arquivo de desenvolvimento aponta para o banco em localhost e não deve
+       ir para a imagem. Fora da máquina local, a configuração vem toda de
+       variável de ambiente. -->
+  <ItemGroup>
+    <Content Update="appsettings.Development.json" CopyToPublishDirectory="Never" />
+  </ItemGroup>
+
 </Project>
