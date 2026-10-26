@@ -1,0 +1,53 @@
+name: Migrations
+
+# Disparo manual, de propósito. Aplicar o schema a cada merge na main deixaria o
+# banco à frente do código publicado sempre que o deploy da API atrasasse.
+on:
+  workflow_dispatch:
+
+# Duas execuções ao mesmo tempo disputariam a mesma migration.
+concurrency:
+  group: migrations-production
+  cancel-in-progress: false
+
+jobs:
+  migrate:
+    name: Aplicar no banco de produção
+    runs-on: ubuntu-latest
+
+    # O ambiente deixa histórico de cada aplicação na aba de deployments, e é
+    # onde se configura aprovação obrigatória, se um dia fizer sentido.
+    environment: production
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 9.0.x
+
+      # Fixado na linha 9: sem versão, o NuGet instala a 10, que não abre
+      # projeto net9.0.
+      - name: Instalar dotnet-ef
+        run: dotnet tool install --global dotnet-ef --version "9.0.*"
+
+      # O pacote é um executável com todas as migrations dentro, e não precisa
+      # do código-fonte para rodar. Gerá-lo só monta o modelo, sem conectar,
+      # mas o Program.cs da API exige uma string de conexão para inicializar —
+      # daí o valor provisório.
+      - name: Gerar pacote de migrations
+        run: >
+          dotnet ef migrations bundle
+          --project src/Remedin.Infrastructure
+          --startup-project src/Remedin.Api
+          --configuration Release
+          --output efbundle
+          --force
+        env:
+          ConnectionStrings__Remedin: Host=nao-usado-na-geracao
+
+      # Aplica só o que falta. Rodar de novo com o banco em dia não faz nada.
+      - name: Aplicar
+        run: ./efbundle
+        env:
+          ConnectionStrings__Remedin: ${{ secrets.DATABASE_CONNECTION }}

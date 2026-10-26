@@ -432,3 +432,7 @@ data/raw/
 *.csv
 !data/samples/*.csv
 .DS_Store
+
+# Pacote de migrations gerado pelo dotnet ef. É binário e se gera de novo a cada uso.
+efbundle
+efbundle.exe
