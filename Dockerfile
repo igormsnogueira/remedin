@@ -38,16 +38,19 @@ RUN dotnet publish src/Remedin.Worker/Remedin.Worker.csproj \
 # cultura pt-BR, e a chiseled comum roda sem ICU, onde pedir pt-BR lança
 # exceção.
 
-FROM mcr.microsoft.com/dotnet/aspnet:${DOTNET_VERSION}-noble-chiseled-extra AS api
-WORKDIR /app
-COPY --from=publish-api /app .
-ENV ASPNETCORE_HTTP_PORTS=8080
-EXPOSE 8080
-ENTRYPOINT ["dotnet", "Remedin.Api.dll"]
-
 # O worker não serve HTTP, então a imagem de runtime basta. Ele roda a carga e
 # termina: o código de saída é o que diz ao agendador se deu certo.
 FROM mcr.microsoft.com/dotnet/runtime:${DOTNET_VERSION}-noble-chiseled-extra AS worker
 WORKDIR /app
 COPY --from=publish-worker /app .
 ENTRYPOINT ["dotnet", "Remedin.Worker.dll"]
+
+# A API é o último estágio de propósito: build sem --target produz o último, e
+# é assim que o Render constrói. O worker é sempre construído com o alvo
+# explícito, por quem controla o comando.
+FROM mcr.microsoft.com/dotnet/aspnet:${DOTNET_VERSION}-noble-chiseled-extra AS api
+WORKDIR /app
+COPY --from=publish-api /app .
+ENV ASPNETCORE_HTTP_PORTS=8080
+EXPOSE 8080
+ENTRYPOINT ["dotnet", "Remedin.Api.dll"]

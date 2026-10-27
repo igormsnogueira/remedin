@@ -1,0 +1,53 @@
+# Serviço da API no Render, descrito no repositório em vez de configurado no
+# painel. Recriar o serviço do zero é ler este arquivo de novo.
+#
+# Referência: https://render.com/docs/blueprint-spec
+
+services:
+  - type: web
+    name: remedin-api
+    runtime: docker
+
+    # Mesma região do banco no Neon (AWS us-east-2). Com os dois em Ohio, quem
+    # acessa do Brasil atravessa o continente uma vez, entre o navegador e a
+    # API, e não de novo a cada consulta ao banco.
+    region: ohio
+
+    # 0,1 CPU e 512 MB, e o serviço dorme depois de 15 minutos sem acesso. A
+    # primeira requisição depois disso demora perto de um minuto.
+    plan: free
+
+    branch: main
+
+    # Publica só quando a CI do commit passar. Com "commit", um merge com teste
+    # quebrado iria para o ar antes de a CI terminar.
+    autoDeployTrigger: checksPass
+
+    # Responde 503 com o banco fora do ar, então o Render não troca a versão
+    # em produção por uma que não consegue falar com o banco.
+    healthCheckPath: /health
+
+    # Mudança só no front, na documentação ou nos testes não reconstrói a API.
+    # O plano gratuito tem minutos de build contados.
+    buildFilter:
+      paths:
+        - src/Remedin.Api/**
+        - src/Remedin.Application/**
+        - src/Remedin.Domain/**
+        - src/Remedin.Infrastructure/**
+        - Dockerfile
+        - render.yaml
+
+    envVars:
+      # O Render encaminha o tráfego para a porta desta variável. A imagem
+      # escuta na 8080, então a variável acompanha a imagem, e não o contrário.
+      - key: PORT
+        value: 8080
+
+      # Pedida no painel na criação do serviço, e nunca escrita aqui. Formato
+      # do Npgsql (Host=...;Database=...), não a URL postgresql:// do Neon.
+      - key: ConnectionStrings__Remedin
+        sync: false
+
+      # A origem do front entra quando o front for publicado. Até lá a API
+      # responde a curl normalmente, e o navegador recusa.
