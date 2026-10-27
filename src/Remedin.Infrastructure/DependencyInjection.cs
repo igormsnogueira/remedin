@@ -29,7 +29,7 @@ public static class DependencyInjection
         this IServiceCollection services,
         string connectionString)
     {
-        ArgumentException.ThrowIfNullOrWhiteSpace(connectionString);
+        DatabaseConnectionString.EnsureValid(connectionString);
 
         services.AddDbContext<RemedinDbContext>(options => options.UseNpgsql(connectionString));
 
