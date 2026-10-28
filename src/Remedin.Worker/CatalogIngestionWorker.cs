@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Options;
 using Remedin.Application.Catalog.Ingestion;
 
 namespace Remedin.Worker;
@@ -9,15 +10,20 @@ namespace Remedin.Worker;
 /// então carregar o registro primeiro é o que evita a lista inteira cair como
 /// órfã na primeira execução.
 ///
-/// Agendamento ainda não entrou. Rodar sob demanda é o que permite reprocessar.
+/// O agendamento fica fora daqui, no workflow do GitHub Actions. O processo só
+/// sabe rodar uma vez e sair, com código diferente de zero quando falha — é o
+/// que o agendador lê para avisar.
 /// </summary>
 public sealed class CatalogIngestionWorker(
     IServiceProvider services,
+    IOptions<IngestionSettings> settings,
     IHostApplicationLifetime lifetime,
     ILogger<CatalogIngestionWorker> logger) : BackgroundService
 {
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
+        var whenRepeated = settings.Value.WhenRepeated;
+
         try
         {
             // Os comandos dependem do DbContext, que é scoped; um serviço de
@@ -25,12 +31,12 @@ public sealed class CatalogIngestionWorker(
             using var scope = services.CreateScope();
 
             var registry = scope.ServiceProvider.GetRequiredService<ImportRegistrySnapshot>();
-            var registryRun = await registry.ExecuteAsync(stoppingToken);
+            var registryRun = await registry.ExecuteAsync(whenRepeated, stoppingToken);
             logger.LogInformation("Registro: execução {Id} terminou como {Outcome}.",
                 registryRun.Id, registryRun.Outcome);
 
             var prices = scope.ServiceProvider.GetRequiredService<ImportPriceList>();
-            var priceRun = await prices.ExecuteAsync(stoppingToken);
+            var priceRun = await prices.ExecuteAsync(whenRepeated, stoppingToken);
             logger.LogInformation("Preço: execução {Id} terminou como {Outcome}.",
                 priceRun.Id, priceRun.Outcome);
         }

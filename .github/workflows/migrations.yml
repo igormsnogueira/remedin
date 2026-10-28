@@ -5,9 +5,10 @@ name: Migrations
 on:
   workflow_dispatch:
 
-# Duas execuções ao mesmo tempo disputariam a mesma migration.
+# Compartilhado com o workflow de carga: migration e carga nunca rodam ao mesmo
+# tempo, e duas migrations também não.
 concurrency:
-  group: migrations-production
+  group: production-database
   cancel-in-progress: false
 
 jobs:

@@ -97,6 +97,21 @@ public class ImportRegistrySnapshotTests
     }
 
     [Fact]
+    public async Task Reprocessa_a_mesma_publicacao_quando_pedido()
+    {
+        // Substitui o DELETE em ingestion_runs que era preciso fazer à mão
+        // quando a regra de leitura mudava e o arquivo, não.
+        var catalog = new FakeCatalog();
+        var journal = new FakeJournal(lastHash: "abc123");
+        var import = Build(new FakeSource(AnySnapshot(hash: "abc123")), catalog, journal);
+
+        var run = await import.ExecuteAsync(RepeatedPublication.Reload);
+
+        Assert.Equal(IngestionOutcome.Succeeded, run.Outcome);
+        Assert.NotNull(catalog.Saved);
+    }
+
+    [Fact]
     public async Task Publicacao_nova_substitui_o_catalogo()
     {
         var catalog = new FakeCatalog();

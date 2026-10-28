@@ -1,0 +1,60 @@
+name: Carga de dados
+
+on:
+  # Semanal, com efeito mensal. O worker compara o hash do arquivo e pula
+  # quando a fonte não mudou, então rodar toda semana não regrava nada à toa:
+  # só faz a publicação nova da CMED entrar em até sete dias.
+  #
+  # Minuto quebrado de propósito. O GitHub atrasa os agendamentos de hora
+  # cheia, que é quando todo mundo agenda.
+  schedule:
+    - cron: "17 9 * * 1" # segunda-feira, 09:17 UTC — 06:17 em Brasília
+
+  workflow_dispatch:
+    inputs:
+      reprocessar:
+        description: Reprocessar mesmo que a fonte tenha publicado o mesmo arquivo
+        type: boolean
+        default: false
+
+# O mesmo grupo do workflow de migrations. Uma carga escrevendo enquanto uma
+# migration altera as tabelas não pode acontecer, então um espera o outro.
+concurrency:
+  group: production-database
+  cancel-in-progress: false
+
+jobs:
+  load:
+    name: Carregar ANVISA e CMED
+    runs-on: ubuntu-latest
+
+    # A carga leva poucos minutos. Sem teto, um download travado na origem
+    # ocuparia as seis horas que o GitHub permite por padrão.
+    timeout-minutes: 30
+
+    environment: production
+
+    steps:
+      - uses: actions/checkout@v4
+
+      # A mesma imagem que roda localmente pelo Compose. O job não depende do
+      # SDK do .NET estar configurado igual na máquina do GitHub.
+      - name: Construir a imagem do worker
+        run: docker build --target worker --tag remedin-worker .
+
+      # "-e NOME" sem valor repassa a variável do ambiente do job para o
+      # container, e assim a string de conexão nunca aparece na linha de
+      # comando.
+      #
+      # O worker sai com código 1 quando a carga falha. O container repassa o
+      # código, o job falha, e o GitHub avisa por e-mail.
+      - name: Rodar a carga
+        run: >
+          docker run --rm
+          -e ConnectionStrings__Remedin
+          -e Ingestion__ReloadRepeated
+          remedin-worker
+        env:
+          ConnectionStrings__Remedin: ${{ secrets.DATABASE_CONNECTION }}
+          # No agendamento não há input, e a expressão resulta em false.
+          Ingestion__ReloadRepeated: ${{ inputs.reprocessar == true }}

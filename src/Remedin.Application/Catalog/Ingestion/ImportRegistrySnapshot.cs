@@ -18,7 +18,9 @@ public sealed class ImportRegistrySnapshot(
 {
     public const string SourceName = "anvisa-registro";
 
-    public async Task<IngestionRun> ExecuteAsync(CancellationToken cancellationToken = default)
+    public async Task<IngestionRun> ExecuteAsync(
+        RepeatedPublication whenRepeated = RepeatedPublication.Skip,
+        CancellationToken cancellationToken = default)
     {
         var run = IngestionRun.Start(SourceName, clock.GetUtcNow());
 
@@ -26,14 +28,20 @@ public sealed class ImportRegistrySnapshot(
         {
             var snapshot = await source.FetchAsync(cancellationToken);
             var lastHash = await journal.LastSuccessfulContentHashAsync(SourceName, cancellationToken);
+            var repeated = lastHash == snapshot.ContentHash;
 
-            if (lastHash == snapshot.ContentHash)
+            if (repeated && whenRepeated == RepeatedPublication.Skip)
             {
                 run.Skip(snapshot.ContentHash, clock.GetUtcNow());
                 logger.LogInformation("Carga ignorada: a origem publicou o mesmo arquivo da anterior.");
             }
             else
             {
+                if (repeated)
+                {
+                    logger.LogInformation("Reprocessando o mesmo arquivo da carga anterior, por pedido explícito.");
+                }
+
                 await catalog.ReplaceAllAsync(snapshot.Medicines, cancellationToken);
 
                 run.Succeed(

@@ -9,6 +9,7 @@ var connectionString = builder.Configuration.GetConnectionString("Remedin")
 
 builder.Services.AddInfrastructure(connectionString);
 builder.Services.AddApplication();
+builder.Services.Configure<IngestionSettings>(builder.Configuration.GetSection(IngestionSettings.Section));
 builder.Services.AddHostedService<CatalogIngestionWorker>();
 
 var host = builder.Build();

@@ -27,7 +27,9 @@ public sealed class ImportPriceList(
     /// <summary>Entre este valor e o mínimo, grava e registra alerta.</summary>
     public const decimal ExpectedCoverage = 0.99m;
 
-    public async Task<IngestionRun> ExecuteAsync(CancellationToken cancellationToken = default)
+    public async Task<IngestionRun> ExecuteAsync(
+        RepeatedPublication whenRepeated = RepeatedPublication.Skip,
+        CancellationToken cancellationToken = default)
     {
         var run = IngestionRun.Start(SourceName, clock.GetUtcNow());
 
@@ -35,14 +37,20 @@ public sealed class ImportPriceList(
         {
             var snapshot = await source.FetchAsync(cancellationToken);
             var lastHash = await journal.LastSuccessfulContentHashAsync(SourceName, cancellationToken);
+            var repeated = lastHash == snapshot.ContentHash;
 
-            if (lastHash == snapshot.ContentHash)
+            if (repeated && whenRepeated == RepeatedPublication.Skip)
             {
                 run.Skip(snapshot.ContentHash, clock.GetUtcNow());
                 logger.LogInformation("Carga de preço ignorada: mesma publicação da anterior.");
             }
             else
             {
+                if (repeated)
+                {
+                    logger.LogInformation("Reprocessando a mesma publicação de preço, por pedido explícito.");
+                }
+
                 await LoadAsync(run, snapshot, cancellationToken);
             }
         }
