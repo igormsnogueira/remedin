@@ -1,8 +1,8 @@
 import { useSelectedState } from '@/app/providers/useSelectedState'
+import { ApiLoading } from '@/shared/api/ApiLoading'
 import { useQuery } from '@/shared/api/useQuery'
 import type { AlternativesResult } from '@/shared/api/types'
 import { Notice } from '@/shared/ui/Notice/Notice'
-import { Spinner } from '@/shared/ui/Spinner/Spinner'
 
 import { fetchAlternatives } from '../api/fetchAlternatives'
 import { AlternativeRow } from './AlternativeRow'
@@ -25,7 +25,7 @@ export function AlternativesSection({ registrationNumber }: { registrationNumber
   )
 
   if (result.status === 'loading' || result.status === 'idle') {
-    return <Spinner label="Buscando medicamentos equivalentes" />
+    return <ApiLoading label="Buscando medicamentos equivalentes" />
   }
 
   // Falha aqui não derruba a ficha: o preço do medicamento consultado já está

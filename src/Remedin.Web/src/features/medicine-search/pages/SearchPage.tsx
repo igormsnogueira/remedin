@@ -1,13 +1,13 @@
 import { Link, useSearchParams } from 'react-router-dom'
 
 import { useSelectedState } from '@/app/providers/useSelectedState'
+import { ApiLoading } from '@/shared/api/ApiLoading'
 import { useQuery } from '@/shared/api/useQuery'
 import type { SearchResults } from '@/shared/api/types'
 import { useDocumentTitle } from '@/shared/hooks/useDocumentTitle'
 import { usePageParam } from '@/shared/hooks/usePageParam'
 import { Notice } from '@/shared/ui/Notice/Notice'
 import { Pagination } from '@/shared/ui/Pagination/Pagination'
-import { Spinner } from '@/shared/ui/Spinner/Spinner'
 
 import { searchMedicines } from '../api/searchMedicines'
 import { ResultCard } from '../components/ResultCard'
@@ -52,7 +52,7 @@ export function SearchPage() {
         Não sabe o nome? <Link to="/finalidades">Veja por finalidade</Link>.
       </p>
 
-      {results.status === 'loading' && <Spinner label="Buscando medicamentos" />}
+      {results.status === 'loading' && <ApiLoading label="Buscando medicamentos" />}
 
       {results.status === 'error' && <Notice tone="danger">{results.error.message}</Notice>}
 
