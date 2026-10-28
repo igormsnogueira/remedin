@@ -178,4 +178,38 @@ public class ImportPriceListTests
         Assert.Equal(IngestionOutcome.Skipped, run.Outcome);
         Assert.Null(store.Saved);
     }
+
+    [Fact]
+    public async Task Reprocessa_a_mesma_publicacao_quando_pedido()
+    {
+        // O caso que motivou a opção: guardar só as alíquotas servidas mudou o
+        // que a carga grava, e o arquivo da CMED era o mesmo.
+        var snapshot = new PriceSnapshot([Priced("102980592")], 1, 0, "mesmo-hash");
+        var store = new FakePriceStore();
+
+        var import = Build(
+            snapshot, new FakeCatalog("102980592"), store, new FakeJournal(lastHash: "mesmo-hash"));
+
+        var run = await import.ExecuteAsync(RepeatedPublication.Reload);
+
+        Assert.Equal(IngestionOutcome.Succeeded, run.Outcome);
+        Assert.Single(store.Saved!);
+    }
+
+    [Fact]
+    public async Task Reprocessar_nao_dispensa_a_verificacao_de_cobertura()
+    {
+        // Forçar a carga pula só a comparação de arquivo. A proteção contra
+        // gravar um cruzamento ruim continua valendo.
+        var (snapshot, registered) = Catalog(registered: 50, orphans: 50);
+        var store = new FakePriceStore();
+
+        var import = Build(
+            snapshot, new FakeCatalog(registered), store, new FakeJournal(lastHash: snapshot.ContentHash));
+
+        await Assert.ThrowsAsync<InvalidOperationException>(
+            () => import.ExecuteAsync(RepeatedPublication.Reload));
+
+        Assert.Null(store.Saved);
+    }
 }
