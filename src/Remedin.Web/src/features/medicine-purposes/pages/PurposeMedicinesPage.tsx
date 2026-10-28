@@ -6,6 +6,7 @@ import { useSelectedState } from '@/app/providers/useSelectedState'
 // Se uma terceira tela precisar dele, aí sim vira componente compartilhado.
 import { ResultCard } from '@/features/medicine-search/components/ResultCard'
 import { StateSelect } from '@/features/state-selection/components/StateSelect'
+import { ApiLoading } from '@/shared/api/ApiLoading'
 import { ApiError } from '@/shared/api/client'
 import { useQuery } from '@/shared/api/useQuery'
 import type { PurposeMedicines } from '@/shared/api/types'
@@ -13,7 +14,6 @@ import { useDocumentTitle } from '@/shared/hooks/useDocumentTitle'
 import { usePageParam } from '@/shared/hooks/usePageParam'
 import { Notice } from '@/shared/ui/Notice/Notice'
 import { Pagination } from '@/shared/ui/Pagination/Pagination'
-import { Spinner } from '@/shared/ui/Spinner/Spinner'
 
 import { fetchPurposeMedicines } from '../api/fetchPurposes'
 
@@ -32,7 +32,7 @@ export function PurposeMedicinesPage() {
   useDocumentTitle(purpose.status === 'success' ? purpose.data.label : null)
 
   if (purpose.status === 'loading' || purpose.status === 'idle') {
-    return <Spinner label="Carregando os medicamentos" />
+    return <ApiLoading label="Carregando os medicamentos" />
   }
 
   if (purpose.status === 'error') {

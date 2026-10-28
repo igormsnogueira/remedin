@@ -2,12 +2,12 @@ import { Link, useParams } from 'react-router-dom'
 
 import { useSelectedState } from '@/app/providers/useSelectedState'
 import { AlternativesSection } from '@/features/medicine-alternatives/components/AlternativesSection'
+import { ApiLoading } from '@/shared/api/ApiLoading'
 import { ApiError } from '@/shared/api/client'
 import { useQuery } from '@/shared/api/useQuery'
 import type { MedicineDetail } from '@/shared/api/types'
 import { useDocumentTitle } from '@/shared/hooks/useDocumentTitle'
 import { Notice } from '@/shared/ui/Notice/Notice'
-import { Spinner } from '@/shared/ui/Spinner/Spinner'
 
 import { MedicineHeader } from '../components/MedicineHeader'
 import { PrescriptionSection } from '../components/PrescriptionSection'
@@ -29,7 +29,7 @@ export function MedicineDetailPage() {
   useDocumentTitle(medicine.status === 'success' ? medicine.data.name : null)
 
   if (medicine.status === 'loading' || medicine.status === 'idle') {
-    return <Spinner label="Carregando o medicamento" />
+    return <ApiLoading label="Carregando o medicamento" />
   }
 
   if (medicine.status === 'error') {

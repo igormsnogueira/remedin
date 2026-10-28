@@ -1,10 +1,10 @@
 import { Link } from 'react-router-dom'
 
+import { ApiLoading } from '@/shared/api/ApiLoading'
 import { useQuery } from '@/shared/api/useQuery'
 import type { PurposeSummary } from '@/shared/api/types'
 import { useDocumentTitle } from '@/shared/hooks/useDocumentTitle'
 import { Notice } from '@/shared/ui/Notice/Notice'
-import { Spinner } from '@/shared/ui/Spinner/Spinner'
 
 import { fetchPurposes } from '../api/fetchPurposes'
 
@@ -25,7 +25,7 @@ export function PurposeListPage() {
         </p>
       </div>
 
-      {purposes.status === 'loading' && <Spinner label="Carregando as finalidades" />}
+      {purposes.status === 'loading' && <ApiLoading label="Carregando as finalidades" />}
 
       {purposes.status === 'error' && <Notice tone="danger">{purposes.error.message}</Notice>}
 
