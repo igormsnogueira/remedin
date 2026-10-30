@@ -184,7 +184,7 @@ sem registrar erro no lado da API.
 
 ## 🌐 Em produção
 
-**https://remedin-web.onrender.com**
+**https://remedin.onrender.com**
 
 Interface e API no Render, banco no Neon, carga semanal e verificação diária
 no GitHub Actions — tudo em plano gratuito. A primeira consulta depois de um
