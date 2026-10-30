@@ -18,7 +18,7 @@ jobs:
     timeout-minutes: 10
 
     env:
-      WEB: https://remedin-web.onrender.com
+      WEB: https://remedin.onrender.com
       API: https://remedin-api.onrender.com
 
     steps:

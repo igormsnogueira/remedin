@@ -8,7 +8,7 @@ Para rodar na máquina local, veja a seção "Rodando localmente" do [README](..
 
 | Peça | Onde | Endereço |
 |---|---|---|
-| Interface | Render, site estático | https://remedin-web.onrender.com |
+| Interface | Render, site estático | https://remedin.onrender.com |
 | API | Render, Docker, região Ohio | https://remedin-api.onrender.com |
 | Banco | Neon, PostgreSQL 18, região us-east-2 (Ohio) | painel do Neon |
 | Carga de dados | GitHub Actions, toda segunda às 06:17 | aba Actions → Carga de dados |
