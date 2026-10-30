@@ -182,6 +182,19 @@ sem registrar erro no lado da API.
 
 ---
 
+## 🌐 Em produção
+
+**https://remedin-web.onrender.com**
+
+Interface e API no Render, banco no Neon, carga semanal e verificação diária
+no GitHub Actions — tudo em plano gratuito. A primeira consulta depois de um
+tempo sem acesso leva cerca de 25 segundos, enquanto o servidor liga.
+
+Como publicar, aplicar migration, forçar a carga e o que fazer quando algo
+falha está no [runbook](docs/runbook.md).
+
+---
+
 ## 📜 Licença
 
 Distribuído sob a licença **MIT**. Veja o arquivo [`LICENSE`](LICENSE) para mais informações.

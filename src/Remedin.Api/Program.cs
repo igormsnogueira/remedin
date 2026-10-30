@@ -1,7 +1,8 @@
+using Microsoft.AspNetCore.HttpLogging;
+using Remedin.Api;
 using Remedin.Application.Catalog.Search;
 using Remedin.Domain.Medicines;
 using Remedin.Infrastructure;
-using Remedin.Infrastructure.Persistence;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -10,9 +11,22 @@ var connectionString = builder.Configuration.GetConnectionString("Remedin")
 
 builder.Services.AddInfrastructure(connectionString);
 
-// Sem AddDbContextCheck a rota responderia 200 com o banco fora do ar, que é
-// o oposto do que um health check serve para dizer.
-builder.Services.AddHealthChecks().AddDbContextCheck<RemedinDbContext>("postgres");
+// Sem consultar o banco, a rota responderia 200 com ele fora do ar, que é o
+// oposto do que um health check serve para dizer.
+builder.Services.AddHealthChecks().AddCheck<DatabaseHealthCheck>("postgres");
+
+// Uma linha por requisição: método, caminho, status e duração. Sem cabeçalho
+// e sem corpo — interessa saber o que foi chamado e quanto demorou, e
+// cabeçalho carrega dado que não precisa ir para log.
+builder.Services.AddHttpLogging(options =>
+{
+    options.LoggingFields = HttpLoggingFields.RequestMethod
+        | HttpLoggingFields.RequestPath
+        | HttpLoggingFields.RequestQuery
+        | HttpLoggingFields.ResponseStatusCode
+        | HttpLoggingFields.Duration;
+    options.CombineLogs = true;
+});
 
 // O front-end roda em outra porta, e o navegador bloqueia a chamada sem isso.
 // A lista vem de configuração porque o endereço muda entre a máquina de
@@ -25,6 +39,12 @@ builder.Services.AddCors(options => options.AddPolicy(
     policy => policy.WithOrigins(allowedOrigins).AllowAnyHeader().AllowAnyMethod()));
 
 var app = builder.Build();
+
+// O health check fica de fora do log: o Render o chama o tempo todo, e cada
+// chamada viraria uma linha sem informação nenhuma.
+app.UseWhen(
+    context => !context.Request.Path.StartsWithSegments("/health"),
+    branch => branch.UseHttpLogging());
 
 app.UseCors(FrontendCors);
 

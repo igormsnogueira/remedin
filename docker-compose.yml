@@ -1,6 +1,8 @@
 services:
+  # Mesma versão maior do Neon, onde roda produção. Desenvolver numa versão e
+  # publicar em outra é diferença que só aparece quando já está no ar.
   db:
-    image: postgres:16
+    image: postgres:18
     container_name: remedin-db
     environment:
       POSTGRES_DB: remedin
@@ -8,8 +10,12 @@ services:
       POSTGRES_PASSWORD: remedin
     ports:
       - "5433:5432"
+    # A imagem 18 mudou o diretório de dados para /var/lib/postgresql/18/docker,
+    # e o volume passa a ser montado no diretório pai. Montar no caminho antigo
+    # (/var/lib/postgresql/data) falha ao subir. O nome do volume também mudou,
+    # para os dados do 16 não serem lidos pelo 18.
     volumes:
-      - db-data:/var/lib/postgresql/data
+      - db-data-18:/var/lib/postgresql
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U remedin -d remedin"]
       interval: 5s
@@ -51,4 +57,4 @@ services:
         condition: service_healthy
 
 volumes:
-  db-data:
+  db-data-18:
