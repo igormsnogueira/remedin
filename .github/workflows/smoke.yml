@@ -1,0 +1,51 @@
+name: Verificação de produção
+
+# Confere uma vez por dia se o site e a API estão de pé, fazendo o que uma
+# pessoa faria: abrir a página, buscar e abrir uma ficha.
+#
+# Uma vez por dia, e não a cada poucos minutos: monitor frequente manteria a API
+# e o banco acordados o tempo todo, e o plano gratuito do Neon tem limite de
+# horas de processamento. Assim o sistema acorda por um minuto e volta a dormir.
+on:
+  schedule:
+    - cron: "43 11 * * *" # todo dia, 11:43 UTC — 08:43 em Brasília
+  workflow_dispatch:
+
+jobs:
+  smoke:
+    name: Site e API respondendo
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    env:
+      WEB: https://remedin-web.onrender.com
+      API: https://remedin-api.onrender.com
+
+    steps:
+      # A primeira chamada acorda a API e o banco, e leva cerca de 25 segundos.
+      # As novas tentativas cobrem o caso de o Render recusar enquanto sobe.
+      - name: API respondendo e alcançando o banco
+        run: >
+          curl --fail --silent --show-error
+          --max-time 120 --retry 3 --retry-delay 10 --retry-all-errors
+          "$API/health"
+
+      - name: Busca devolvendo resultado
+        run: |
+          total=$(curl --fail --silent --show-error --max-time 60 \
+            "$API/medicamentos?q=dipirona&uf=SP" | jq '.medicines.total')
+          echo "dipirona em SP: $total resultados"
+          test "$total" -gt 0
+
+      # O cabeçalho confere que o que respondeu é o site publicado com a
+      # configuração do render.yaml, e não uma página de erro do provedor.
+      - name: Site no ar com a política de segurança
+        run: |
+          curl --fail --silent --show-error --max-time 60 \
+            --dump-header headers.txt --output /dev/null "$WEB/"
+          grep --quiet --ignore-case '^content-security-policy:' headers.txt
+
+      - name: Link direto para uma ficha
+        run: >
+          curl --fail --silent --show-error --max-time 60 --output /dev/null
+          "$WEB/medicamento/102980354"
