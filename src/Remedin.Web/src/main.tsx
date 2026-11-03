@@ -4,6 +4,12 @@
 // "components" primeiro, e "base" acaba passando a vencê-la.
 import './shared/styles/index.css'
 
+// A fonte vem empacotada com o site, e não de um servidor de fontes: assim a
+// política de segurança continua aceitando só a própria origem. Só os dois
+// pesos que existem nela.
+import '@fontsource/atkinson-hyperlegible/400.css'
+import '@fontsource/atkinson-hyperlegible/700.css'
+
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { RouterProvider } from 'react-router-dom'
