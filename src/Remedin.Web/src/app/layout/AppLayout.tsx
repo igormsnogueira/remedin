@@ -1,4 +1,7 @@
-import { Link, Outlet } from 'react-router-dom'
+import { Link, NavLink, Outlet } from 'react-router-dom'
+
+import { classNames } from '@/shared/ui/classNames'
+import { Logo } from '@/shared/ui/Logo/Logo'
 
 import styles from './AppLayout.module.css'
 import { useFocusOnNavigation } from './useFocusOnNavigation'
@@ -19,15 +22,31 @@ export function AppLayout() {
       </a>
 
       <header className={styles.header}>
-        <div className={styles.container}>
-          <Link className={styles.brand} to="/">
-            Remedin
+        <div className={classNames(styles.container, styles.bar)}>
+          <Link className={styles.brand} to="/" aria-label="Remedin, página inicial">
+            <Logo />
           </Link>
+
+          <nav aria-label="Principal">
+            <ul className={styles.nav}>
+              <li>
+                {/* end: sem ele, "/" ficaria ativo em todas as páginas. */}
+                <NavLink className={navClass} to="/" end>
+                  Buscar
+                </NavLink>
+              </li>
+              <li>
+                <NavLink className={navClass} to="/finalidades">
+                  Por finalidade
+                </NavLink>
+              </li>
+            </ul>
+          </nav>
         </div>
       </header>
 
       <main
-        className={`${styles.main} ${styles.container}`}
+        className={classNames(styles.main, styles.container)}
         id="conteudo"
         ref={main}
         // -1 aceita foco por código sem entrar na ordem do Tab, que é o que
@@ -38,12 +57,18 @@ export function AppLayout() {
       </main>
 
       <footer className={styles.footer}>
-        <div className={styles.container}>
-          Preços da Câmara de Regulação do Mercado de Medicamentos (CMED) e dados de registro da
-          ANVISA. Esta é uma consulta informativa e não substitui orientação de médico ou
-          farmacêutico.
+        <div className={classNames(styles.container, styles.footerContent)}>
+          <p>
+            Preços da Câmara de Regulação do Mercado de Medicamentos (CMED) e registros da ANVISA,
+            atualizados toda semana.
+          </p>
+          <p>Consulta informativa. Não substitui a orientação do médico ou do farmacêutico.</p>
         </div>
       </footer>
     </div>
   )
+}
+
+function navClass({ isActive }: { isActive: boolean }) {
+  return classNames(styles.navLink, isActive && styles.navLinkActive)
 }

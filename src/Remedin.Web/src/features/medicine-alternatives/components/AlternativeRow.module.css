@@ -32,7 +32,7 @@
   }
 
   .name {
-    font-weight: 650;
+    font-weight: 700;
   }
 
   .manufacturer,
@@ -54,7 +54,7 @@
 
   .amount {
     font-size: var(--text-lg);
-    font-weight: 650;
+    font-weight: 700;
   }
 
   .unit {
@@ -64,6 +64,6 @@
   }
 
   .box {
-    font-weight: 650;
+    font-weight: 700;
   }
 }

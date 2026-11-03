@@ -42,8 +42,9 @@
   }
 
   .name {
+    color: var(--color-heading);
     font-size: var(--text-lg);
-    font-weight: 650;
+    font-weight: 700;
   }
 
   .manufacturer {
@@ -68,8 +69,9 @@
   }
 
   .amount {
+    color: var(--color-accent);
     font-size: var(--text-lg);
-    font-weight: 650;
+    font-weight: 700;
   }
 
   .priceLabel {

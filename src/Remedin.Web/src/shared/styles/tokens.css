@@ -5,45 +5,54 @@
  */
 @layer tokens {
   :root {
-    /* Habilita light-dark() e faz os controles nativos seguirem o tema. */
-    color-scheme: light dark;
+    /* Tema único, claro. Os controles nativos do navegador seguem. */
+    color-scheme: light;
 
     /* Cor ------------------------------------------------------------- */
-    --color-canvas: light-dark(#f7f8f7, #14171a);
-    --color-surface: light-dark(#ffffff, #1c2025);
-    --color-border: light-dark(#dfe3e0, #2f353c);
-    --color-text: light-dark(#16211c, #e8ecea);
-    --color-text-muted: light-dark(#5a6a63, #9aa8a2);
+    --color-canvas: #f7f9f7;
+    --color-surface: #ffffff;
+    --color-border: #dce3df;
+    --color-border-soft: #edf1ee;
 
-    --color-accent: light-dark(#0f6b52, #4dbf9b);
-    --color-accent-text: light-dark(#ffffff, #0d1512);
+    --color-text: #16211c;
+    --color-text-muted: #4a5a53;
+    --color-heading: #0f3d2f;
 
-    --color-warning: light-dark(#8a5a00, #e0a83c);
-    --color-danger: light-dark(#9b2226, #f08a8d);
+    /* O verde da marca, do mais escuro ao mais claro. */
+    --color-accent: #0f6e56;
+    --color-accent-text: #ffffff;
+    --color-accent-soft: #e1f5ee;
+    --color-accent-soft-text: #085041;
+    --color-accent-light: #9fe1cb;
+
+    --color-warning: #8a5a00;
+    --color-danger: #9b2226;
 
     /* Estados derivados da cor base, em vez de mais um token para manter
        em sincronia à mão. */
     --color-accent-hover: color-mix(in oklab, var(--color-accent) 85%, black);
-    --color-accent-soft: color-mix(in oklab, var(--color-accent) 12%, transparent);
-    --color-surface-hover: color-mix(in oklab, var(--color-accent) 6%, var(--color-surface));
+    --color-surface-hover: color-mix(in oklab, var(--color-accent) 5%, var(--color-surface));
 
     /* Tipografia ------------------------------------------------------ */
-    --font-sans: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+    /* Atkinson Hyperlegible foi desenhada pelo Braille Institute para
+       leitura por pessoas com baixa visão: I, l e 1 não se confundem, nem
+       0 e O. Num site de saúde lido por gente de toda idade, é critério. */
+    --font-sans: 'Atkinson Hyperlegible', system-ui, -apple-system, 'Segoe UI', sans-serif;
     --font-numeric: ui-monospace, 'SF Mono', 'Cascadia Code', monospace;
 
     /* Escala fluida: cresce com a janela, sem breakpoint de fonte. */
-    --text-xs: clamp(0.75rem, 0.73rem + 0.1vw, 0.8rem);
+    --text-xs: clamp(0.78rem, 0.76rem + 0.1vw, 0.83rem);
     --text-sm: clamp(0.875rem, 0.85rem + 0.12vw, 0.938rem);
     --text-base: clamp(1rem, 0.96rem + 0.2vw, 1.094rem);
     --text-lg: clamp(1.125rem, 1.06rem + 0.32vw, 1.313rem);
     --text-xl: clamp(1.375rem, 1.24rem + 0.68vw, 1.75rem);
-    --text-2xl: clamp(1.75rem, 1.5rem + 1.25vw, 2.5rem);
+    --text-2xl: clamp(1.875rem, 1.5rem + 1.6vw, 2.75rem);
 
-    --leading-tight: 1.2;
+    --leading-tight: 1.15;
     --leading-normal: 1.55;
 
     /* Largura de linha confortável para leitura corrida. */
-    --measure: 68ch;
+    --measure: 64ch;
 
     /* Espaço ---------------------------------------------------------- */
     --space-3xs: 0.25rem;
@@ -63,16 +72,16 @@
 
     --border-thin: 1px solid var(--color-border);
 
-    --shadow-sm: 0 1px 2px light-dark(rgb(0 0 0 / 6%), rgb(0 0 0 / 40%));
-    --shadow-md: 0 4px 16px light-dark(rgb(0 0 0 / 8%), rgb(0 0 0 / 45%));
+    --shadow-sm: 0 1px 2px rgb(15 61 47 / 6%);
+    --shadow-md: 0 6px 20px rgb(15 61 47 / 8%);
 
     /* Movimento e foco ------------------------------------------------ */
     --transition-fast: 120ms ease;
-    --focus-ring: 2px solid var(--color-accent);
+    --focus-ring: 3px solid color-mix(in oklab, var(--color-accent) 55%, transparent);
     --focus-offset: 2px;
 
     /* Estrutura ------------------------------------------------------- */
-    --layout-max: 68rem;
+    --layout-max: 70rem;
     --layout-gutter: clamp(var(--space-sm), 4vw, var(--space-lg));
   }
 }

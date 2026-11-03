@@ -49,14 +49,10 @@ services:
       - key: ConnectionStrings__Remedin
         sync: false
 
-      # As origens que o navegador aceita chamar a API. Não são segredo, e por
-      # isso ficam aqui e não no painel.
+      # A única origem que o navegador aceita chamar a API. Não é segredo, e
+      # por isso fica aqui e não no painel.
       - key: Cors__AllowedOrigins__0
         value: https://remedin.onrender.com
-      # Endereço anterior do front, mantido só durante a troca de domínio.
-      # Sai junto com o serviço antigo.
-      - key: Cors__AllowedOrigins__1
-        value: https://remedin-web.onrender.com
 
   # O front, servido como arquivo estático por CDN. Não dorme: quem dorme é a
   # API, e a página já carrega antes de precisar dela.
