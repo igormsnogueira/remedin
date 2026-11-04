@@ -64,6 +64,9 @@
     *::before,
     *::after {
       animation-duration: 0.01ms !important;
+      /* Sem zerar o atraso, o que entra com animação ficaria invisível até
+         o atraso acabar, mesmo sem movimento nenhum. */
+      animation-delay: 0ms !important;
       animation-iteration-count: 1 !important;
       transition-duration: 0.01ms !important;
       scroll-behavior: auto !important;

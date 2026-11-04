@@ -1,6 +1,9 @@
 import { Link, useSearchParams } from 'react-router-dom'
 
 import { useSelectedState } from '@/app/providers/useSelectedState'
+import { HomeHero } from '@/features/home/components/HomeHero'
+import { HowItWorks } from '@/features/home/components/HowItWorks'
+import { PriceExample } from '@/features/home/components/PriceExample'
 import { ApiLoading } from '@/shared/api/ApiLoading'
 import { useQuery } from '@/shared/api/useQuery'
 import type { SearchResults } from '@/shared/api/types'
@@ -31,22 +34,38 @@ export function SearchPage() {
     [term, state, page],
   )
 
+  // A key recria o formulário quando o termo da URL muda. Sem ela, o campo
+  // guardaria o texto antigo depois de um atalho da home ou do botão voltar.
+  //
+  // Buscar de novo volta para a primeira página: continuar na página 3 de um
+  // resultado que não existe mais mostraria uma tela vazia.
+  const form = (
+    <SearchForm
+      key={term}
+      initialTerm={term}
+      onSearch={(value) => setParams(value ? { q: value } : {})}
+      // Na home o cartão em volta já tem título e explicação do que digitar.
+      hideLabel={!term}
+    />
+  )
+
+  // Sem termo, a mesma rota é a apresentação do site. Assim os links de busca
+  // compartilhados continuam abrindo direto nos resultados.
+  if (!term) {
+    return (
+      <div className={styles.home}>
+        <HomeHero search={form} />
+        <PriceExample />
+        <HowItWorks />
+      </div>
+    )
+  }
+
   return (
     <div className={styles.page}>
-      <div>
-        <h1>Consulte o preço máximo de um medicamento</h1>
-        <p className={styles.intro}>
-          O preço que a farmácia pode cobrar tem teto definido por lei, e ele muda conforme o
-          estado. Busque pelo nome do produto ou pelo princípio ativo.
-        </p>
-      </div>
+      <h1 className={styles.resultsTitle}>Resultados para “{term}”</h1>
 
-      {/* Buscar de novo volta para a primeira página: continuar na página 3 de
-          um resultado que não existe mais mostraria uma tela vazia. */}
-      <SearchForm
-        initialTerm={term}
-        onSearch={(value) => setParams(value ? { q: value } : {})}
-      />
+      {form}
 
       <p className={styles.browse}>
         Não sabe o nome? <Link to="/finalidades">Veja por finalidade</Link>.

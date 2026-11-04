@@ -1,0 +1,24 @@
+@layer components {
+  /* A largura vem da grade do cabeçalho. */
+  .form {
+    min-inline-size: 0;
+  }
+
+  .input {
+    inline-size: 100%;
+    min-block-size: 2.5rem;
+
+    padding-block: var(--space-3xs);
+    padding-inline: var(--space-xs);
+
+    border: var(--border-thin);
+    border-radius: var(--radius-md);
+    background-color: var(--color-canvas);
+
+    font-size: var(--text-sm);
+  }
+
+  .input::placeholder {
+    color: var(--color-text-muted);
+  }
+}
