@@ -18,16 +18,37 @@
     border-block-end: var(--border-thin);
   }
 
+  /* No celular: logo e menu na primeira linha, busca na segunda, de ponta a
+     ponta. Com flex-wrap o menu caía sozinho numa terceira linha. */
   .bar {
-    display: flex;
-    flex-wrap: wrap;
+    display: grid;
+    grid-template-columns: auto 1fr;
+    grid-template-areas:
+      'brand nav'
+      'search search';
     align-items: center;
-    justify-content: space-between;
     gap: var(--space-xs) var(--space-md);
     padding-block: var(--space-xs);
   }
 
+  @media (min-width: 40rem) {
+    .bar {
+      grid-template-columns: auto minmax(0, 22rem) 1fr;
+      grid-template-areas: 'brand search nav';
+    }
+  }
+
+  .search {
+    grid-area: search;
+  }
+
+  .navArea {
+    grid-area: nav;
+    justify-self: end;
+  }
+
   .brand {
+    grid-area: brand;
     text-decoration: none;
     border-radius: var(--radius-sm);
   }
@@ -65,7 +86,13 @@
   }
 
   .main {
-    padding-block: var(--space-lg) var(--space-2xl);
+    padding-block: var(--space-md) var(--space-xl);
+  }
+
+  @media (min-width: 52rem) {
+    .main {
+      padding-block: var(--space-lg) var(--space-2xl);
+    }
   }
 
   /* O foco vai para cá na troca de rota, e o anel em volta do conteúdo

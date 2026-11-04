@@ -5,9 +5,23 @@
     gap: var(--space-md);
   }
 
-  .intro {
-    max-inline-size: var(--measure);
-    color: var(--color-text-muted);
+  /* A apresentação, quando não há termo buscado. Mais espaço entre as partes
+     do que nos resultados: são blocos independentes, não uma lista. */
+  .home {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-lg);
+  }
+
+  @media (min-width: 52rem) {
+    .home {
+      gap: var(--space-xl);
+      padding-block-start: var(--space-sm);
+    }
+  }
+
+  .resultsTitle {
+    font-size: var(--text-xl);
   }
 
   .results {

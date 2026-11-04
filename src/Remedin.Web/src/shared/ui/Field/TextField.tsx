@@ -1,5 +1,5 @@
 import { useId } from 'react'
-import type { InputHTMLAttributes } from 'react'
+import type { InputHTMLAttributes, Ref } from 'react'
 
 import { classNames } from '@/shared/ui/classNames'
 
@@ -9,6 +9,7 @@ interface TextFieldProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'id
   label: string
   /** Esconde o rótulo na tela sem tirá-lo do leitor de tela. */
   hideLabel?: boolean
+  ref?: Ref<HTMLInputElement>
 }
 
 export function TextField({ label, hideLabel = false, className, ...rest }: TextFieldProps) {

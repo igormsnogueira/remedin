@@ -1,5 +1,6 @@
-import { Link, NavLink, Outlet } from 'react-router-dom'
+import { Link, NavLink, Outlet, useLocation } from 'react-router-dom'
 
+import { HeaderSearch } from '@/features/medicine-search/components/HeaderSearch'
 import { classNames } from '@/shared/ui/classNames'
 import { Logo } from '@/shared/ui/Logo/Logo'
 
@@ -15,6 +16,11 @@ import { useFocusOnNavigation } from './useFocusOnNavigation'
 export function AppLayout() {
   const main = useFocusOnNavigation<HTMLElement>()
 
+  // A home e os resultados já têm a busca grande no topo da página. Repetir no
+  // cabeçalho seria dois campos para a mesma coisa na mesma tela.
+  const { pathname } = useLocation()
+  const showHeaderSearch = pathname !== '/'
+
   return (
     <div className={styles.shell}>
       <a className={styles.skip} href="#conteudo">
@@ -27,17 +33,15 @@ export function AppLayout() {
             <Logo />
           </Link>
 
-          <nav aria-label="Principal">
+          {showHeaderSearch && <HeaderSearch className={styles.search} />}
+
+          {/* Sem link para o início: o logo já faz isso, que é o que todo
+              mundo espera de um logo. */}
+          <nav className={styles.navArea} aria-label="Principal">
             <ul className={styles.nav}>
               <li>
-                {/* end: sem ele, "/" ficaria ativo em todas as páginas. */}
-                <NavLink className={navClass} to="/" end>
-                  Buscar
-                </NavLink>
-              </li>
-              <li>
                 <NavLink className={navClass} to="/finalidades">
-                  Por finalidade
+                  Finalidades
                 </NavLink>
               </li>
             </ul>
