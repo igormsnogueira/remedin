@@ -1,3 +1,4 @@
+import { FavoriteButton } from '@/features/favorites/components/FavoriteButton'
 import type { MedicineDetail } from '@/shared/api/types'
 import { Tag } from '@/shared/ui/Tag/Tag'
 
@@ -6,7 +7,10 @@ import styles from './MedicineHeader.module.css'
 export function MedicineHeader({ medicine }: { medicine: MedicineDetail }) {
   return (
     <header className={styles.header}>
-      <h1>{medicine.name}</h1>
+      <div className={styles.title}>
+        <h1>{medicine.name}</h1>
+        <FavoriteButton medicine={medicine} />
+      </div>
 
       {medicine.manufacturer && <p className={styles.manufacturer}>{medicine.manufacturer}</p>}
 

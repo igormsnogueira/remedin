@@ -5,6 +5,21 @@
     gap: var(--space-3xs);
   }
 
+  /* O botão fica sempre no canto direito, na altura do nome. Nome longo
+     quebra linha dentro da própria coluna em vez de empurrar o botão para
+     baixo, o que fazia ele mudar de lugar de um remédio para outro. */
+  .title {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: start;
+    gap: var(--space-sm);
+  }
+
+  /* Nomes da fonte chegam a ter palavras maiores que a tela do celular. */
+  .title h1 {
+    overflow-wrap: anywhere;
+  }
+
   .manufacturer {
     color: var(--color-text-muted);
   }

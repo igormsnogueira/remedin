@@ -1,0 +1,54 @@
+@layer components {
+  .button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-2xs);
+
+    /* Alvo de toque mínimo recomendado. */
+    min-block-size: 2.75rem;
+    padding-inline: var(--space-sm);
+
+    border: var(--border-thin);
+    border-radius: var(--radius-md);
+    background-color: var(--color-surface);
+    color: var(--color-text-muted);
+
+    font-size: var(--text-sm);
+    font-weight: 700;
+    cursor: pointer;
+    transition:
+      background-color var(--transition-fast),
+      border-color var(--transition-fast),
+      color var(--transition-fast);
+  }
+
+  .button:hover:not(:disabled) {
+    border-color: var(--color-accent);
+    color: var(--color-accent);
+  }
+
+  /* Ícone cheio e fundo verde, e não só a cor: o estado continua visível
+     para quem não distingue o verde. */
+  .button[aria-pressed='true'] {
+    border-color: var(--color-accent-light);
+    background-color: var(--color-accent-soft);
+    color: var(--color-accent-soft-text);
+  }
+
+  .button:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+  }
+
+  .compact {
+    inline-size: 2.75rem;
+    padding-inline: 0;
+  }
+
+  .icon {
+    inline-size: 1.125rem;
+    block-size: 1.125rem;
+    flex-shrink: 0;
+  }
+}

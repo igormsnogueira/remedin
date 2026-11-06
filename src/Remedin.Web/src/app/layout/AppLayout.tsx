@@ -1,5 +1,6 @@
 import { Link, NavLink, Outlet, useLocation } from 'react-router-dom'
 
+import { useFavorites } from '@/features/favorites/model/useFavorites'
 import { HeaderSearch } from '@/features/medicine-search/components/HeaderSearch'
 import { classNames } from '@/shared/ui/classNames'
 import { Logo } from '@/shared/ui/Logo/Logo'
@@ -20,6 +21,8 @@ export function AppLayout() {
   // cabeçalho seria dois campos para a mesma coisa na mesma tela.
   const { pathname } = useLocation()
   const showHeaderSearch = pathname !== '/'
+
+  const { favorites } = useFavorites()
 
   return (
     <div className={styles.shell}>
@@ -42,6 +45,17 @@ export function AppLayout() {
               <li>
                 <NavLink className={navClass} to="/finalidades">
                   Finalidades
+                </NavLink>
+              </li>
+              <li>
+                <NavLink className={navClass} to="/favoritos">
+                  Favoritos
+                  {favorites.length > 0 && (
+                    <span className={styles.badge}>
+                      {favorites.length}
+                      <span className="visually-hidden"> salvos</span>
+                    </span>
+                  )}
                 </NavLink>
               </li>
             </ul>

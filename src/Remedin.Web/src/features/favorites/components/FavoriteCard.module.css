@@ -1,0 +1,114 @@
+@layer components {
+  .card {
+    container-type: inline-size;
+    position: relative;
+
+    padding: var(--space-sm);
+    border: var(--border-thin);
+    border-radius: var(--radius-md);
+    background-color: var(--color-surface);
+    transition: background-color var(--transition-fast), box-shadow var(--transition-fast);
+  }
+
+  .card:hover {
+    background-color: var(--color-surface-hover);
+    box-shadow: var(--shadow-sm);
+  }
+
+  .card:has(.name:focus-visible) {
+    outline: var(--focus-ring);
+    outline-offset: var(--focus-offset);
+  }
+
+  .name:focus-visible {
+    outline: none;
+  }
+
+  /* O link cobre o cartão inteiro. */
+  .name::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+  }
+
+  /* Acima da camada do link, para remover sem abrir a ficha. */
+  .remove {
+    position: relative;
+    z-index: 1;
+  }
+
+  /* A grade fica num filho do cartão: um elemento não consulta o próprio
+     tamanho, então quem responde à largura precisa estar um nível abaixo de
+     quem declara container-type. */
+  .layout {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xs);
+  }
+
+  .info {
+    min-inline-size: 0;
+  }
+
+  @container (min-width: 30rem) {
+    .layout {
+      flex-direction: row;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--space-md);
+    }
+  }
+
+  .name {
+    color: var(--color-heading);
+    font-size: var(--text-lg);
+    font-weight: 700;
+    text-decoration: none;
+  }
+
+  .manufacturer {
+    color: var(--color-text-muted);
+    font-size: var(--text-sm);
+  }
+
+  .tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3xs);
+    margin-block-start: var(--space-3xs);
+  }
+
+  .aside {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-sm);
+  }
+
+  .price {
+    text-align: end;
+    white-space: nowrap;
+  }
+
+  .amount {
+    display: block;
+    color: var(--color-accent);
+    font-size: var(--text-lg);
+    font-weight: 700;
+  }
+
+  .priceLabel {
+    display: block;
+    color: var(--color-text-muted);
+    font-size: var(--text-xs);
+  }
+
+  .pricePlaceholder {
+    display: block;
+    inline-size: 6rem;
+    block-size: 2.5rem;
+    border-radius: var(--radius-sm);
+    background-color: var(--color-border-soft);
+  }
+}
