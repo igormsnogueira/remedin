@@ -1,5 +1,6 @@
 import { createBrowserRouter } from 'react-router-dom'
 
+import { FavoritesPage } from '@/features/favorites/pages/FavoritesPage'
 import { MedicineDetailPage } from '@/features/medicine-detail/pages/MedicineDetailPage'
 import { PurposeListPage } from '@/features/medicine-purposes/pages/PurposeListPage'
 import { PurposeMedicinesPage } from '@/features/medicine-purposes/pages/PurposeMedicinesPage'
@@ -25,6 +26,7 @@ export const router = createBrowserRouter([
       },
       { path: 'finalidades', Component: PurposeListPage, ErrorBoundary: ErrorPage },
       { path: 'finalidades/:code', Component: PurposeMedicinesPage, ErrorBoundary: ErrorPage },
+      { path: 'favoritos', Component: FavoritesPage, ErrorBoundary: ErrorPage },
       { path: '*', Component: NotFoundPage },
     ],
   },
