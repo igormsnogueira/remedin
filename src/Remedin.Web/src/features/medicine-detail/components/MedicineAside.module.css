@@ -1,0 +1,30 @@
+@layer components {
+  .aside {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+  }
+
+  .text {
+    color: var(--color-text-muted);
+    font-size: var(--text-sm);
+  }
+
+  .reference {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xs);
+    padding-block-start: var(--space-sm);
+    border-block-start: var(--border-thin);
+    font-size: var(--text-sm);
+  }
+
+  .reference dt {
+    color: var(--color-text-muted);
+    font-size: var(--text-xs);
+  }
+
+  .reference dd {
+    margin: 0;
+  }
+}

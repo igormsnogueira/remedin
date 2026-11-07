@@ -1,0 +1,127 @@
+@layer components {
+  .section {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xs);
+    scroll-margin-block-start: var(--space-md);
+  }
+
+  .title {
+    font-size: var(--text-xl);
+  }
+
+  /* Um painel só, com divisórias, em vez de um cartão por linha. */
+  .list,
+  .plainList {
+    min-inline-size: 0;
+    margin: 0;
+    padding: 0;
+    border: var(--border-thin);
+    border-radius: var(--radius-lg);
+    background-color: var(--color-surface);
+  }
+
+  .row {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    padding: var(--space-xs) var(--space-md);
+    transition: background-color var(--transition-fast);
+  }
+
+  .row + .row {
+    border-block-start: 1px solid var(--color-border-soft);
+  }
+
+  .row:first-of-type {
+    border-start-start-radius: inherit;
+    border-start-end-radius: inherit;
+  }
+
+  .row:last-of-type {
+    border-end-start-radius: inherit;
+    border-end-end-radius: inherit;
+  }
+
+  .list .row {
+    cursor: pointer;
+  }
+
+  .list .row:hover {
+    background-color: var(--color-surface-hover);
+  }
+
+  .selected,
+  .list .selected:hover {
+    background-color: var(--color-accent-soft);
+  }
+
+  .radio {
+    flex-shrink: 0;
+    inline-size: 1.125rem;
+    block-size: 1.125rem;
+    margin: 0;
+    accent-color: var(--color-accent);
+  }
+
+  /* O anel de foco vai na linha inteira, que é a área clicável. */
+  .radio:focus-visible {
+    outline: none;
+  }
+
+  .row:has(.radio:focus-visible) {
+    outline: var(--focus-ring);
+    outline-offset: -3px;
+  }
+
+  .description {
+    flex: 1;
+    min-inline-size: 0;
+    font-weight: 700;
+    overflow-wrap: anywhere;
+  }
+
+  .price {
+    flex-shrink: 0;
+    text-align: end;
+  }
+
+  .amount {
+    display: block;
+    color: var(--color-heading);
+    font-size: var(--text-lg);
+    font-weight: 700;
+    white-space: nowrap;
+  }
+
+  .unit {
+    display: block;
+    color: var(--color-text-muted);
+    font-size: var(--text-xs);
+    white-space: nowrap;
+  }
+
+  .missing {
+    flex-shrink: 0;
+    color: var(--color-text-muted);
+    font-size: var(--text-sm);
+    white-space: nowrap;
+  }
+
+  .hospital summary {
+    color: var(--color-accent);
+    font-size: var(--text-sm);
+    font-weight: 700;
+    cursor: pointer;
+  }
+
+  .hospitalNote {
+    margin-block: var(--space-2xs);
+    color: var(--color-text-muted);
+    font-size: var(--text-sm);
+  }
+
+  .plainList {
+    list-style: none;
+  }
+}

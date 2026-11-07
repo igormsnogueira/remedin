@@ -47,3 +47,34 @@
     background-color: var(--color-accent-soft);
   }
 }
+
+@layer base {
+  /* Os tons de uma finalidade, todos a partir de um matiz só (--purpose-hue,
+     definido no elemento por purposeStyle). OKLCH porque nele a claridade é
+     a que o olho percebe: o amarelo e o roxo com o mesmo L têm o mesmo
+     contraste com o texto, o que em HSL não acontece. */
+  .purpose-theme {
+    --purpose-hue: 165;
+    --purpose-soft: oklch(95.5% 0.03 var(--purpose-hue));
+    --purpose-tint: oklch(91% 0.06 var(--purpose-hue));
+    --purpose-mid: oklch(72% 0.13 var(--purpose-hue));
+    --purpose-strong: oklch(50% 0.14 var(--purpose-hue));
+    --purpose-ink: oklch(32% 0.09 var(--purpose-hue));
+  }
+
+  /* Transição entre páginas: o nome do remédio clicado desliza até o título
+     da ficha (ver viewTransition nos links). Curta, para não atrasar quem
+     navega rápido. */
+  ::view-transition-group(*) {
+    animation-duration: 320ms;
+    animation-timing-function: cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    ::view-transition-group(*),
+    ::view-transition-old(*),
+    ::view-transition-new(*) {
+      animation: none;
+    }
+  }
+}

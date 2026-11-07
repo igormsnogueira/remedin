@@ -11,14 +11,30 @@
     padding-block: var(--space-3xs);
     padding-inline: var(--space-xs);
 
-    border: var(--border-thin);
+    /* Translúcido sobre o cabeçalho verde: aparece como campo sem virar um
+       retângulo branco brigando com o logo. Ganha fundo claro ao focar,
+       quando a pessoa vai digitar. */
+    border: 1px solid color-mix(in oklab, white 22%, transparent);
     border-radius: var(--radius-md);
-    background-color: var(--color-canvas);
+    background-color: color-mix(in oklab, white 10%, transparent);
+    color: white;
 
     font-size: var(--text-sm);
+    transition:
+      background-color var(--transition-fast),
+      color var(--transition-fast);
   }
 
   .input::placeholder {
+    color: color-mix(in oklab, white 65%, transparent);
+  }
+
+  .input:focus {
+    background-color: var(--color-surface);
+    color: var(--color-text);
+  }
+
+  .input:focus::placeholder {
     color: var(--color-text-muted);
   }
 }

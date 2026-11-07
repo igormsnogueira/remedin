@@ -2,6 +2,8 @@ import { Link } from 'react-router-dom'
 
 import { useSelectedState } from '@/app/providers/useSelectedState'
 import { fetchMedicine } from '@/features/medicine-detail/api/fetchMedicine'
+import { PurposeIcon } from '@/features/medicine-purposes/components/PurposeIcon'
+import { purposeStyle } from '@/features/medicine-purposes/model/purposeTheme'
 import { ApiError } from '@/shared/api/client'
 import { useQuery } from '@/shared/api/useQuery'
 import type { QueryState } from '@/shared/api/useQuery'
@@ -36,15 +38,34 @@ export function FavoriteCard({ favorite, onRemove }: FavoriteCardProps) {
     [favorite.registrationNumber, state],
   )
 
+  // A finalidade não é guardada com o favorito: vem junto com o preço, e o
+  // cartão ganha a cor quando a resposta chega.
+  const loaded = detail.status === 'success' ? detail.data : null
+
   return (
-    <article className={styles.card}>
+    <article
+      className={`purpose-theme ${styles.card}`}
+      style={purposeStyle(loaded?.therapeuticClassCode)}
+    >
       <div className={styles.layout}>
         <div className={styles.info}>
-          <Link className={styles.name} to={`/medicamento/${favorite.registrationNumber}`}>
+          <Link
+            className={styles.name}
+            to={`/medicamento/${favorite.registrationNumber}`}
+            style={{ viewTransitionName: `medicine-${favorite.registrationNumber}` }}
+            viewTransition
+          >
             {favorite.name}
           </Link>
 
           {favorite.manufacturer && <p className={styles.manufacturer}>{favorite.manufacturer}</p>}
+
+          {loaded?.purpose && (
+            <p className={styles.purpose}>
+              <PurposeIcon code={loaded.therapeuticClassCode} size="sm" />
+              {loaded.purpose}
+            </p>
+          )}
 
           {favorite.activeIngredient && (
             <div className={styles.tags}>

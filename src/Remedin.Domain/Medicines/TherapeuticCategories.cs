@@ -86,6 +86,10 @@ public static class TherapeuticCategories
         ["M3B"] = "Relaxante muscular",
         ["M5B3"] = "Osteoporose",
         ["A3F"] = "Náusea e digestão lenta",
+        // Sem estas, a meclizina caía em "Estômago, intestino e diabetes",
+        // que não diz nada a quem procura remédio para enjoo.
+        ["A4A1"] = "Enjoo, náusea e vômito",
+        ["A4A9"] = "Enjoo, náusea e vômito",
         ["B1F"] = "Anticoagulante",
         ["N1A2"] = "Anestesia",
         ["N7D1"] = "Alzheimer",

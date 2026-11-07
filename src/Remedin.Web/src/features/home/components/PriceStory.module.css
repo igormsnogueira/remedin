@@ -1,0 +1,290 @@
+@layer components {
+  /* Versão básica: um passo embaixo do outro, com a cena ao lado quando cabe.
+     É o que vê quem está no celular, em navegador sem animação por rolagem ou
+     com pedido de menos movimento. */
+  .story {
+    padding-block: var(--space-xl);
+  }
+
+  .stage {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-lg);
+  }
+
+  .title {
+    max-inline-size: 20ch;
+    font-size: var(--text-2xl);
+    letter-spacing: -0.02em;
+  }
+
+  .steps {
+    display: grid;
+    gap: var(--space-xl);
+  }
+
+  .step {
+    display: grid;
+    gap: var(--space-md);
+    align-items: center;
+  }
+
+  @media (min-width: 48rem) {
+    .step {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
+      gap: var(--space-xl);
+    }
+  }
+
+  .text {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2xs);
+  }
+
+  .number {
+    color: var(--color-accent);
+    font-size: var(--text-sm);
+    font-weight: 700;
+    letter-spacing: 0.08em;
+  }
+
+  .stepTitle {
+    font-size: var(--text-xl);
+  }
+
+  .stepText {
+    max-inline-size: 40ch;
+    color: var(--color-text-muted);
+    font-size: var(--text-lg);
+  }
+
+  .card {
+    padding: var(--space-md);
+    border: var(--border-thin);
+    border-radius: var(--radius-lg);
+    background-color: var(--color-surface);
+    box-shadow: var(--shadow-md);
+  }
+
+  /* Cena 1: o campo de busca e os primeiros resultados. */
+  .fakeInput {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    padding: var(--space-xs) var(--space-sm);
+    border: 2px solid var(--color-accent-light);
+    border-radius: var(--radius-md);
+    font-size: var(--text-lg);
+  }
+
+  .caret {
+    inline-size: 2px;
+    block-size: 1.2em;
+    background-color: var(--color-accent);
+    animation: blink 1s steps(1) infinite;
+  }
+
+  .fakeResults {
+    margin-block-start: var(--space-xs);
+  }
+
+  .fakeResult {
+    display: flex;
+    flex-direction: column;
+    padding-block: var(--space-2xs);
+    border-block-start: 1px solid var(--color-border-soft);
+  }
+
+  .fakeName {
+    color: var(--color-heading);
+    font-weight: 700;
+  }
+
+  .fakeMaker {
+    color: var(--color-text-muted);
+    font-size: var(--text-xs);
+  }
+
+  .fakeBar {
+    display: block;
+    inline-size: 60%;
+    block-size: 0.875rem;
+    border-radius: var(--radius-sm);
+    background-color: var(--color-border-soft);
+  }
+
+  /* Cena 2: o preço grande. */
+  .sceneLabel {
+    color: var(--color-text-muted);
+    font-size: var(--text-sm);
+  }
+
+  .bigPrice {
+    color: var(--color-accent);
+    font-size: clamp(2.5rem, 1.5rem + 4vw, 4.5rem);
+    font-weight: 700;
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+  }
+
+  .sceneNote {
+    margin-block-start: var(--space-2xs);
+    color: var(--color-text-muted);
+  }
+
+  /* Cena 3: o número que mais importa da página, do maior tamanho dela. */
+  .ratio {
+    color: var(--color-heading);
+    font-size: clamp(4.5rem, 2rem + 10vw, 9rem);
+    font-weight: 700;
+    line-height: 0.9;
+    letter-spacing: -0.04em;
+  }
+
+  .times {
+    color: var(--color-accent);
+  }
+
+  .progress {
+    display: none;
+  }
+
+  @keyframes blink {
+    50% {
+      opacity: 0;
+    }
+  }
+
+  /* Versão contada pela rolagem. A seção fica com três telas de altura, o
+     palco fica preso na tela, e cada passo ocupa um terço do caminho. */
+  @supports (animation-timeline: view()) {
+    @media (min-width: 60rem) and (prefers-reduced-motion: no-preference) {
+      .story {
+        view-timeline: --story block;
+        min-block-size: 300vh;
+        padding-block: 0;
+      }
+
+      .stage {
+        position: sticky;
+        inset-block-start: 0;
+        block-size: 100svh;
+        justify-content: center;
+        padding-inline-start: var(--space-lg);
+      }
+
+      .steps {
+        gap: 0;
+      }
+
+      /* Os três passos no mesmo lugar, um por cima do outro. Texto e cena
+         alinhados pelo topo: centralizados, o número do passo ficava mais
+         baixo que o cartão e parecia solto. */
+      .step {
+        grid-area: 1 / 1;
+        align-items: start;
+        animation: step-middle linear both;
+        animation-timeline: --story;
+        animation-range: contain calc(var(--step) * 33.333%) contain
+          calc((var(--step) + 1) * 33.333%);
+      }
+
+      .step:first-child {
+        animation-name: step-first;
+      }
+
+      .step:last-child {
+        animation-name: step-last;
+      }
+
+      /* O número cresce enquanto o último passo entra. */
+      .step:last-child .ratio {
+        animation: ratio-in linear both;
+        animation-timeline: --story;
+        animation-range: contain 66% contain 88%;
+        transform-origin: left bottom;
+      }
+
+      .progress {
+        position: absolute;
+        inset-block: 35% 25%;
+        inset-inline-start: 0;
+        display: block;
+        inline-size: 3px;
+        border-radius: var(--radius-pill);
+        background-color: var(--color-border);
+      }
+
+      .progress::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        border-radius: inherit;
+        background-color: var(--color-accent);
+        transform-origin: top;
+        animation: progress linear both;
+        animation-timeline: --story;
+        animation-range: contain;
+      }
+    }
+  }
+
+  @keyframes step-first {
+    0%,
+    75% {
+      opacity: 1;
+      translate: 0 0;
+    }
+
+    100% {
+      opacity: 0;
+      translate: 0 -2rem;
+    }
+  }
+
+  @keyframes step-middle {
+    0% {
+      opacity: 0;
+      translate: 0 2rem;
+    }
+
+    25%,
+    75% {
+      opacity: 1;
+      translate: 0 0;
+    }
+
+    100% {
+      opacity: 0;
+      translate: 0 -2rem;
+    }
+  }
+
+  @keyframes step-last {
+    0% {
+      opacity: 0;
+      translate: 0 2rem;
+    }
+
+    25%,
+    100% {
+      opacity: 1;
+      translate: 0 0;
+    }
+  }
+
+  @keyframes ratio-in {
+    from {
+      opacity: 0.2;
+      scale: 0.5;
+    }
+  }
+
+  @keyframes progress {
+    from {
+      scale: 1 0;
+    }
+  }
+}

@@ -1,3 +1,5 @@
+import { trackRequest } from './apiStatus'
+
 const baseUrl = import.meta.env.VITE_API_URL
 
 if (!baseUrl) {
@@ -38,10 +40,20 @@ interface ErrorBody {
  * fonte externa, entraria validação de esquema aqui.
  */
 export async function get<T>(path: string, signal?: AbortSignal): Promise<T> {
-  const response = await fetch(`${baseUrl}${path}`, {
-    headers: { Accept: 'application/json' },
-    signal,
-  })
+  const done = trackRequest()
+  let response: Response
+
+  try {
+    response = await fetch(`${baseUrl}${path}`, {
+      headers: { Accept: 'application/json' },
+      signal,
+    })
+  } catch (error) {
+    done(false)
+    throw error
+  }
+
+  done(true)
 
   if (!response.ok) {
     throw new ApiError(response.status, await readErrorMessage(response))
@@ -57,6 +69,23 @@ async function readErrorMessage(response: Response): Promise<string> {
   } catch {
     return `A requisição falhou com status ${response.status}.`
   }
+}
+
+/**
+ * Acorda a API assim que o site abre, antes da primeira busca.
+ *
+ * O /health consulta o banco, então acorda os dois de uma vez. A resposta não
+ * importa: se falhar, a primeira chamada de verdade tenta de novo. Passa pelo
+ * mesmo registro das outras chamadas, então o aviso de servidor ligando
+ * aparece também enquanto a pessoa ainda está lendo a página.
+ */
+export function wakeUpApi(): void {
+  const done = trackRequest()
+
+  fetch(`${baseUrl}/health`, { cache: 'no-store' }).then(
+    () => done(true),
+    () => done(false),
+  )
 }
 
 /** Monta a query string ignorando o que estiver vazio. */

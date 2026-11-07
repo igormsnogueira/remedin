@@ -2,31 +2,50 @@
   .header {
     display: flex;
     flex-direction: column;
-    gap: var(--space-3xs);
+    gap: var(--space-2xs);
+
+    padding: var(--space-lg) var(--space-md);
+    border-radius: var(--radius-lg);
+    background-color: var(--purpose-soft);
   }
 
-  /* O botão fica sempre no canto direito, na altura do nome. Nome longo
-     quebra linha dentro da própria coluna em vez de empurrar o botão para
-     baixo, o que fazia ele mudar de lugar de um remédio para outro. */
+  @media (min-width: 48rem) {
+    .header {
+      padding: var(--space-xl) var(--space-lg);
+    }
+  }
+
+  /* Ícone, nome e botão na mesma linha. O nome longo quebra dentro da
+     própria coluna, e o botão fica sempre no canto. */
   .title {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) auto;
-    align-items: start;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    align-items: center;
     gap: var(--space-sm);
   }
 
-  /* Nomes da fonte chegam a ter palavras maiores que a tela do celular. */
-  .title h1 {
+  .name {
+    color: var(--purpose-ink);
+    font-size: var(--text-2xl);
+    letter-spacing: -0.02em;
+    /* Nomes da fonte chegam a ter palavras maiores que a tela do celular. */
     overflow-wrap: anywhere;
   }
 
-  .manufacturer {
-    color: var(--color-text-muted);
+  /* No celular o ícone ocupa espaço demais ao lado de um nome longo. */
+  @media (max-width: 30rem) {
+    .title {
+      grid-template-columns: minmax(0, 1fr) auto;
+    }
+
+    .title > :first-child {
+      display: none;
+    }
   }
 
-  .registration {
-    color: var(--color-text-muted);
-    font-size: var(--text-sm);
+  .manufacturer {
+    color: var(--purpose-ink);
+    opacity: 0.85;
   }
 
   .tags {
@@ -34,5 +53,12 @@
     flex-wrap: wrap;
     gap: var(--space-3xs);
     margin-block-start: var(--space-2xs);
+  }
+
+  /* As etiquetas verdes padrão brigavam com o fundo laranja ou roxo. Aqui
+     ficam brancas, com o texto na cor da finalidade. */
+  .tags > span {
+    background-color: var(--color-surface);
+    color: var(--purpose-ink);
   }
 }

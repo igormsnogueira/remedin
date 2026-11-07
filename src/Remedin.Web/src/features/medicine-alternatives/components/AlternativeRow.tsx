@@ -2,61 +2,54 @@ import { Link } from 'react-router-dom'
 
 import type { MedicineAlternative } from '@/shared/api/types'
 import { formatPrice } from '@/shared/format/currency'
-import { classNames } from '@/shared/ui/classNames'
-import { Tag } from '@/shared/ui/Tag/Tag'
+import { describePresentation } from '@/shared/format/presentation'
 
 import styles from './AlternativeRow.module.css'
 
-interface AlternativeRowProps {
-  alternative: MedicineAlternative
-  /** Dosagem do medicamento consultado, para apontar as que não batem. */
-  referenceDosage: number | null
-}
-
-export function AlternativeRow({ alternative, referenceDosage }: AlternativeRowProps) {
-  const differentDosage =
-    referenceDosage !== null &&
-    alternative.dosageInMilligrams !== null &&
-    alternative.dosageInMilligrams !== referenceDosage
+/** Uma linha da lista de equivalentes, clicável por inteiro. */
+export function AlternativeRow({ alternative }: { alternative: MedicineAlternative }) {
+  const readable = describePresentation(alternative.presentation)
+  const measure = readable?.measure ?? null
+  const perMeasure =
+    alternative.pricePerUnit === null && measure && measure.amount > 1
+      ? alternative.consumerPrice / measure.amount
+      : null
+  const presentation = readable
+    ? [readable.content, readable.strength].filter(Boolean).join(' · ')
+    : alternative.presentation
 
   return (
-    <li className={classNames(styles.row, alternative.isCurrent && styles.current)}>
-      <div>
-        {alternative.isCurrent ? (
-          <p className={styles.name}>{alternative.name}</p>
-        ) : (
-          <Link className={styles.name} to={`/medicamento/${alternative.registrationNumber}`}>
-            {alternative.name}
-          </Link>
-        )}
+    <li className={styles.row}>
+      <div className={styles.info}>
+        <Link
+          className={styles.name}
+          to={`/medicamento/${alternative.registrationNumber}`}
+          style={{ viewTransitionName: `medicine-${alternative.registrationNumber}` }}
+          viewTransition
+        >
+          {alternative.name}
+        </Link>
 
-        {alternative.manufacturer && (
-          <p className={styles.manufacturer}>{alternative.manufacturer}</p>
-        )}
-
-        <p className={styles.presentation}>{alternative.presentation}</p>
-
-        <div className={styles.tags}>
-          {alternative.isCurrent && <Tag>Você está vendo este</Tag>}
-
-          {/* A dosagem aparece sempre que é conhecida. Mostrar só quando
-              diverge esconderia a informação justamente quando a dosagem do
-              medicamento consultado não pôde ser lida, que é quando a pessoa
-              mais precisa comparar por conta própria. */}
-          {alternative.dosageInMilligrams !== null && (
-            <Tag tone="muted">
-              {differentDosage && 'Dosagem diferente: '}
-              {alternative.dosageInMilligrams} MG
-            </Tag>
-          )}
-        </div>
+        <p className={styles.meta}>
+          {[alternative.manufacturer, presentation].filter(Boolean).join(' · ')}
+        </p>
       </div>
 
       <div className={styles.price}>
-        {alternative.pricePerUnit === null ? (
+        {perMeasure !== null && measure ? (
           <>
-            <span className={`${styles.box} numeric`}>{formatPrice(alternative.consumerPrice)}</span>
-            <span className={styles.unit}>a embalagem inteira</span>
+            <span className={`${styles.amount} numeric`}>{formatPrice(perMeasure)}</span>
+            <span className={styles.unit}>
+              por {measure.unit} ·{' '}
+              <span className="numeric">{formatPrice(alternative.consumerPrice)}</span> a embalagem
+            </span>
+          </>
+        ) : alternative.pricePerUnit === null ? (
+          <>
+            <span className={`${styles.amount} numeric`}>
+              {formatPrice(alternative.consumerPrice)}
+            </span>
+            <span className={styles.unit}>a embalagem</span>
           </>
         ) : (
           <>
@@ -64,7 +57,8 @@ export function AlternativeRow({ alternative, referenceDosage }: AlternativeRowP
               {formatPrice(alternative.pricePerUnit)}
             </span>
             <span className={styles.unit}>
-              por unidade · {formatPrice(alternative.consumerPrice)} a caixa
+              por unidade · <span className="numeric">{formatPrice(alternative.consumerPrice)}</span> a
+              caixa
             </span>
           </>
         )}

@@ -1,0 +1,93 @@
+@layer components {
+  .facts {
+    container-type: inline-size;
+
+    border: var(--border-thin);
+    border-radius: var(--radius-lg);
+    background-color: var(--color-surface);
+  }
+
+  .fact {
+    display: grid;
+    gap: var(--space-3xs);
+    padding: var(--space-sm) var(--space-md);
+  }
+
+  .fact + .fact {
+    border-block-start: 1px solid var(--color-border-soft);
+  }
+
+  /* Rótulo à esquerda e resposta à direita quando cabe, como numa ficha
+     impressa. */
+  @container (min-width: 32rem) {
+    .fact {
+      grid-template-columns: 11rem minmax(0, 1fr);
+      align-items: baseline;
+      gap: var(--space-md);
+    }
+  }
+
+  .label {
+    color: var(--color-text-muted);
+    font-size: var(--text-sm);
+  }
+
+  .value {
+    margin: 0;
+  }
+
+  .answer {
+    color: var(--color-heading);
+    font-size: var(--text-lg);
+    font-weight: 700;
+    line-height: var(--leading-tight);
+  }
+
+  .unknown {
+    color: var(--color-text-muted);
+    font-weight: 700;
+  }
+
+  .note {
+    margin-block-start: var(--space-3xs);
+    color: var(--color-text-muted);
+    font-size: var(--text-sm);
+  }
+
+  .badge {
+    display: inline-block;
+    padding-block: var(--space-3xs);
+    padding-inline: var(--space-xs);
+    border-radius: var(--radius-pill);
+    font-weight: 700;
+  }
+
+  .badgeFree {
+    background-color: var(--color-accent-soft);
+    color: var(--color-accent-soft-text);
+  }
+
+  .badgeRequired {
+    background-color: color-mix(in oklab, var(--color-warning) 12%, var(--color-surface));
+    color: color-mix(in oklab, var(--color-warning) 80%, black);
+  }
+
+  .price {
+    color: var(--color-accent);
+    font-size: var(--text-xl);
+    font-weight: 700;
+    line-height: var(--leading-tight);
+  }
+
+  .priceLine {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: var(--space-3xs) var(--space-xs);
+  }
+
+  .priceFor {
+    color: var(--color-text-muted);
+    font-size: var(--text-sm);
+  }
+}

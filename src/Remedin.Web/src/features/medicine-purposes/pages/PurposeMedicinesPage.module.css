@@ -5,16 +5,59 @@
     gap: var(--space-md);
   }
 
-  .heading {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: end;
-    justify-content: space-between;
-    gap: var(--space-sm);
+  .banner {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: center;
+    gap: var(--space-sm) var(--space-md);
+
+    padding: var(--space-lg) var(--space-md);
+    border-radius: var(--radius-lg);
+    background-color: var(--purpose-soft);
+    color: var(--purpose-ink);
   }
 
+  @media (min-width: 48rem) {
+    .banner {
+      grid-template-columns: auto minmax(0, 1fr) auto;
+      padding: var(--space-xl) var(--space-lg);
+    }
+  }
+
+  .bannerText {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3xs);
+  }
+
+  .back {
+    align-self: start;
+    color: var(--purpose-strong);
+    font-size: var(--text-sm);
+    font-weight: 700;
+  }
+
+  .bannerTitle {
+    color: var(--purpose-ink);
+    font-size: var(--text-2xl);
+    letter-spacing: -0.02em;
+  }
+
+  .bannerMeta {
+    color: var(--purpose-strong);
+    font-weight: 700;
+  }
+
+  /* No celular o seletor desce para a linha de baixo, de ponta a ponta. */
   .state {
+    grid-column: 1 / -1;
     min-inline-size: 12rem;
+  }
+
+  @media (min-width: 48rem) {
+    .state {
+      grid-column: auto;
+    }
   }
 
   .list {

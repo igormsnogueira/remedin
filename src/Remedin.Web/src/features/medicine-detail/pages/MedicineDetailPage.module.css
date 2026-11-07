@@ -5,4 +5,49 @@
     gap: var(--space-lg);
     max-inline-size: var(--measure);
   }
+
+  .layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-lg);
+  }
+
+  .head,
+  .body {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-lg);
+  }
+
+  .body {
+    gap: var(--space-xl);
+  }
+
+  /* Duas colunas quando a lateral cabe sem apertar o conteúdo. A lateral
+     acompanha a rolagem, para o seletor de estado continuar à mão na lista
+     de alternativas. */
+  @media (min-width: 60rem) {
+    .layout {
+      grid-template-columns: minmax(0, 1fr) 17rem;
+      grid-template-areas:
+        'head aside'
+        'body aside';
+      column-gap: var(--space-xl);
+      align-items: start;
+    }
+
+    .head {
+      grid-area: head;
+    }
+
+    .body {
+      grid-area: body;
+    }
+
+    .layout > aside {
+      grid-area: aside;
+      position: sticky;
+      inset-block-start: var(--space-md);
+    }
+  }
 }
