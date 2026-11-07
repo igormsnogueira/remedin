@@ -16,6 +16,8 @@ import { Notice } from '@/shared/ui/Notice/Notice'
 import { Pagination } from '@/shared/ui/Pagination/Pagination'
 
 import { fetchPurposeMedicines } from '../api/fetchPurposes'
+import { PurposeIcon } from '../components/PurposeIcon'
+import { purposeStyle } from '../model/purposeTheme'
 
 import styles from './PurposeMedicinesPage.module.css'
 
@@ -52,10 +54,26 @@ export function PurposeMedicinesPage() {
 
   return (
     <div className={styles.page}>
-      <div className={styles.heading}>
-        <h1>{label}</h1>
+      {/* Na cor da finalidade, e com o mesmo nome de transição do bloco da
+          lista: o bloco clicado se expande até virar este topo. */}
+      <header
+        className={`purpose-theme ${styles.banner}`}
+        style={{ ...purposeStyle(code), viewTransitionName: `purpose-${code}` }}
+      >
+        <PurposeIcon code={code} size="lg" onTint />
+
+        <div className={styles.bannerText}>
+          <Link className={styles.back} to="/finalidades" viewTransition>
+            Finalidades
+          </Link>
+          <h1 className={styles.bannerTitle}>{label}</h1>
+          <p className={`${styles.bannerMeta} numeric`}>
+            {medicines.total.toLocaleString('pt-BR')} medicamentos com preço em {uf}
+          </p>
+        </div>
+
         <StateSelect className={styles.state} />
-      </div>
+      </header>
 
       {medicines.items.length === 0 ? (
         <Notice>
@@ -65,10 +83,7 @@ export function PurposeMedicinesPage() {
         </Notice>
       ) : (
         <section className={styles.list}>
-          <p className={styles.count}>
-            {medicines.total.toLocaleString('pt-BR')} medicamentos, do mais barato ao mais caro ·
-            preço para {uf}
-          </p>
+          <p className={styles.count}>Do mais barato ao mais caro, pelo preço máximo em {uf}</p>
 
           {medicines.items.map((medicine) => (
             <ResultCard key={medicine.registrationNumber} medicine={medicine} />

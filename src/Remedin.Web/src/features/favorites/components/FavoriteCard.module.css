@@ -5,9 +5,23 @@
 
     padding: var(--space-sm);
     border: var(--border-thin);
+    border-inline-start: 4px solid var(--purpose-mid);
     border-radius: var(--radius-md);
     background-color: var(--color-surface);
-    transition: background-color var(--transition-fast), box-shadow var(--transition-fast);
+    transition:
+      background-color var(--transition-fast),
+      box-shadow var(--transition-fast),
+      border-color var(--transition-fast);
+  }
+
+  .purpose {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2xs);
+    margin-block-start: var(--space-2xs);
+    color: var(--purpose-ink);
+    font-size: var(--text-sm);
+    font-weight: 700;
   }
 
   .card:hover {

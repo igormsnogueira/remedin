@@ -2,6 +2,7 @@ import { Link, NavLink, Outlet, useLocation } from 'react-router-dom'
 
 import { useFavorites } from '@/features/favorites/model/useFavorites'
 import { HeaderSearch } from '@/features/medicine-search/components/HeaderSearch'
+import { WakeUpNotice } from '@/shared/api/WakeUpNotice'
 import { classNames } from '@/shared/ui/classNames'
 import { Logo } from '@/shared/ui/Logo/Logo'
 
@@ -73,6 +74,8 @@ export function AppLayout() {
       >
         <Outlet />
       </main>
+
+      <WakeUpNotice />
 
       <footer className={styles.footer}>
         <div className={classNames(styles.container, styles.footerContent)}>

@@ -1,0 +1,35 @@
+@layer components {
+  .icon {
+    display: inline-grid;
+    flex-shrink: 0;
+    place-items: center;
+    border-radius: 50%;
+    background-color: var(--purpose-soft);
+    color: var(--purpose-strong);
+  }
+
+  .onTint {
+    background-color: var(--color-surface);
+    box-shadow: 0 2px 8px oklch(40% 0.08 var(--purpose-hue) / 15%);
+  }
+
+  .glyph {
+    inline-size: 55%;
+    block-size: 55%;
+  }
+
+  .sm {
+    inline-size: 1.75rem;
+    block-size: 1.75rem;
+  }
+
+  .md {
+    inline-size: 2.5rem;
+    block-size: 2.5rem;
+  }
+
+  .lg {
+    inline-size: 3.75rem;
+    block-size: 3.75rem;
+  }
+}

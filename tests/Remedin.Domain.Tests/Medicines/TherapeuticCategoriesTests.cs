@@ -8,6 +8,7 @@ public class TherapeuticCategoriesTests
     [InlineData("M1A1", "Anti-inflamatório para dor e inflamação")]
     [InlineData("A2B2", "Azia, refluxo e gastrite")]
     [InlineData("R6A", "Alergia")]
+    [InlineData("A4A9", "Enjoo, náusea e vômito")]
     public void Classe_conhecida_ganha_descricao_especifica(string code, string expected)
     {
         Assert.Equal(expected, TherapeuticCategories.Describe(code)!.Label);

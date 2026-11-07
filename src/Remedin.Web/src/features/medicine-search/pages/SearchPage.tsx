@@ -1,9 +1,7 @@
 import { Link, useSearchParams } from 'react-router-dom'
 
 import { useSelectedState } from '@/app/providers/useSelectedState'
-import { HomeHero } from '@/features/home/components/HomeHero'
-import { HowItWorks } from '@/features/home/components/HowItWorks'
-import { PriceExample } from '@/features/home/components/PriceExample'
+import { HomePage } from '@/features/home/pages/HomePage'
 import { ApiLoading } from '@/shared/api/ApiLoading'
 import { useQuery } from '@/shared/api/useQuery'
 import type { SearchResults } from '@/shared/api/types'
@@ -52,13 +50,7 @@ export function SearchPage() {
   // Sem termo, a mesma rota é a apresentação do site. Assim os links de busca
   // compartilhados continuam abrindo direto nos resultados.
   if (!term) {
-    return (
-      <div className={styles.home}>
-        <HomeHero search={form} />
-        <PriceExample />
-        <HowItWorks />
-      </div>
-    )
+    return <HomePage search={form} />
   }
 
   return (

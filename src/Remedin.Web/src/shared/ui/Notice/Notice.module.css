@@ -1,26 +1,27 @@
 @layer components {
+  /* Fundo de leve tom e nada mais. A borda grossa colorida na lateral, que
+     era o padrão daqui, transformava todo recado em alerta, e a página ficava
+     cheia deles. */
   .notice {
     padding-block: var(--space-xs);
     padding-inline: var(--space-sm);
-
-    border: var(--border-thin);
-    border-inline-start-width: 4px;
     border-radius: var(--radius-md);
 
-    background-color: var(--color-surface);
     font-size: var(--text-sm);
     color: var(--color-text-muted);
   }
 
   .info {
-    border-inline-start-color: var(--color-accent);
+    background-color: var(--color-border-soft);
   }
 
   .warning {
-    border-inline-start-color: var(--color-warning);
+    background-color: color-mix(in oklab, var(--color-warning) 10%, var(--color-surface));
+    color: color-mix(in oklab, var(--color-warning) 80%, black);
   }
 
   .danger {
-    border-inline-start-color: var(--color-danger);
+    background-color: color-mix(in oklab, var(--color-danger) 8%, var(--color-surface));
+    color: var(--color-danger);
   }
 }

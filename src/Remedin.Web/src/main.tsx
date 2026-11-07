@@ -16,6 +16,12 @@ import { RouterProvider } from 'react-router-dom'
 
 import { SelectedStateProvider } from './app/providers/SelectedStateProvider'
 import { router } from './app/routes'
+import { wakeUpApi } from './shared/api/client'
+
+// Antes de desenhar a página: o servidor gratuito pode estar desligado, e
+// cada segundo que ele começa a ligar antes da primeira busca é um segundo a
+// menos de espera.
+wakeUpApi()
 
 const container = document.getElementById('root')
 

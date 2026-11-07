@@ -13,9 +13,16 @@
     padding-inline: var(--layout-gutter);
   }
 
+  /* Verde-escuro em todas as páginas, como a barra da marca. Antes era
+     verde só na home e branco no resto, e cada clique trocava a cor do
+     topo, como se fossem dois sites. Na home ele emenda com a faixa. */
   .header {
-    background-color: var(--color-surface);
-    border-block-end: var(--border-thin);
+    --logo-text: white;
+    /* O anel de foco padrão é verde, e some sobre verde escuro. */
+    --focus-ring: 3px solid var(--color-accent-light);
+
+    background-color: var(--color-heading);
+    color: white;
   }
 
   /* No celular: logo e menu na primeira linha, busca na segunda, de ponta a
@@ -64,7 +71,7 @@
     padding-inline: var(--space-xs);
     border-radius: var(--radius-sm);
 
-    color: var(--color-text-muted);
+    color: color-mix(in oklab, white 80%, var(--color-heading));
     font-size: var(--text-sm);
     text-decoration: none;
     transition: background-color var(--transition-fast), color var(--transition-fast);
@@ -85,16 +92,16 @@
   }
 
   .navLink:hover {
-    background-color: var(--color-accent-soft);
-    color: var(--color-accent-soft-text);
+    background-color: color-mix(in oklab, white 12%, transparent);
+    color: white;
   }
 
-  /* Cor e peso, e não só cor: quem não distingue o verde ainda vê qual é a
-     página atual. */
+  /* Cor, peso e sublinhado, e não só cor: quem não distingue o verde ainda
+     vê qual é a página atual. */
   .navLinkActive {
-    color: var(--color-accent);
+    color: white;
     font-weight: 700;
-    box-shadow: inset 0 -2px 0 var(--color-accent);
+    box-shadow: inset 0 -2px 0 var(--color-accent-light);
     border-end-start-radius: 0;
     border-end-end-radius: 0;
   }
@@ -107,6 +114,12 @@
     .main {
       padding-block: var(--space-lg) var(--space-2xl);
     }
+  }
+
+  /* Página que abre com uma faixa colorida de ponta a ponta encosta a faixa
+     no cabeçalho, sem a folga de cima. */
+  .main:has([data-full-bleed]) {
+    padding-block-start: 0;
   }
 
   /* O foco vai para cá na troca de rota, e o anel em volta do conteúdo
