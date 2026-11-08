@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.HttpLogging;
 using Remedin.Api;
 using Remedin.Application.Catalog.Search;
+using Remedin.Application.Location;
 using Remedin.Domain.Medicines;
 using Remedin.Infrastructure;
 
@@ -51,6 +52,29 @@ app.UseCors(FrontendCors);
 app.MapHealthChecks("/health");
 
 app.MapGet("/estados", () => StateOptions.All);
+
+// O estado provável de quem acessa, pelo IP, para o site já abrir com os
+// preços certos. O IP é usado só nesta consulta: não vai para o log (o
+// registro de requisições não guarda cabeçalho nem endereço) nem para o banco.
+app.MapGet("/localizacao", async (
+    HttpContext http,
+    IStateLocator locator,
+    CancellationToken cancellationToken) =>
+{
+    // A resposta depende de quem pergunta; cache compartilhado entregaria o
+    // estado de uma pessoa para outra.
+    http.Response.Headers.CacheControl = "private, no-store";
+
+    var address = ClientAddress.From(http);
+
+    if (address is null || ClientAddress.IsPrivate(address))
+    {
+        return Results.Ok(new { state = (string?)null });
+    }
+
+    var state = await locator.FindStateAsync(address, cancellationToken);
+    return Results.Ok(new { state });
+});
 
 app.MapGet("/medicamentos", async (
     string? q,

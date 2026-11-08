@@ -1,7 +1,19 @@
 import { createContext } from 'react'
 
+/**
+ * De onde veio o estado escolhido. Decide se a escolha pode ser trocada
+ * sozinha pela detecção.
+ *
+ * - manual: a pessoa escolheu. Nada muda sem ela.
+ * - detected: estimado pela conexão. Uma detecção nova pode trocá-lo.
+ * - default: nenhuma das duas ainda; vale SP.
+ */
+export type StateOrigin = 'manual' | 'detected' | 'default'
+
 export interface SelectedState {
   state: string
+  origin: StateOrigin
+  /** Escolha da pessoa: vale para sempre neste navegador. */
   setState: (state: string) => void
 }
 
