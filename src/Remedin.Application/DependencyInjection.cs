@@ -1,5 +1,6 @@
 using Microsoft.Extensions.DependencyInjection;
 using Remedin.Application.Catalog.Ingestion;
+using Remedin.Application.Location;
 
 namespace Remedin.Application;
 
@@ -10,6 +11,7 @@ public static class DependencyInjection
         services.TryAddTimeProvider();
         services.AddScoped<ImportRegistrySnapshot>();
         services.AddScoped<ImportPriceList>();
+        services.AddScoped<ImportIpStateRanges>();
 
         return services;
     }

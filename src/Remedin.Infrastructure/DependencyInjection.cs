@@ -2,8 +2,10 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Remedin.Application.Catalog.Ingestion;
 using Remedin.Application.Catalog.Search;
+using Remedin.Application.Location;
 using Remedin.Infrastructure.Ingestion.Anvisa;
 using Remedin.Infrastructure.Ingestion.Cmed;
+using Remedin.Infrastructure.Ingestion.DbIp;
 using Remedin.Infrastructure.Persistence;
 
 namespace Remedin.Infrastructure;
@@ -19,6 +21,9 @@ public static class DependencyInjection
         "Remedin/1.0 (+https://github.com/igormsnogueira/remedin) Mozilla/5.0 compatible";
 
     private static readonly TimeSpan DownloadTimeout = TimeSpan.FromMinutes(5);
+
+    /// <summary>A base de geolocalização passa de 100 MB compactada.</summary>
+    private static readonly TimeSpan LargeDownloadTimeout = TimeSpan.FromMinutes(15);
 
     /// <summary>
     /// Recebe a string de conexão em vez de <c>IConfiguration</c>: a
@@ -42,11 +47,20 @@ public static class DependencyInjection
 
         services.AddScoped<IMedicinePriceStore, MedicinePriceStore>();
 
+        services.AddScoped<PostgresIpStates>();
+        services.AddScoped<IIpStateStore>(provider => provider.GetRequiredService<PostgresIpStates>());
+        services.AddScoped<IStateLocator>(provider => provider.GetRequiredService<PostgresIpStates>());
+
         services.AddSingleton<AnvisaRegistryReader>();
         services.AddSingleton<CmedPriceReader>();
 
         services.AddHttpClient<IRegistrySnapshotSource, AnvisaRegistrySnapshotSource>(ConfigureDownload);
         services.AddHttpClient<IPriceSnapshotSource, CmedPriceSnapshotSource>(ConfigureDownload);
+        services.AddHttpClient<IIpStateSource, DbIpStateSource>(client =>
+        {
+            ConfigureDownload(client);
+            client.Timeout = LargeDownloadTimeout;
+        });
 
         return services;
     }

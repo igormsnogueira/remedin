@@ -38,4 +38,38 @@ public class BrazilianStatesTests
     {
         Assert.False(BrazilianStates.TryGetName(code, out _));
     }
+
+    [Theory]
+    [InlineData("São Paulo", "SP")]
+    [InlineData("Sao Paulo", "SP")]
+    [InlineData("SANTA CATARINA", "SC")]
+    [InlineData(" Espirito Santo ", "ES")]
+    [InlineData("Federal District", "DF")]
+    [InlineData("Distrito Federal", "DF")]
+    public void Nome_do_estado_vira_sigla_com_ou_sem_acento(string name, string expected)
+    {
+        // A base de geolocalização por IP escreve os nomes sem acento, e o
+        // Distrito Federal em inglês.
+        Assert.True(BrazilianStates.TryFindByName(name, out var code));
+        Assert.Equal(expected, code);
+    }
+
+    [Theory]
+    [InlineData(null)]
+    [InlineData("")]
+    [InlineData("California")]
+    public void Nome_desconhecido_nao_vira_sigla(string? name)
+    {
+        Assert.False(BrazilianStates.TryFindByName(name, out _));
+    }
+
+    [Fact]
+    public void Todo_nome_oficial_volta_para_a_propria_sigla()
+    {
+        foreach (var code in BrazilianStates.Codes)
+        {
+            Assert.True(BrazilianStates.TryFindByName(BrazilianStates.NameOf(code), out var found));
+            Assert.Equal(code, found);
+        }
+    }
 }

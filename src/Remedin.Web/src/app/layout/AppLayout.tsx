@@ -84,6 +84,15 @@ export function AppLayout() {
             atualizados toda semana.
           </p>
           <p>Consulta informativa. Não substitui a orientação do médico ou do farmacêutico.</p>
+          {/* Atribuição exigida pela licença da base de geolocalização (CC BY
+              4.0), em toda página, porque o estado sugerido vale em todas. */}
+          <p>
+            Estado sugerido pela conexão com dados de{' '}
+            <a href="https://db-ip.com" rel="noopener">
+              IP Geolocation by DB-IP
+            </a>
+            .
+          </p>
         </div>
       </footer>
     </div>

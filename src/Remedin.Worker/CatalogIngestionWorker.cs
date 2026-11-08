@@ -1,5 +1,6 @@
 using Microsoft.Extensions.Options;
 using Remedin.Application.Catalog.Ingestion;
+using Remedin.Application.Location;
 
 namespace Remedin.Worker;
 
@@ -39,6 +40,13 @@ public sealed class CatalogIngestionWorker(
             var priceRun = await prices.ExecuteAsync(whenRepeated, stoppingToken);
             logger.LogInformation("Preço: execução {Id} terminou como {Outcome}.",
                 priceRun.Id, priceRun.Outcome);
+
+            // Por último: o catálogo não depende dela, e se o download grande
+            // falhar, registro e preço já estão atualizados.
+            var location = scope.ServiceProvider.GetRequiredService<ImportIpStateRanges>();
+            var locationRun = await location.ExecuteAsync(whenRepeated, stoppingToken);
+            logger.LogInformation("Geolocalização: execução {Id} terminou como {Outcome}.",
+                locationRun.Id, locationRun.Outcome);
         }
         catch (OperationCanceledException)
         {
