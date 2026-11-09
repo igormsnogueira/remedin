@@ -11,6 +11,7 @@ public static class DependencyInjection
         services.TryAddTimeProvider();
         services.AddScoped<ImportRegistrySnapshot>();
         services.AddScoped<ImportPriceList>();
+        services.AddScoped<ImportLeaflets>();
         services.AddScoped<ImportIpStateRanges>();
 
         return services;

@@ -91,6 +91,8 @@ export interface MedicineDetail {
   soldInPharmacy: boolean
   soldRecently: boolean
   cheapestConsumerPrice: number | null
+  /** Data da bula atual no Bulário Eletrônico ("2025-12-09"). Nula quando não há bula lá. */
+  leafletPublishedOn: string | null
 }
 
 export interface MedicineAlternative {

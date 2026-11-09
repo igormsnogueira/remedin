@@ -47,15 +47,19 @@ public static class DependencyInjection
 
         services.AddScoped<IMedicinePriceStore, MedicinePriceStore>();
 
+        services.AddScoped<ILeafletStore, PostgresLeaflets>();
+
         services.AddScoped<PostgresIpStates>();
         services.AddScoped<IIpStateStore>(provider => provider.GetRequiredService<PostgresIpStates>());
         services.AddScoped<IStateLocator>(provider => provider.GetRequiredService<PostgresIpStates>());
 
         services.AddSingleton<AnvisaRegistryReader>();
         services.AddSingleton<CmedPriceReader>();
+        services.AddSingleton<AnvisaLeafletReader>();
 
         services.AddHttpClient<IRegistrySnapshotSource, AnvisaRegistrySnapshotSource>(ConfigureDownload);
         services.AddHttpClient<IPriceSnapshotSource, CmedPriceSnapshotSource>(ConfigureDownload);
+        services.AddHttpClient<ILeafletSource, AnvisaLeafletSource>(ConfigureDownload);
         services.AddHttpClient<IIpStateSource, DbIpStateSource>(client =>
         {
             ConfigureDownload(client);
