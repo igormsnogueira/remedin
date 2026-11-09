@@ -41,6 +41,11 @@ public sealed class CatalogIngestionWorker(
             logger.LogInformation("Preço: execução {Id} terminou como {Outcome}.",
                 priceRun.Id, priceRun.Outcome);
 
+            var leaflets = scope.ServiceProvider.GetRequiredService<ImportLeaflets>();
+            var leafletRun = await leaflets.ExecuteAsync(whenRepeated, stoppingToken);
+            logger.LogInformation("Bulas: execução {Id} terminou como {Outcome}.",
+                leafletRun.Id, leafletRun.Outcome);
+
             // Por último: o catálogo não depende dela, e se o download grande
             // falhar, registro e preço já estão atualizados.
             var location = scope.ServiceProvider.GetRequiredService<ImportIpStateRanges>();

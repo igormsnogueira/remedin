@@ -22,6 +22,10 @@ public sealed record PresentationDetail(
 /// comercialização recente, e omitir isso faria o produto parecer incompleto
 /// sem explicar por quê (ADR 0007).
 /// </summary>
+/// <param name="LeafletPublishedOn">
+/// Data da bula atual no Bulário Eletrônico. Nula quando o medicamento não tem
+/// bula publicada lá.
+/// </param>
 public sealed record MedicineDetail(
     string RegistrationNumber,
     string Name,
@@ -33,7 +37,8 @@ public sealed record MedicineDetail(
     bool IsActive,
     string State,
     decimal IcmsRate,
-    IReadOnlyList<PresentationDetail> Presentations)
+    IReadOnlyList<PresentationDetail> Presentations,
+    DateOnly? LeafletPublishedOn = null)
 {
     /// <summary>
     /// Para que serve, em linguagem comum. Nulo quando não há tradução, e

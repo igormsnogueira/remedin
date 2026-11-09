@@ -90,4 +90,16 @@
     color: var(--color-text-muted);
     font-size: var(--text-sm);
   }
+
+  .external {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-3xs);
+    font-weight: 700;
+  }
+
+  .externalIcon {
+    inline-size: 1em;
+    block-size: 1em;
+  }
 }

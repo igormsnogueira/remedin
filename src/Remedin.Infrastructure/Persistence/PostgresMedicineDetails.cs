@@ -18,9 +18,10 @@ public sealed class PostgresMedicineDetails(RemedinDbContext context) : IMedicin
         SELECT m.registration_number, m.name, m.active_ingredient, m.manufacturer,
                m.therapeutic_class_code, m.therapeutic_class_name, m.prescription_band, m.status,
                p.ggrem_code, p.description, p.hospital_only, p.sold_recently,
-               consumer.amount, factory.amount
+               consumer.amount, factory.amount, leaflet.published_on
         FROM medicines m
-        LEFT JOIN presentations p USING (registration_number)
+        LEFT JOIN leaflets leaflet ON leaflet.registration_number = m.registration_number
+        LEFT JOIN presentations p ON p.registration_number = m.registration_number
         LEFT JOIN prices consumer
                ON consumer.registration_number = p.registration_number
               AND consumer.ggrem_code = p.ggrem_code
@@ -73,7 +74,8 @@ public sealed class PostgresMedicineDetails(RemedinDbContext context) : IMedicin
                 IsActive: reader.GetString(7) == "Active",
                 State: state.ToUpperInvariant(),
                 IcmsRate: rate,
-                Presentations: presentations);
+                Presentations: presentations,
+                LeafletPublishedOn: reader.IsDBNull(14) ? null : reader.GetFieldValue<DateOnly>(14));
 
             // A junção à esquerda devolve uma linha sem apresentação quando o
             // medicamento ainda não tem preço carregado.
