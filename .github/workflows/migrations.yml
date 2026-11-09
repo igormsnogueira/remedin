@@ -1,8 +1,12 @@
 name: Migrations
 
-# Disparo manual, de propósito. Aplicar o schema a cada merge na main deixaria o
-# banco à frente do código publicado sempre que o deploy da API atrasasse.
+# Roda sozinho quando um merge na main traz migration nova, e continua
+# disponível manualmente.
 on:
+  push:
+    branches: [main]
+    paths:
+      - src/Remedin.Infrastructure/Persistence/Migrations/**
   workflow_dispatch:
 
 # Compartilhado com o workflow de carga: migration e carga nunca rodam ao mesmo
