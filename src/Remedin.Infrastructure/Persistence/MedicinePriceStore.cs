@@ -167,7 +167,7 @@ public sealed class MedicinePriceStore(RemedinDbContext context) : IMedicinePric
         await using var writer = await connection.BeginBinaryImportAsync(
             """
             COPY presentations (registration_number, ggrem_code, description, hospital_only,
-                sold_recently, dosage_mg, unit_count)
+                sold_recently, dosage_mg, unit_count, institutional)
             FROM STDIN (FORMAT BINARY)
             """,
             cancellationToken);
@@ -203,6 +203,8 @@ public sealed class MedicinePriceStore(RemedinDbContext context) : IMedicinePric
                 {
                     await writer.WriteAsync(packaging.UnitCount.Value, NpgsqlDbType.Integer, cancellationToken);
                 }
+
+                await writer.WriteAsync(presentation.Institutional, NpgsqlDbType.Boolean, cancellationToken);
             }
         }
 

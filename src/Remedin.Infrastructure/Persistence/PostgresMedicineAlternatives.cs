@@ -26,6 +26,7 @@ public sealed class PostgresMedicineAlternatives(RemedinDbContext context) : IMe
         JOIN prices pr USING (registration_number, ggrem_code)
         WHERE p.registration_number = source.registration_number
           AND NOT p.hospital_only
+              AND NOT p.institutional
           AND pr.kind = 'Consumer'
           AND pr.icms_rate = @rate
           AND NOT pr.free_trade_zone

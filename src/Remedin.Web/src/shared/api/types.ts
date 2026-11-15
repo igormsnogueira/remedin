@@ -69,6 +69,8 @@ export interface PresentationDetail {
   soldRecently: boolean
   consumerPrice: number | null
   factoryPrice: number | null
+  /** Embalagem de compra institucional (hospital, prefeitura, rede): fora da escolha. */
+  institutional: boolean
 }
 
 export interface MedicineDetail {

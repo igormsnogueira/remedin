@@ -18,7 +18,7 @@ public sealed class PostgresMedicineDetails(RemedinDbContext context) : IMedicin
         SELECT m.registration_number, m.name, m.active_ingredient, m.manufacturer,
                m.therapeutic_class_code, m.therapeutic_class_name, m.prescription_band, m.status,
                p.ggrem_code, p.description, p.hospital_only, p.sold_recently,
-               consumer.amount, factory.amount, leaflet.published_on
+               consumer.amount, factory.amount, leaflet.published_on, p.institutional
         FROM medicines m
         LEFT JOIN leaflets leaflet ON leaflet.registration_number = m.registration_number
         LEFT JOIN presentations p ON p.registration_number = m.registration_number
@@ -90,7 +90,8 @@ public sealed class PostgresMedicineDetails(RemedinDbContext context) : IMedicin
                 HospitalOnly: reader.GetBoolean(10),
                 SoldRecently: reader.GetBoolean(11),
                 ConsumerPrice: reader.IsDBNull(12) ? null : reader.GetDecimal(12),
-                FactoryPrice: reader.IsDBNull(13) ? null : reader.GetDecimal(13)));
+                FactoryPrice: reader.IsDBNull(13) ? null : reader.GetDecimal(13),
+                Institutional: reader.GetBoolean(15)));
         }
 
         return detail;

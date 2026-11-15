@@ -89,4 +89,33 @@ public class PackagingTests
         Assert.Null(packaging.DosageInMilligrams);
         Assert.Null(packaging.UnitCount);
     }
+
+    [Theory]
+    [InlineData("10 MG COM CT BL AL PLAS PVC/PVDC OPC X 100 (EMB FRAC)")]
+    [InlineData("1000 MG COM CT BL AL PLAS AMB X 240 (EMB FRAC)")]
+    [InlineData("0,275 MG/ML SOL GOT OTO CX 50 FR GOT PLAS TRANS X 5 ML (EMB HOSP)")]
+    [InlineData("3,0 MG/ML SOL OR CX 50 FR PLAS PET AMB X 60 ML + 50 COP")]
+    [InlineData("1 MG/G CREM DERM CX 100 BG AL X 10 G")]
+    [InlineData("400 MG COM REV CX 50 FR PLAS PEAD OPC X 28")]
+    [InlineData("75 MG COM CT BL AL PLAS TRANS X 500")]
+    [InlineData("24 MG CAP DURA LIB PROL CT BL AL PLAS PVDC/PVC TRANS X 280")]
+    public void Embalagem_institucional_e_reconhecida(string description)
+    {
+        // Exemplos reais da lista da CMED de novembro de 2026.
+        Assert.True(Packaging.IsInstitutional(description));
+    }
+
+    [Theory]
+    [InlineData("50 MG COM REV CT BL AL AL X 30")]
+    [InlineData("100 MG COM REV CT FR PLAS OPC X 120")]
+    [InlineData("40 MG COM CT BL AL PLAS PVC OPC X 150")]
+    [InlineData("125 MG/ML SOL INJ SC CT 4 SER PREENC VD TRANS")]
+    [InlineData("5 MG/ML XPE CT FR VD AMB X 120 ML + COP")]
+    [InlineData(null)]
+    public void Embalagem_de_balcao_nao_e_institucional(string? description)
+    {
+        // Caixa de 120 e de 150 ainda é tratamento contínuo comprado na
+        // farmácia, e "CT 4 SER" tem poucas seringas.
+        Assert.False(Packaging.IsInstitutional(description));
+    }
 }
