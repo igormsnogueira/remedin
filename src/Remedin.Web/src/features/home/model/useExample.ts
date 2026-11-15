@@ -66,7 +66,7 @@ export function useExample(): ExampleState {
   }
 
   const lowestPrice =
-    groupPackages(medicine.data.presentations, false).find((option) => option.price !== null)
+    groupPackages(medicine.data.presentations, 'pharmacy').find((option) => option.price !== null)
       ?.price ?? null
 
   const result = alternatives.status === 'success' ? alternatives.data : null

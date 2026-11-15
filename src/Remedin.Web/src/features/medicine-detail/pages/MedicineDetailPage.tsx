@@ -32,8 +32,9 @@ export function MedicineDetailPage() {
 
   // Antes dos retornos antecipados: hook não pode ser chamado só às vezes.
   const presentations = medicine.status === 'success' ? medicine.data.presentations : []
-  const pharmacy = groupPackages(presentations, false)
-  const hospital = groupPackages(presentations, true)
+  const pharmacy = groupPackages(presentations, 'pharmacy')
+  const institutional = groupPackages(presentations, 'institutional')
+  const hospital = groupPackages(presentations, 'hospital')
   const { selected, select } = useSelectedPackage(pharmacy)
 
   if (medicine.status === 'loading' || medicine.status === 'idle') {
@@ -68,6 +69,7 @@ export function MedicineDetailPage() {
       <div className={styles.body}>
         <PackagesSection
           pharmacy={pharmacy}
+          institutional={institutional}
           hospital={hospital}
           selectedKey={selected?.key ?? null}
           onSelect={select}

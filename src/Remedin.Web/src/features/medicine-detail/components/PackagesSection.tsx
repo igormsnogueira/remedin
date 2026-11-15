@@ -9,6 +9,7 @@ import styles from './PackagesSection.module.css'
 
 interface PackagesSectionProps {
   pharmacy: PackageOption[]
+  institutional: PackageOption[]
   hospital: PackageOption[]
   selectedKey: string | null
   onSelect: (key: string) => void
@@ -24,10 +25,16 @@ interface PackagesSectionProps {
  * Botões de rádio de verdade, e não cartões clicáveis: assim as setas do
  * teclado trocam a opção e o leitor de tela diz "1 de 4, selecionado".
  */
-export function PackagesSection({ pharmacy, hospital, selectedKey, onSelect }: PackagesSectionProps) {
+export function PackagesSection({
+  pharmacy,
+  institutional,
+  hospital,
+  selectedKey,
+  onSelect,
+}: PackagesSectionProps) {
   const name = useId()
 
-  if (pharmacy.length === 0 && hospital.length === 0) {
+  if (pharmacy.length === 0 && institutional.length === 0 && hospital.length === 0) {
     return null
   }
 
@@ -63,7 +70,26 @@ export function PackagesSection({ pharmacy, hospital, selectedKey, onSelect }: P
         </fieldset>
       )}
 
-      {/* Recolhido: não vai ao balcão, e só interessa a quem trabalha na área. */}
+      {/* Recolhidas: não são de balcão. Ficam na ficha para quem trabalha na
+          área, mas fora da escolha e da comparação. */}
+      {institutional.length > 0 && (
+        <details className={styles.hospital}>
+          <summary>Embalagens para hospitais e redes ({institutional.length})</summary>
+          <p className={styles.hospitalNote}>
+            Caixas grandes ou fracionáveis, compradas por hospital, prefeitura ou rede de
+            farmácia. Não entram na comparação de preço.
+          </p>
+          <ul className={styles.plainList}>
+            {institutional.map((option) => (
+              <li key={option.key} className={styles.row}>
+                <span className={styles.description}>{option.title}</span>
+                <Price option={option} />
+              </li>
+            ))}
+          </ul>
+        </details>
+      )}
+
       {hospital.length > 0 && (
         <details className={styles.hospital}>
           <summary>Uso restrito a hospital ({hospital.length})</summary>

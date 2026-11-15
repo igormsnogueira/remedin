@@ -24,18 +24,36 @@ export interface PackageOption {
 }
 
 /**
+ * Para que a embalagem serve:
+ * - pharmacy: balcão, a que a pessoa escolhe e compara;
+ * - institutional: compra de hospital, prefeitura ou rede (caixa com 500
+ *   comprimidos, 50 frascos, fracionável). A regra é do domínio, na API;
+ * - hospital: uso restrito a hospital, com preço de fábrica.
+ */
+export type PackageKind = 'pharmacy' | 'institutional' | 'hospital'
+
+function kindOf(presentation: PresentationDetail): PackageKind {
+  if (presentation.hospitalOnly) {
+    return 'hospital'
+  }
+
+  return presentation.institutional ? 'institutional' : 'pharmacy'
+}
+
+/**
  * Embalagens que só diferem no material do blister saem com o mesmo texto
  * legível e o mesmo preço. Para quem compra são a mesma coisa, então viram uma
  * opção só. Ordem: da mais barata para a mais cara, sem preço por último.
  */
 export function groupPackages(
   presentations: PresentationDetail[],
-  hospital: boolean,
+  kind: PackageKind,
 ): PackageOption[] {
   const options = new Map<string, PackageOption>()
+  const hospital = kind === 'hospital'
 
   for (const presentation of presentations) {
-    if (presentation.hospitalOnly !== hospital) {
+    if (kindOf(presentation) !== kind) {
       continue
     }
 

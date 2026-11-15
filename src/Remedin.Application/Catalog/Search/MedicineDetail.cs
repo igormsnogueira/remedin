@@ -6,13 +6,18 @@ namespace Remedin.Application.Catalog.Search;
 /// <param name="ConsumerPrice">
 /// Ausente em produto de uso hospitalar, que não vai ao balcão.
 /// </param>
+/// <param name="Institutional">
+/// Embalagem de compra institucional (hospital, prefeitura, rede de farmácia).
+/// Aparece na ficha, mas fora da escolha e da comparação de preço.
+/// </param>
 public sealed record PresentationDetail(
     string GgremCode,
     string Description,
     bool HospitalOnly,
     bool SoldRecently,
     decimal? ConsumerPrice,
-    decimal? FactoryPrice);
+    decimal? FactoryPrice,
+    bool Institutional = false);
 
 /// <summary>
 /// A ficha do medicamento.
@@ -61,7 +66,7 @@ public sealed record MedicineDetail(
     public bool SoldRecently => Presentations.Any(p => p.SoldRecently);
 
     public decimal? CheapestConsumerPrice => Presentations
-        .Where(p => !p.HospitalOnly)
+        .Where(p => !p.HospitalOnly && !p.Institutional)
         .Select(p => p.ConsumerPrice)
         .Where(price => price is not null)
         .Min();

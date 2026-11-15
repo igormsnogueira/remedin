@@ -31,6 +31,53 @@ public sealed partial record Packaging(decimal? DosageInMilligrams, int? UnitCou
         return new Packaging(ReadDosage(description), ReadUnitCount(description));
     }
 
+    /// <summary>
+    /// Acima disso a caixa é de compra institucional (hospital, prefeitura,
+    /// rede de farmácia). De 101 a 200 ainda aparece muito tratamento contínuo
+    /// de balcão, como "X 120"; de 280, 400 e 500 não.
+    /// </summary>
+    public const int RetailUnitLimit = 200;
+
+    /// <summary>
+    /// A partir disso, caixa com vários frascos, ampolas ou bisnagas não é de
+    /// balcão: "CX 50 FR", "CX 100 BG". Embalagem de varejo com mais de um
+    /// recipiente existe, mas com poucos, como "CT 4 SER".
+    /// </summary>
+    public const int RetailContainerLimit = 20;
+
+    /// <summary>
+    /// Embalagem vendida a instituição, e não a quem vai ao balcão.
+    ///
+    /// A CMED publica essas embalagens na mesma lista e sem campo próprio. Na
+    /// comparação de preço elas distorcem tudo: a caixa de 500 comprimidos sai
+    /// mais barata por unidade, mas ninguém compra 500 comprimidos na farmácia.
+    /// Medido no catálogo de novembro de 2026: 439 apresentações de balcão com
+    /// mais de 200 unidades, além das marcadas como fracionável ou hospitalar.
+    /// </summary>
+    public static bool IsInstitutional(string? description)
+    {
+        if (string.IsNullOrWhiteSpace(description))
+        {
+            return false;
+        }
+
+        if (InstitutionalMark().IsMatch(description))
+        {
+            return true;
+        }
+
+        var containers = MultipleContainers().Match(description);
+
+        if (containers.Success
+            && int.TryParse(containers.Groups[1].Value, out var count)
+            && count >= RetailContainerLimit)
+        {
+            return true;
+        }
+
+        return ReadUnitCount(description) > RetailUnitLimit;
+    }
+
     private static decimal? ReadDosage(string description)
     {
         var match = Dosage().Match(description);
@@ -69,4 +116,16 @@ public sealed partial record Packaging(decimal? DosageInMilligrams, int? UnitCou
     /// </summary>
     [GeneratedRegex(@"X\s*(\d+)\s*$", RegexOptions.IgnoreCase)]
     private static partial Regex UnitsInPack();
+
+    /// <summary>
+    /// "(EMB FRAC)" é embalagem fracionável: a farmácia abre a caixa e vende
+    /// em partes. "(EMB HOSP)" é a hospitalar que não veio marcada como uso
+    /// restrito no campo próprio.
+    /// </summary>
+    [GeneratedRegex(@"\bEMB\s*(FRAC|HOSP)", RegexOptions.IgnoreCase)]
+    private static partial Regex InstitutionalMark();
+
+    /// <summary>"CX 50 FR", "CX 100 BG", "CX 50 AMP": quantos recipientes vêm na caixa.</summary>
+    [GeneratedRegex(@"\bCX\s+(\d+)\s+(FR|FA|AMP|BG|SER|TB|ENV|STR)\b", RegexOptions.IgnoreCase)]
+    private static partial Regex MultipleContainers();
 }

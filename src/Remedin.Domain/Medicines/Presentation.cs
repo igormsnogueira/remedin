@@ -40,6 +40,12 @@ public sealed class Presentation
     /// </summary>
     public Packaging Packaging => Packaging.Read(Description);
 
+    /// <summary>
+    /// Embalagem de compra institucional, fora da escolha e da comparação de
+    /// preço de balcão. Ver <see cref="Packaging.IsInstitutional"/>.
+    /// </summary>
+    public bool Institutional => Packaging.IsInstitutional(Description);
+
     public static Presentation Create(
         string ggremCode,
         string description,
