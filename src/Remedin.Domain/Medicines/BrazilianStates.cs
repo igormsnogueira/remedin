@@ -3,16 +3,6 @@ using System.Text;
 
 namespace Remedin.Domain.Medicines;
 
-/// <summary>
-/// As 27 unidades da federação, por sigla.
-///
-/// Existe porque a consulta de preço é por estado e a pessoa escolhe o dela numa
-/// lista: "Acre" é uma escolha, "AC" é uma adivinhação.
-///
-/// Separada de <see cref="IcmsRates"/> de propósito. A alíquota muda quando o
-/// estado altera a lei; o nome não muda nunca. Guardar as duas no mesmo
-/// dicionário faria a tabela de imposto carregar dado que não é dela.
-/// </summary>
 public static class BrazilianStates
 {
     private static readonly Dictionary<string, string> NamesByCode =
@@ -47,11 +37,6 @@ public static class BrazilianStates
             ["TO"] = "Tocantins",
         };
 
-    /// <summary>
-    /// Nomes como aparecem em fontes externas que não usam a grafia oficial:
-    /// a base de geolocalização por IP escreve em inglês o Distrito Federal.
-    /// Os demais nomes batem com os de cima depois de tirar acento e caixa.
-    /// </summary>
     private static readonly Dictionary<string, string> Aliases = new(StringComparer.Ordinal)
     {
         ["federal district"] = "DF",
@@ -63,10 +48,6 @@ public static class BrazilianStates
 
     public static IReadOnlyCollection<string> Codes => NamesByCode.Keys;
 
-    /// <summary>
-    /// A sigla a partir do nome do estado, com ou sem acento, em qualquer
-    /// caixa: "São Paulo", "Sao Paulo" e "SAO PAULO" dão "SP".
-    /// </summary>
     public static bool TryFindByName(string? name, out string code)
     {
         if (!string.IsNullOrWhiteSpace(name))
@@ -86,8 +67,6 @@ public static class BrazilianStates
 
     private static string Normalize(string name)
     {
-        // FormD separa a letra do acento ("ã" vira "a" + til), e o acento sai
-        // por ser da categoria de marca sem espaço.
         var decomposed = name.Trim().Normalize(NormalizationForm.FormD);
         var builder = new StringBuilder(decomposed.Length);
 

@@ -14,8 +14,6 @@ export const router = createBrowserRouter([
   {
     path: '/',
     Component: AppLayout,
-    // No pai, cobre falha do próprio layout. Nos filhos, mantém cabeçalho e
-    // rodapé na tela quando o erro é de uma página só.
     ErrorBoundary: ErrorPage,
     children: [
       { index: true, Component: SearchPage, ErrorBoundary: ErrorPage },

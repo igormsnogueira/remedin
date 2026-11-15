@@ -3,14 +3,6 @@ using Remedin.Domain.Ingestion;
 
 namespace Remedin.Application.Catalog.Ingestion;
 
-/// <summary>
-/// Carrega quais medicamentos têm bula no Bulário Eletrônico, e de quando.
-///
-/// O PDF não vem junto: o download no Bulário passa por uma verificação
-/// contra robôs, e contorná-la seria burlar uma proteção posta de propósito.
-/// O que a lista traz é o bastante para a ficha mostrar a data e levar ao
-/// Bulário já filtrado pelo registro.
-/// </summary>
 public sealed class ImportLeaflets(
     ILeafletSource source,
     ILeafletStore store,

@@ -7,14 +7,11 @@ import styles from './Field.module.css'
 
 interface TextFieldProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'id'> {
   label: string
-  /** Esconde o rótulo na tela sem tirá-lo do leitor de tela. */
   hideLabel?: boolean
   ref?: Ref<HTMLInputElement>
 }
 
 export function TextField({ label, hideLabel = false, className, ...rest }: TextFieldProps) {
-  // useId garante que o for do label case com o id do input mesmo com dois
-  // campos iguais na mesma página.
   const id = useId()
 
   return (

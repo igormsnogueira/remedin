@@ -33,8 +33,6 @@ export function PurposeListPage() {
 
       {purposes.status === 'success' && (
         <div className={styles.grid}>
-          {/* Do grupo com mais remédios para o com menos: os primeiros são
-              os que mais gente procura, e ganham o bloco maior. */}
           {[...purposes.data]
             .sort((a, b) => b.medicineCount - a.medicineCount)
             .map((purpose, index) => (

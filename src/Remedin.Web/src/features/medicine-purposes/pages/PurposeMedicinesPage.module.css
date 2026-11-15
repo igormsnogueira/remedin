@@ -48,7 +48,6 @@
     font-weight: 700;
   }
 
-  /* No celular o seletor desce para a linha de baixo, de ponta a ponta. */
   .state {
     grid-column: 1 / -1;
     min-inline-size: 12rem;

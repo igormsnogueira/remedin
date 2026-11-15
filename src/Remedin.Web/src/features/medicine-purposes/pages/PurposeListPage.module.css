@@ -24,8 +24,6 @@
     font-size: var(--text-lg);
   }
 
-  /* Mosaico: auto-fill cria as colunas conforme o espaço, e os dois grupos
-     com mais remédios ocupam duas colunas quando há pelo menos três. */
   .grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(min(100%, 13rem), 1fr));

@@ -11,10 +11,6 @@ public class CmedPriceReaderTests
         "CLASSE TERAPÊUTICA;PF Sem Impostos;PF 0%;PF 18 %;PF 18 %  ALC;PMC 18 %;PMC 22,5 %;" +
         "RESTRIÇÃO HOSPITALAR;COMERCIALIZAÇÃO 2025;TARJA";
 
-    /// <summary>
-    /// A lista real traz 41 linhas de texto jurídico antes do cabeçalho.
-    /// Reproduzir isso é o que faz o teste cobrir a detecção.
-    /// </summary>
     private static readonly string[] Preamble =
     [
         "Secretaria Executiva - CMED;;;;;;;;;;;;;;;;;",
@@ -66,8 +62,6 @@ public class CmedPriceReaderTests
     [Fact]
     public void Interpreta_preco_com_virgula_decimal()
     {
-        // Com cultura invariável, "27,44" viraria 2744 e o site mostraria
-        // preço cem vezes maior.
         var result = Reader.ReadRows(Csv(Row(consumerPrice: "1.234,56")));
 
         var consumer = result.Rows[0].Prices.First(p => p.Kind == PriceKind.Consumer && p.Aliquot == 18m);
@@ -118,8 +112,6 @@ public class CmedPriceReaderTests
     [Fact]
     public void Preco_vazio_nao_vira_zero()
     {
-        // Produto hospitalar não tem preço ao consumidor. Gravar zero diria
-        // que é de graça.
         var result = Reader.ReadRows(Csv(Row(consumerPrice: "")));
 
         Assert.DoesNotContain(
@@ -130,8 +122,6 @@ public class CmedPriceReaderTests
     [Fact]
     public void Substancia_com_ponto_e_virgula_dentro_nao_desalinha_a_linha()
     {
-        // A CMED escreve associação como "A;B;C" entre aspas. Quebrar a linha
-        // por ";" na mão jogaria todos os campos seguintes para o lugar errado.
         var result = Reader.ReadRows(Csv(Row(substance: "\"NICOTINAMIDA;DEXPANTENOL\"")));
 
         var row = result.Rows[0];

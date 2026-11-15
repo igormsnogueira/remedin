@@ -1,8 +1,5 @@
 @layer components {
   .card {
-    /* Consulta de contêiner: o cartão responde ao espaço que ele tem, não ao
-       tamanho da janela. O mesmo componente serve numa lista estreita e numa
-       coluna larga sem media query. */
     container-type: inline-size;
     position: relative;
 
@@ -16,8 +13,6 @@
     transition: background-color var(--transition-fast), box-shadow var(--transition-fast);
   }
 
-  /* A borda da esquerda na cor da finalidade: numa lista longa, o olho
-     separa os remédios de pressão dos de dor antes de ler. */
   .card {
     border-inline-start: 4px solid var(--purpose-mid);
   }
@@ -27,8 +22,6 @@
     box-shadow: var(--shadow-md);
   }
 
-  /* O anel de foco vai no cartão todo, que é a área clicável, e não só no
-     nome. */
   .card:has(.name:focus-visible) {
     outline: var(--focus-ring);
     outline-offset: var(--focus-offset);
@@ -38,7 +31,6 @@
     outline: none;
   }
 
-  /* O link cobre o cartão inteiro. */
   .name::after {
     content: '';
     position: absolute;
@@ -46,7 +38,6 @@
     border-radius: inherit;
   }
 
-  /* Acima da camada do link, para o clique no botão não abrir a ficha. */
   .favorite {
     position: relative;
     z-index: 1;
@@ -58,8 +49,6 @@
     gap: var(--space-2xs);
   }
 
-  /* Estreito: preço à esquerda e botão à direita, embaixo do texto. Largo:
-     os dois na coluna da direita. */
   .aside {
     display: flex;
     align-items: center;

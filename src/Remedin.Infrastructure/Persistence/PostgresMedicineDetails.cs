@@ -5,15 +5,8 @@ using Remedin.Domain.Medicines;
 
 namespace Remedin.Infrastructure.Persistence;
 
-/// <summary>
-/// Monta a ficha do medicamento com os preços do estado consultado.
-/// </summary>
 public sealed class PostgresMedicineDetails(RemedinDbContext context) : IMedicineDetails
 {
-    /// <summary>
-    /// Uma consulta só, com o medicamento repetido por apresentação. Duas
-    /// idas ao banco custariam mais que a repetição de sete colunas.
-    /// </summary>
     private const string Sql = """
         SELECT m.registration_number, m.name, m.active_ingredient, m.manufacturer,
                m.therapeutic_class_code, m.therapeutic_class_name, m.prescription_band, m.status,
@@ -77,8 +70,6 @@ public sealed class PostgresMedicineDetails(RemedinDbContext context) : IMedicin
                 Presentations: presentations,
                 LeafletPublishedOn: reader.IsDBNull(14) ? null : reader.GetFieldValue<DateOnly>(14));
 
-            // A junção à esquerda devolve uma linha sem apresentação quando o
-            // medicamento ainda não tem preço carregado.
             if (reader.IsDBNull(8))
             {
                 continue;

@@ -2,18 +2,8 @@ using Remedin.Domain.Medicines;
 
 namespace Remedin.Infrastructure.Ingestion.Cmed;
 
-/// <summary>
-/// Um dos 52 preços publicados por apresentação, ainda como veio do arquivo.
-///
-/// O teto legal depende da alíquota de ICMS do estado onde o medicamento é
-/// vendido, então guardar um só faria o site exibir valor abaixo do legal em
-/// boa parte do país (ADR 0006).
-/// </summary>
-/// <param name="Aliquot">Nulo na coluna "Sem Impostos".</param>
-/// <param name="FreeTradeZone">Coluna ALC, das áreas de livre comércio.</param>
 public sealed record PriceQuote(PriceKind Kind, decimal? Aliquot, bool FreeTradeZone, decimal Value);
 
-/// <summary>Uma linha da lista de preços, já interpretada.</summary>
 public sealed record PriceRow(
     RegistrationNumber Registration,
     string GgremCode,

@@ -4,19 +4,8 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace Remedin.Infrastructure.Persistence.Migrations
 {
-    /// <summary>
-    /// Guarda a dosagem e a quantidade lidas da descrição da apresentação.
-    ///
-    /// Das 25.691 apresentações, 14.548 têm os dois valores legíveis com
-    /// segurança. Nas demais as colunas ficam nulas, e a comparação por
-    /// unidade não é oferecida (ADR 0010).
-    ///
-    /// Preenchidas pela carga: a leitura é regra do domínio, e reescrevê-la em
-    /// SQL criaria duas versões da mesma coisa.
-    /// </summary>
     public partial class PresentationPackaging : Migration
     {
-        /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.Sql("""
@@ -26,7 +15,6 @@ namespace Remedin.Infrastructure.Persistence.Migrations
                 """);
         }
 
-        /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.Sql("""

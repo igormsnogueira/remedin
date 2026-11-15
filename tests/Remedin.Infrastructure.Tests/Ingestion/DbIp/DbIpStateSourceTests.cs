@@ -28,8 +28,6 @@ public class DbIpStateSourceTests
     [Fact]
     public async Task Junta_faixas_vizinhas_do_mesmo_estado()
     {
-        // Cidades diferentes do mesmo estado vêm em linhas seguidas. Para
-        // descobrir o estado, são uma faixa só.
         using var csv = Csv(
             "177.0.0.0,177.0.0.255,SA,BR,\"Santa Catarina\",Florianópolis,0,0",
             "177.0.1.0,177.0.1.255,SA,BR,\"Santa Catarina\",Joinville,0,0",
@@ -70,7 +68,6 @@ public class DbIpStateSourceTests
     [Fact]
     public async Task Recusa_arquivo_com_poucas_faixas_do_brasil()
     {
-        // Arquivo truncado trocaria a tabela boa por uma quase vazia.
         using var csv = Csv("177.0.0.0,177.0.0.255,SA,BR,\"Santa Catarina\",Florianópolis,0,0");
 
         await Assert.ThrowsAsync<InvalidDataException>(

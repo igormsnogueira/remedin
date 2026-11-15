@@ -5,12 +5,6 @@ import { SelectField } from '@/shared/ui/Field/SelectField'
 
 import { fetchStates } from '../api/fetchStates'
 
-/**
- * Seletor do estado do usuário.
- *
- * Enquanto a lista não chega, mostra só a sigla já escolhida: um seletor vazio
- * pareceria defeito, e a escolha anterior continua válida.
- */
 export function StateSelect({ className }: { className?: string }) {
   const { state, setState } = useSelectedState()
   const states = useQuery<StateOption[]>(fetchStates, [])

@@ -7,7 +7,6 @@ public class AnvisaLeafletReaderTests
 {
     private static readonly AnvisaLeafletReader Reader = new();
 
-    // Linhas copiadas da publicação de outubro de 2026.
     private const string Meclin =
         "172780;\"MECLIN\";\"101180165\";6;\"25351162067200258\";\"62462015000129\";" +
         "\"APSEN FARMACEUTICA S/A\";34546761;\"1578799252\";\"12/09/2025 06:48:52\";" +
@@ -36,8 +35,6 @@ public class AnvisaLeafletReaderTests
     [Fact]
     public void Data_vem_com_o_mes_antes_do_dia()
     {
-        // "07/24/2026" só existe como 24 de julho. Lida como dia/mês, seria
-        // recusada; em datas como 12/09 sairia trocada sem aviso.
         using var csv = Csv(Omeprazol);
 
         var snapshot = Reader.ReadRows(csv, "hash");

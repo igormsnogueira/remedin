@@ -7,21 +7,11 @@ using Remedin.Domain.Medicines;
 
 namespace Remedin.Infrastructure.Ingestion.Anvisa;
 
-/// <summary>
-/// Lê o CSV de medicamentos registrados da ANVISA.
-///
-/// As regras vêm da análise da base real, documentada em
-/// docs/analise-dados-anvisa.md.
-/// </summary>
 public sealed partial class AnvisaRegistryReader
 {
-    /// <summary>
-    /// O arquivo é latin1. Declarar o encoding é obrigatório: lido como UTF-8
-    /// a acentuação quebra sem gerar erro.
-    /// </summary>
+    // O arquivo da ANVISA é Latin-1; lido como UTF-8, o acento quebra sem dar erro.
     private static readonly Encoding FileEncoding = Encoding.Latin1;
 
-    /// <summary>O arquivo real tem 7,9 MB; abaixo disso veio truncado.</summary>
     public const long MinimumBytes = 1_000_000;
 
     private const string RegistrationNumberColumn = "NUMERO_REGISTRO_PRODUTO";
@@ -45,7 +35,6 @@ public sealed partial class AnvisaRegistryReader
         return ReadRows(content);
     }
 
-    /// <summary>Sem a validação de arquivo. Serve para ler amostra em teste.</summary>
     public RegistryReadResult ReadRows(Stream content)
     {
         ArgumentNullException.ThrowIfNull(content);
@@ -68,8 +57,6 @@ public sealed partial class AnvisaRegistryReader
 
             if (!RegistrationNumber.TryParse(Field(csv, RegistrationNumberColumn), out var number))
             {
-                // Um quarto da base não tem número de registro. É o filtro de
-                // escopo do catálogo, não um defeito do arquivo.
                 rejected.Add(new RejectedRow(csv.Parser.Row, "sem número de registro"));
                 continue;
             }
@@ -82,7 +69,6 @@ public sealed partial class AnvisaRegistryReader
                 continue;
             }
 
-            // A base traz 3.438 linhas duplicadas por inteiro. A primeira vale.
             if (medicines.ContainsKey(number.Value))
             {
                 duplicates++;
@@ -117,8 +103,6 @@ public sealed partial class AnvisaRegistryReader
             Delimiter = ";",
             HasHeaderRecord = true,
             TrimOptions = TrimOptions.Trim,
-            // A base tem aspas soltas em nome de produto. Interromper a carga
-            // inteira por causa disso custa mais do que ignorar a linha.
             BadDataFound = null,
             MissingFieldFound = null,
         };
@@ -141,10 +125,6 @@ public sealed partial class AnvisaRegistryReader
             ? value.Trim()
             : null;
 
-    /// <summary>
-    /// A ANVISA publica o fabricante como "CNPJ - RAZÃO SOCIAL". O CNPJ não
-    /// ajuda quem procura o remédio e sujaria o índice de busca.
-    /// </summary>
     private static string? WithoutCompanyId(string? manufacturer) =>
         manufacturer is null ? null : CompanyIdPrefix().Replace(manufacturer, string.Empty).Trim();
 

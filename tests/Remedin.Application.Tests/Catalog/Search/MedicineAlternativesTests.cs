@@ -6,12 +6,9 @@ public class MedicineAlternativesTests
 {
     private int _lastRegistration;
 
-
     [Fact]
     public void Economia_e_por_comprimido_e_nao_por_caixa()
     {
-        // R$ 150,36 em 28 cápsulas contra R$ 43,70 em 56: comparar as caixas
-        // daria R$ 106,66, número que não corresponde a nada que a pessoa paga.
         var result = Result(
             Alternative("REFERÊNCIA", price: 150.36m, dosage: 20, units: 28, current: true),
             Alternative("GENÉRICO", price: 43.70m, dosage: 20, units: 56));
@@ -45,7 +42,6 @@ public class MedicineAlternativesTests
     [Fact]
     public void Sem_quantidade_legivel_no_consultado_nao_ha_economia()
     {
-        // Frasco de xarope: não dá para dizer quantas doses tem.
         var result = Result(
             Alternative("XAROPE", price: 30m, dosage: 20, units: null, current: true),
             Alternative("COMPRIMIDO", price: 12m, dosage: 20, units: 30));
@@ -68,7 +64,6 @@ public class MedicineAlternativesTests
     [Fact]
     public void Sem_o_consultado_na_lista_nao_ha_com_o_que_comparar()
     {
-        // Acontece quando o medicamento consultado não tem preço publicado.
         var result = Result(Alternative("OUTRO", price: 20m, dosage: 20, units: 30));
 
         Assert.Null(result.CheapestComparable);

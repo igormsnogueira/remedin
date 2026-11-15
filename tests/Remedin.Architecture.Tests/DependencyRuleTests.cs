@@ -5,14 +5,6 @@ using Remedin.Domain.Medicines;
 
 namespace Remedin.Architecture.Tests;
 
-/// <summary>
-/// A regra de dependência do Clean Architecture já é imposta pelas referências
-/// de projeto: o compilador não deixa o domínio enxergar infraestrutura.
-///
-/// Estes testes cobrem o que a referência de projeto não cobre — dependência
-/// que entra por transitividade, ou por alguém adicionar a referência errada
-/// sem perceber o que ela significa.
-/// </summary>
 public class DependencyRuleTests
 {
     private static readonly Assembly Domain = typeof(RegistrationNumber).Assembly;
@@ -47,8 +39,6 @@ public class DependencyRuleTests
 
     private static void AssertDoesNotDependOn(Assembly assembly, string[] forbidden, string rule)
     {
-        // Sem esta guarda, um assembly vazio faria a regra passar sem ter sido
-        // verificada — o teste viraria enfeite conforme o projeto crescesse.
         var types = Types.InAssembly(assembly).GetTypes().ToArray();
         Assert.True(
             types.Length > 0,

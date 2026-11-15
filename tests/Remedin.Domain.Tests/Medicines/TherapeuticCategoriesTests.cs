@@ -20,8 +20,6 @@ public class TherapeuticCategoriesTests
     [InlineData("A10L", "Estômago, intestino e diabetes")]
     public void Classe_sem_traducao_cai_na_descricao_do_grupo(string code, string expected)
     {
-        // São 528 classes e as mais comuns cobrem 42% do catálogo. O grupo
-        // garante que nenhum medicamento fique sem descrição.
         Assert.Equal(expected, TherapeuticCategories.Describe(code)!.Label);
     }
 
@@ -51,8 +49,6 @@ public class TherapeuticCategoriesTests
     [InlineData("Z9")]
     public void Codigo_sem_traducao_devolve_ausencia(string? code)
     {
-        // Nulo em vez de chute: a interface mostra o nome técnico da fonte,
-        // que é impreciso mas verdadeiro.
         Assert.Null(TherapeuticCategories.Describe(code));
     }
 

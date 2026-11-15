@@ -1,5 +1,4 @@
 @layer components {
-  /* Preso embaixo, no centro, por cima do conteúdo e sem empurrá-lo. */
   .region {
     position: fixed;
     inset-inline: var(--space-sm);
@@ -27,7 +26,6 @@
     animation: notice-in 420ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
   }
 
-  /* A cápsula balança como se estivesse sendo sacudida para acordar. */
   .mark {
     display: grid;
     place-items: center;
@@ -59,9 +57,6 @@
     font-weight: 700;
   }
 
-  /* A barra anda rápido no começo e desacelera perto do fim, sem nunca
-     chegar sozinha a 100%: quem completa é a resposta da API. Mentir que
-     falta pouco seria pior que não ter barra. */
   .progress {
     overflow: hidden;
     block-size: 0.3rem;
@@ -76,6 +71,7 @@
     border-radius: inherit;
     background-color: var(--color-accent-light);
     transform-origin: left center;
+    /* Nunca chega a 100% sozinha: quem completa é a resposta da API. */
     animation: progress 50s cubic-bezier(0.1, 0.6, 0.3, 1) both;
   }
 

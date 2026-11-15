@@ -5,14 +5,6 @@ using Remedin.Domain.Ingestion;
 
 namespace Remedin.Application.Location;
 
-/// <summary>
-/// Carrega a base de geolocalização por IP, para o site abrir com o estado de
-/// quem acessa já escolhido.
-///
-/// A publicação é mensal, e a carga roda toda semana com as outras. Por isso a
-/// verificação de "já carregado" acontece antes do download: são mais de 100
-/// MB, e baixar quatro vezes por mês para descartar três seria desperdício.
-/// </summary>
 public sealed class ImportIpStateRanges(
     IIpStateSource source,
     IIpStateStore store,
@@ -33,6 +25,7 @@ public sealed class ImportIpStateRanges(
 
         try
         {
+            // A publicação é mensal e passa de 100 MB: confere se já foi carregada antes de baixar.
             var lastRelease = await journal.LastSuccessfulContentHashAsync(SourceName, cancellationToken);
 
             if (lastRelease == currentRelease && whenRepeated == RepeatedPublication.Skip)
@@ -46,7 +39,6 @@ public sealed class ImportIpStateRanges(
 
                 if (snapshot.Release == lastRelease && whenRepeated == RepeatedPublication.Skip)
                 {
-                    // A deste mês ainda não saiu, e a anterior já está no banco.
                     run.Skip(snapshot.Release, clock.GetUtcNow());
                     logger.LogInformation(
                         "Geolocalização: publicação {Release} já carregada; a deste mês ainda não saiu.",
@@ -84,7 +76,6 @@ public sealed class ImportIpStateRanges(
         return run;
     }
 
-    /// <summary>"2026-11": o mesmo formato do nome do arquivo publicado.</summary>
     public static string ReleaseOf(DateOnly month) =>
         month.ToString("yyyy-MM", CultureInfo.InvariantCulture);
 }

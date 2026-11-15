@@ -17,8 +17,6 @@ import { SearchForm } from '../components/SearchForm'
 import styles from './SearchPage.module.css'
 
 export function SearchPage() {
-  // O termo vive na URL, não em useState: assim a busca é compartilhável e o
-  // botão voltar do navegador funciona.
   const [params, setParams] = useSearchParams()
   const term = params.get('q') ?? ''
 
@@ -32,23 +30,15 @@ export function SearchPage() {
     [term, state, page],
   )
 
-  // A key recria o formulário quando o termo da URL muda. Sem ela, o campo
-  // guardaria o texto antigo depois de um atalho da home ou do botão voltar.
-  //
-  // Buscar de novo volta para a primeira página: continuar na página 3 de um
-  // resultado que não existe mais mostraria uma tela vazia.
   const form = (
     <SearchForm
       key={term}
       initialTerm={term}
       onSearch={(value) => setParams(value ? { q: value } : {})}
-      // Na home o cartão em volta já tem título e explicação do que digitar.
       hideLabel={!term}
     />
   )
 
-  // Sem termo, a mesma rota é a apresentação do site. Assim os links de busca
-  // compartilhados continuam abrindo direto nos resultados.
   if (!term) {
     return <HomePage search={form} />
   }
@@ -76,8 +66,6 @@ export function SearchPage() {
           </Notice>
         ) : (
           <section className={styles.results}>
-            {/* polite anuncia a contagem quando a lista muda, sem interromper
-                quem está digitando. */}
             <p className={styles.count} aria-live="polite">
               {results.data.medicines.total.toLocaleString('pt-BR')} resultados · preço para{' '}
               {results.data.state}

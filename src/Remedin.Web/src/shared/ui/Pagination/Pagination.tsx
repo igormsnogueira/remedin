@@ -6,7 +6,6 @@ import styles from './Pagination.module.css'
 interface PaginationProps {
   page: PagedResults<unknown>
   onChange: (pageNumber: number) => void
-  /** Desabilita os botões enquanto a página pedida ainda não chegou. */
   busy?: boolean
 }
 

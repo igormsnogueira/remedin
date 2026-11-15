@@ -38,7 +38,6 @@
     outline: none;
   }
 
-  /* O link cobre o cartão inteiro. */
   .name::after {
     content: '';
     position: absolute;
@@ -46,15 +45,11 @@
     border-radius: inherit;
   }
 
-  /* Acima da camada do link, para remover sem abrir a ficha. */
   .remove {
     position: relative;
     z-index: 1;
   }
 
-  /* A grade fica num filho do cartão: um elemento não consulta o próprio
-     tamanho, então quem responde à largura precisa estar um nível abaixo de
-     quem declara container-type. */
   .layout {
     display: flex;
     flex-direction: column;

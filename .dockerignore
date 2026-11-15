@@ -1,7 +1,3 @@
-# O contexto de build é a raiz do repositório. Sem esta lista, o Docker
-# enviaria node_modules, os CSVs de dados e as saídas de compilação locais a
-# cada build — e bin/obj da máquina iriam parar dentro da imagem.
-
 **/bin
 **/obj
 **/node_modules

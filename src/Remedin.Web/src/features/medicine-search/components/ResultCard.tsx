@@ -9,13 +9,6 @@ import { Tag } from '@/shared/ui/Tag/Tag'
 
 import styles from './ResultCard.module.css'
 
-/**
- * Um resultado de busca, clicável por inteiro.
- *
- * O cartão não é mais um <a> em volta de tudo: o botão de favorito não pode
- * ficar dentro de um link. O link fica no nome e cobre o cartão com um
- * pseudo-elemento, e o botão fica por cima dele.
- */
 export function ResultCard({ medicine }: { medicine: MedicineSummary }) {
   return (
     <article
@@ -24,8 +17,6 @@ export function ResultCard({ medicine }: { medicine: MedicineSummary }) {
     >
       <div className={styles.layout}>
         <div>
-          {/* Mesmo nome de transição do título da ficha: ao abrir, o nome
-              desliza do cartão até o topo da página. */}
           <Link
             className={styles.name}
             to={`/medicamento/${medicine.registrationNumber}`}

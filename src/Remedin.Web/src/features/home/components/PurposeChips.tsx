@@ -7,14 +7,8 @@ import type { PurposeSummary } from '@/shared/api/types'
 
 import styles from './PurposeChips.module.css'
 
-/** Quantas finalidades aparecem. As outras ficam a um clique. */
 const SHOWN = 6
 
-/**
- * A entrada pela finalidade, logo abaixo da busca: as que têm mais
- * medicamentos, com a contagem vinda da API. Se a chamada falhar, fica só o
- * link para a lista completa.
- */
 export function PurposeChips() {
   const purposes = useQuery<PurposeSummary[]>(fetchPurposes, [])
 
@@ -30,8 +24,6 @@ export function PurposeChips() {
       </p>
 
       <ul className={styles.list} aria-busy={purposes.status === 'loading'}>
-        {/* Formato dos atalhos enquanto a lista não chega, para a faixa não
-            mudar de altura quando eles aparecem. */}
         {purposes.status === 'loading' &&
           Array.from({ length: SHOWN }, (_, index) => (
             <li key={index} className={styles.ghost} aria-hidden="true" />

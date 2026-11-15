@@ -1,7 +1,4 @@
 @layer components {
-  /* Fundo de leve tom e nada mais. A borda grossa colorida na lateral, que
-     era o padrão daqui, transformava todo recado em alerta, e a página ficava
-     cheia deles. */
   .notice {
     padding-block: var(--space-xs);
     padding-inline: var(--space-sm);

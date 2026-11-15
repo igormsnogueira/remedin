@@ -5,7 +5,6 @@
     justify-content: center;
     gap: var(--space-2xs);
 
-    /* Alvo de toque mínimo recomendado. */
     min-block-size: 2.75rem;
     padding-inline: var(--space-sm);
 
@@ -28,8 +27,6 @@
     color: var(--color-accent);
   }
 
-  /* Ícone cheio e fundo verde, e não só a cor: o estado continua visível
-     para quem não distingue o verde. */
   .button[aria-pressed='true'] {
     border-color: var(--color-accent-light);
     background-color: var(--color-accent-soft);

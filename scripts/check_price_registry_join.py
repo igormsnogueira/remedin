@@ -27,21 +27,15 @@ DEFAULT_REPORT = repo_path("docs", "output", "cruzamento-preco-registro.md")
 REGISTRY_KEY = "NUMERO_REGISTRO_PRODUTO"
 PRICE_KEY = "REGISTRO"
 
-# A base de registro guarda o historico inteiro, incluindo registro cancelado.
-# Cobertura sobre o total nao diz nada; o que decide o MVP e a cobertura sobre
-# o que ainda esta valendo.
 STATUS_COLUMN = "SITUACAO_REGISTRO"
 ACTIVE_STATUS = "Ativo"
 
-# Os 9 primeiros digitos do registro da CMED devem ser o registro da ANVISA.
 REGISTRY_KEY_LENGTH = 9
 
 EXAMPLES_TO_SHOW = 5
 
-
 def digits_only(series):
     return series.dropna().astype(str).str.replace(r"\D", "", regex=True)
-
 
 def require_column(df, column, source):
     if column not in df.columns:
@@ -49,7 +43,6 @@ def require_column(df, column, source):
             f"erro: coluna {column!r} nao existe em {source}\n"
             f"colunas disponiveis: {list(df.columns)}"
         )
-
 
 def describe_key(label, values):
     print(f"\n[{label}]")
@@ -59,7 +52,6 @@ def describe_key(label, values):
     for length, qty in values.str.len().value_counts().sort_index().items():
         print(f"    {length}: {qty:,}".replace(",", "."))
     print(f"  exemplos: {values.head(EXAMPLES_TO_SHOW).tolist()}")
-
 
 def report_coverage(label, keys, reference):
     reference_set = set(reference)
@@ -73,7 +65,6 @@ def report_coverage(label, keys, reference):
         print(f"  exemplos sem par: {missing.drop_duplicates().head(EXAMPLES_TO_SHOW).tolist()}")
     return matched
 
-
 def check(registry_path, price_path, report_path):
     for path in (registry_path, price_path):
         if not os.path.exists(path):
@@ -86,7 +77,6 @@ def check(registry_path, price_path, report_path):
 
     with report_to(report_path, REPORT_TITLE, price_path):
         write_join_report(registry, price)
-
 
 def write_join_report(registry, price):
     registry_keys = digits_only(registry[REGISTRY_KEY])
@@ -122,7 +112,6 @@ def write_join_report(registry, price):
 
     duplicated_full = price_keys_full.duplicated().sum()
     print(f"registros de 13 dígitos repetidos na lista de preço: {duplicated_full:,}".replace(",", "."))
-
 
 if __name__ == "__main__":
     if len(sys.argv) < 3:

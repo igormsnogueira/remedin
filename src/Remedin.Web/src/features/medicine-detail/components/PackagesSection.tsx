@@ -15,16 +15,6 @@ interface PackagesSectionProps {
   onSelect: (key: string) => void
 }
 
-/**
- * As embalagens à venda, para escolher uma.
- *
- * A escolha muda o preço do topo e a comparação com os equivalentes. É a
- * ideia de "sua receita" dos comparadores de preço: primeiro se diz o que vai
- * comprar, depois se compara a mesma coisa.
- *
- * Botões de rádio de verdade, e não cartões clicáveis: assim as setas do
- * teclado trocam a opção e o leitor de tela diz "1 de 4, selecionado".
- */
 export function PackagesSection({
   pharmacy,
   institutional,
@@ -70,8 +60,6 @@ export function PackagesSection({
         </fieldset>
       )}
 
-      {/* Recolhidas: não são de balcão. Ficam na ficha para quem trabalha na
-          área, mas fora da escolha e da comparação. */}
       {institutional.length > 0 && (
         <details className={styles.hospital}>
           <summary>Embalagens para hospitais e redes ({institutional.length})</summary>

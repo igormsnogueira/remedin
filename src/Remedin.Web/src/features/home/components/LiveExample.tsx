@@ -9,12 +9,7 @@ import type { Example, ExampleState } from '../model/useExample'
 
 import styles from './LiveExample.module.css'
 
-/**
- * Uma ficha de verdade no topo da home, no estado escolhido. O dado vem de
- * useExample, consultado uma vez para a página toda.
- */
 export function LiveExample({ state, className }: { state: ExampleState; className?: string }) {
-  // Apoio, não conteúdo principal: se falhar, some sem mostrar erro.
   if (state.status === 'error') {
     return null
   }
@@ -133,7 +128,6 @@ function Bar({
   )
 }
 
-/** O cartão no formato final, vazio, para a página não pular quando o dado chegar. */
 function Placeholder({ className }: { className?: string }) {
   return (
     <div className={classNames(styles.card, styles.placeholder, className)} aria-hidden="true">

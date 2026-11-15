@@ -48,15 +48,12 @@
     outline: none;
   }
 
-  /* O link cobre a linha inteira. */
   .name::after {
     content: '';
     position: absolute;
     inset: 0;
   }
 
-  /* pretty evita a última linha com uma palavra só ("500" e "mg" em
-     linhas separadas). */
   .meta {
     color: var(--color-text-muted);
     font-size: var(--text-sm);

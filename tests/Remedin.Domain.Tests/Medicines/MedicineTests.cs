@@ -4,8 +4,8 @@ namespace Remedin.Domain.Tests.Medicines;
 
 public class MedicineTests
 {
-    private const string SaoPaulo = "SP";   // 18%
-    private const string RioDeJaneiro = "RJ";  // 20%
+    private const string SaoPaulo = "SP";
+    private const string RioDeJaneiro = "RJ";
 
     private static Medicine AnyMedicine() =>
         Medicine.Register(RegistrationNumber.Parse("102980592"), "DIPIRONA MONOIDRATADA", RegistrationStatus.Active);
@@ -102,7 +102,6 @@ public class MedicineTests
     [Fact]
     public void O_preco_muda_conforme_o_estado()
     {
-        // O mesmo medicamento tem teto legal diferente por causa do ICMS.
         var presentation = Presentation.Create(
             "111111111111111", "descrição", prices:
             [
@@ -155,8 +154,6 @@ public class MedicineTests
     [Fact]
     public void Apresentacao_so_com_preco_de_fabrica_ainda_conta_como_com_preco()
     {
-        // Produto hospitalar tem Preço Fábrica e não tem preço ao consumidor.
-        // Continua sendo um medicamento com preço publicado.
         var presentation = Presentation.Create(
             "111111111111111", "descrição", hospitalOnly: true, prices:
             [Price.Create(PriceKind.Factory, 18m, freeTradeZone: false, 900.00m)]);

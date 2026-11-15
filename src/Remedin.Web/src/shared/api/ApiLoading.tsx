@@ -7,20 +7,10 @@ import styles from './ApiLoading.module.css'
 type Shape = 'list' | 'detail' | 'grid' | 'rows'
 
 interface ApiLoadingProps {
-  /** O que está sendo carregado, para quem usa leitor de tela. */
   label: string
-  /** O formato do que vai aparecer, para o esqueleto ter a mesma cara. */
   shape?: Shape
 }
 
-/**
- * Carregando de dado da API, no formato do conteúdo que vem.
- *
- * Esqueleto em vez de ícone girando: a página já aparece com a forma final, e
- * quando o dado chega ele ocupa o mesmo espaço, sem pular. O motivo de uma
- * espera longa (servidor ligando) fica no aviso global, WakeUpNotice, e não
- * repetido em cada pedaço da tela.
- */
 export function ApiLoading({ label, shape = 'list' }: ApiLoadingProps) {
   return (
     <div className={classNames(styles.loading, styles[shape])} role="status">

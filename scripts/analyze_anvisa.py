@@ -35,7 +35,6 @@ SAMPLE_ROWS = 100
 REPORT_TITLE = "Perfil da base de registro da ANVISA"
 DEFAULT_REPORT = repo_path("docs", "output", "registro-anvisa.md")
 
-
 def analyze(path, report_path):
     if not os.path.exists(path):
         sys.exit(f"erro: arquivo nao encontrado: {path}")
@@ -46,7 +45,6 @@ def analyze(path, report_path):
 
     with report_to(report_path, REPORT_TITLE, path):
         write_profile(path, loaded)
-
 
 def write_profile(path, loaded):
     df = loaded.frame
@@ -71,8 +69,6 @@ def write_profile(path, loaded):
     candidates = find_key_candidates(df)
     print_key_analysis(df, candidates)
 
-    # nulos de registro correlacionam com categoria regulatoria? Especifico
-    # deste dataset - achado da issue #2, ver docs/analise-dados-anvisa.md.
     if "NUMERO_REGISTRO_PRODUTO" in df.columns and "CATEGORIA_REGULATORIA" in df.columns:
         section("nulos de NUMERO_REGISTRO_PRODUTO por CATEGORIA_REGULATORIA")
         null_rows = df[df["NUMERO_REGISTRO_PRODUTO"].isna()]
@@ -92,7 +88,6 @@ def write_profile(path, loaded):
     section("amostra para o repositório")
     destination = repo_path("data", "samples", "medicamentos-sample.csv")
     save_sample(df, destination, loaded.separator, SAMPLE_ROWS)
-
 
 if __name__ == "__main__":
     if len(sys.argv) < 2:

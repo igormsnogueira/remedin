@@ -11,10 +11,6 @@ public class AnvisaRegistryReaderTests
         "NUMERO_REGISTRO_PRODUTO;DATA_VENCIMENTO_REGISTRO;NUMERO_PROCESSO;CLASSE_TERAPEUTICA;" +
         "EMPRESA_DETENTORA_REGISTRO;SITUACAO_REGISTRO;PRINCIPIO_ATIVO";
 
-    /// <summary>
-    /// O arquivo real é latin1. Escrever a amostra no mesmo encoding é o que
-    /// faz o teste cobrir a acentuação de verdade.
-    /// </summary>
     private static Stream Csv(params string[] rows)
     {
         var content = string.Join("\r\n", [Header, .. rows]);

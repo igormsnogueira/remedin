@@ -8,7 +8,6 @@
     padding-block: var(--space-2xs);
     padding-inline: var(--space-sm);
 
-    /* Alvo de toque mínimo recomendado. */
     min-block-size: 2.75rem;
 
     border: var(--border-thin);

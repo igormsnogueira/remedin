@@ -4,17 +4,6 @@ using Remedin.Application.Location;
 
 namespace Remedin.Worker;
 
-/// <summary>
-/// Executa as cargas em sequência e encerra o processo.
-///
-/// A ordem importa: o preço se liga ao medicamento pelo número de registro,
-/// então carregar o registro primeiro é o que evita a lista inteira cair como
-/// órfã na primeira execução.
-///
-/// O agendamento fica fora daqui, no workflow do GitHub Actions. O processo só
-/// sabe rodar uma vez e sair, com código diferente de zero quando falha — é o
-/// que o agendador lê para avisar.
-/// </summary>
 public sealed class CatalogIngestionWorker(
     IServiceProvider services,
     IOptions<IngestionSettings> settings,
@@ -27,10 +16,9 @@ public sealed class CatalogIngestionWorker(
 
         try
         {
-            // Os comandos dependem do DbContext, que é scoped; um serviço de
-            // fundo é singleton, então o escopo é criado aqui.
             using var scope = services.CreateScope();
 
+            // Registro antes do preço: o preço se liga ao medicamento pelo número de registro.
             var registry = scope.ServiceProvider.GetRequiredService<ImportRegistrySnapshot>();
             var registryRun = await registry.ExecuteAsync(whenRepeated, stoppingToken);
             logger.LogInformation("Registro: execução {Id} terminou como {Outcome}.",
@@ -46,8 +34,6 @@ public sealed class CatalogIngestionWorker(
             logger.LogInformation("Bulas: execução {Id} terminou como {Outcome}.",
                 leafletRun.Id, leafletRun.Outcome);
 
-            // Por último: o catálogo não depende dela, e se o download grande
-            // falhar, registro e preço já estão atualizados.
             var location = scope.ServiceProvider.GetRequiredService<ImportIpStateRanges>();
             var locationRun = await location.ExecuteAsync(whenRepeated, stoppingToken);
             logger.LogInformation("Geolocalização: execução {Id} terminou como {Outcome}.",

@@ -1,9 +1,6 @@
 import { Link, useParams } from 'react-router-dom'
 
 import { useSelectedState } from '@/app/providers/useSelectedState'
-// O cartão vem da busca em vez de shared/ui: ele conhece o formato de
-// MedicineSummary e a rota do medicamento, então não é primitivo de interface.
-// Se uma terceira tela precisar dele, aí sim vira componente compartilhado.
 import { ResultCard } from '@/features/medicine-search/components/ResultCard'
 import { StateSelect } from '@/features/state-selection/components/StateSelect'
 import { ApiLoading } from '@/shared/api/ApiLoading'
@@ -54,8 +51,6 @@ export function PurposeMedicinesPage() {
 
   return (
     <div className={styles.page}>
-      {/* Na cor da finalidade, e com o mesmo nome de transição do bloco da
-          lista: o bloco clicado se expande até virar este topo. */}
       <header
         className={`purpose-theme ${styles.banner}`}
         style={{ ...purposeStyle(code), viewTransitionName: `purpose-${code}` }}

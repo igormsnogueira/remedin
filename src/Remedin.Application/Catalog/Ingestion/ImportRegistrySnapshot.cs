@@ -3,12 +3,6 @@ using Remedin.Domain.Ingestion;
 
 namespace Remedin.Application.Catalog.Ingestion;
 
-/// <summary>
-/// Carrega a publicação mais recente da base de registro no catálogo.
-///
-/// Comando: passa pelo domínio, valida invariantes e escreve. Roda pelo
-/// agendador, não por requisição de usuário.
-/// </summary>
 public sealed class ImportRegistrySnapshot(
     IRegistrySnapshotSource source,
     IMedicineCatalog catalog,
@@ -60,8 +54,6 @@ public sealed class ImportRegistrySnapshot(
         }
         catch (Exception exception) when (exception is not OperationCanceledException)
         {
-            // A execução é registrada como falha antes de propagar: sem isso,
-            // uma carga que quebrou de madrugada não deixa rastro nenhum.
             run.Fail(exception.Message, clock.GetUtcNow());
             await journal.RecordAsync(run, CancellationToken.None);
 

@@ -5,10 +5,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace Remedin.Infrastructure.Persistence.Migrations
 {
-    /// <inheritdoc />
     public partial class PricesByIcmsRate : Migration
     {
-        /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropColumn(
@@ -49,7 +47,6 @@ namespace Remedin.Infrastructure.Persistence.Migrations
                 columns: new[] { "registration_number", "ggrem_code", "kind", "icms_rate" });
         }
 
-        /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(

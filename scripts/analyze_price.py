@@ -37,12 +37,8 @@ SAMPLE_ROWS = 100
 REPORT_TITLE = "Perfil da lista de preços da CMED"
 DEFAULT_REPORT = repo_path("docs", "output", "preco-cmed.md")
 
-# Termos especificos de lista de preco da CMED, alem de REGISTRO/PROCESSO
-# ja cobertos por find_key_candidates.
 EXTRA_KEY_TERMS = ("GGREM", "EAN")
 
-# Colunas de dominio curto que definem o recorte do MVP (o que exibir e o
-# que esconder). Nome exato conforme cabecalho da CMED.
 CATEGORY_COLUMNS = (
     "TIPO DE PRODUTO (STATUS DO PRODUTO)",
     "REGIME DE PREÇO",
@@ -51,10 +47,7 @@ CATEGORY_COLUMNS = (
     "COMERCIALIZAÇÃO 2025",
 )
 
-# A lista repete o mesmo preco para cada aliquota de ICMS. Sao dezenas de
-# colunas variando so no percentual; o MVP precisa escolher uma.
 PRICE_PREFIXES = ("PF", "PMC")
-
 
 def print_price_columns(df):
     for prefix in PRICE_PREFIXES:
@@ -64,7 +57,6 @@ def print_price_columns(df):
         filled = df[columns].notna().any(axis=1).sum()
         print(f"{prefix}: {len(columns)} colunas | linhas com algum valor: {filled:,}".replace(",", "."))
         print(f"  {columns}")
-
 
 def print_category_breakdown(df):
     for col in CATEGORY_COLUMNS:
@@ -76,7 +68,6 @@ def print_category_breakdown(df):
         print(f"\n[{col}]")
         print(pd.DataFrame({"linhas": count, "%": percentage}).to_string())
 
-
 def analyze(path, report_path):
     if not os.path.exists(path):
         sys.exit(f"erro: arquivo nao encontrado: {path}")
@@ -87,7 +78,6 @@ def analyze(path, report_path):
 
     with report_to(report_path, REPORT_TITLE, path):
         write_profile(path, loaded)
-
 
 def write_profile(path, loaded):
     df = loaded.frame
@@ -114,7 +104,6 @@ def write_profile(path, loaded):
     section("amostra para o repositório")
     destination = repo_path("data", "samples", "preco-sample.csv")
     save_sample(df, destination, loaded.separator, SAMPLE_ROWS)
-
 
 if __name__ == "__main__":
     if len(sys.argv) < 2:

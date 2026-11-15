@@ -16,8 +16,6 @@ export function FavoritesPage() {
 
   useDocumentTitle('Favoritos')
 
-  // O botão clicado some junto com o cartão. Sem mover o foco, ele cairia no
-  // começo da página, e quem usa teclado ou leitor de tela perderia o lugar.
   function handleRemove(registrationNumber: string) {
     remove(registrationNumber)
     summary.current?.focus()

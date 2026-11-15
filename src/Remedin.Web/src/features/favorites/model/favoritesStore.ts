@@ -1,43 +1,26 @@
-/**
- * A lista de favoritos, guardada no navegador da pessoa.
- *
- * Fica no localStorage, e não na API, de propósito: guardar no servidor
- * exigiria conta e login, e uma lista de remédios ligada a uma pessoa é dado
- * de saúde, que a LGPD trata como sensível. Aqui nada sai do aparelho.
- *
- * Fica fora do React, num módulo, e os componentes leem com
- * useSyncExternalStore. Assim o botão da ficha, o cartão da busca e o contador
- * do cabeçalho mostram sempre a mesma lista, inclusive entre abas abertas.
- */
-
 export interface Favorite {
   registrationNumber: string
   name: string
   manufacturer: string | null
   activeIngredient: string | null
-  /** ISO 8601. A lista sai do mais recente para o mais antigo. */
   savedAt: string
 }
 
 export type FavoriteInput = Omit<Favorite, 'savedAt'>
 
+// Só no navegador, sem conta: lista de remédios ligada a uma pessoa é dado de saúde (LGPD).
 const STORAGE_KEY = 'remedin:favorites'
 
-/** Teto para a lista não crescer sem fim no armazenamento do navegador. */
 export const FAVORITES_LIMIT = 100
 
 const EMPTY: Favorite[] = []
 
 const listeners = new Set<() => void>()
 
-// A lista é lida do armazenamento a cada renderização, mas só é convertida de
-// novo quando o texto guardado muda. O useSyncExternalStore exige a mesma
-// referência enquanto nada mudou, senão renderiza em laço.
+// O useSyncExternalStore exige a mesma referência enquanto nada mudou.
 let cachedRaw: string | null = null
 let cached: Favorite[] = EMPTY
 
-// Com o armazenamento bloqueado (navegação anônima em alguns navegadores, ou
-// cota cheia), a lista passa a viver só na memória até a aba fechar.
 let memoryOnly = false
 
 export function getFavorites(): Favorite[] {
@@ -58,8 +41,6 @@ export function getServerFavorites(): Favorite[] {
 export function subscribe(listener: () => void): () => void {
   listeners.add(listener)
 
-  // O evento storage só chega nas outras abas, nunca na que gravou. É ele que
-  // mantém duas abas abertas com a mesma lista.
   function onStorage(event: StorageEvent) {
     if (event.key === STORAGE_KEY || event.key === null) {
       listener()
@@ -121,11 +102,6 @@ function write(favorites: Favorite[]): void {
   listeners.forEach((listener) => listener())
 }
 
-/**
- * O conteúdo do localStorage pode ter sido editado à mão ou gravado por uma
- * versão antiga do site. Item que não tem o formato esperado é descartado, em
- * vez de quebrar a página.
- */
 function parse(raw: string | null): Favorite[] {
   if (!raw) {
     return EMPTY

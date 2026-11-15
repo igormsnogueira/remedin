@@ -36,8 +36,6 @@ public class SourceFileTests
     [InlineData("\r\n  <HTML>")]
     public void Recusa_pagina_html_disfarcada_de_csv(string html)
     {
-        // A origem responde com página de erro quando a URL muda, e o corpo
-        // seria gravado como uma linha de lixo sem esta checagem.
         using var content = Content(html, padToBytes: 2_000);
 
         var exception = Assert.Throws<InvalidDataException>(

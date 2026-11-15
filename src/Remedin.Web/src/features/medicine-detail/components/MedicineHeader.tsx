@@ -6,10 +6,6 @@ import { Tag } from '@/shared/ui/Tag/Tag'
 
 import styles from './MedicineHeader.module.css'
 
-/**
- * O topo da ficha, na cor da finalidade do remédio: dá para saber de que tipo
- * ele é antes de ler qualquer coisa.
- */
 export function MedicineHeader({ medicine }: { medicine: MedicineDetail }) {
   return (
     <header
@@ -19,7 +15,6 @@ export function MedicineHeader({ medicine }: { medicine: MedicineDetail }) {
       <div className={styles.title}>
         <PurposeIcon code={medicine.therapeuticClassCode} size="lg" onTint />
 
-        {/* Mesmo nome de transição do cartão de onde a pessoa veio. */}
         <h1
           className={styles.name}
           style={{ viewTransitionName: `medicine-${medicine.registrationNumber}` }}

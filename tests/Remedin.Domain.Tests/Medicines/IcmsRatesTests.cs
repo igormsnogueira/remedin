@@ -7,8 +7,6 @@ public class IcmsRatesTests
     [Fact]
     public void As_aliquotas_servidas_sao_as_da_tabela_de_estados()
     {
-        // Quatro valores para 27 estados. É o que a carga usa para descartar
-        // as outras alíquotas publicadas pela CMED.
         Assert.Equal([17m, 17.5m, 18m, 20m], IcmsRates.Served.Order());
     }
 
@@ -32,8 +30,6 @@ public class IcmsRatesTests
     [Fact]
     public void Recusa_preco_sem_imposto()
     {
-        // A coluna "sem impostos" da CMED chega com alíquota nula, e nenhuma
-        // consulta a alcança: em SQL, NULL = 18 não é verdadeiro.
         Assert.False(IcmsRates.Serves(null));
     }
 

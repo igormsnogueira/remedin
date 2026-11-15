@@ -1,12 +1,6 @@
-// Primeiro import do arquivo, de propósito: é aqui que a ordem das camadas de
-// cascata é declarada, e a ordem vale a partir da primeira vez que cada camada
-// aparece. Se um CSS Module de componente for injetado antes, ele cria a camada
-// "components" primeiro, e "base" acaba passando a vencê-la.
+// Primeiro import de propósito: define a ordem das camadas de CSS.
 import './shared/styles/index.css'
 
-// A fonte vem empacotada com o site, e não de um servidor de fontes: assim a
-// política de segurança continua aceitando só a própria origem. Só os dois
-// pesos que existem nela.
 import '@fontsource/atkinson-hyperlegible/400.css'
 import '@fontsource/atkinson-hyperlegible/700.css'
 
@@ -18,9 +12,7 @@ import { SelectedStateProvider } from './app/providers/SelectedStateProvider'
 import { router } from './app/routes'
 import { wakeUpApi } from './shared/api/client'
 
-// Antes de desenhar a página: o servidor gratuito pode estar desligado, e
-// cada segundo que ele começa a ligar antes da primeira busca é um segundo a
-// menos de espera.
+// O servidor gratuito dorme sem uso; começar a acordá-lo ao abrir encurta a primeira espera.
 wakeUpApi()
 
 const container = document.getElementById('root')

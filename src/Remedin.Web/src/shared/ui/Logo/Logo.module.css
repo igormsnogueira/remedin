@@ -9,7 +9,6 @@
     flex-shrink: 0;
   }
 
-  /* Sobre fundo escuro, quem usa o logo troca a cor pela variável. */
   .wordmark {
     color: var(--logo-text, var(--color-heading));
     font-size: 1.375rem;

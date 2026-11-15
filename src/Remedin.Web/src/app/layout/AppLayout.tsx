@@ -9,17 +9,9 @@ import { Logo } from '@/shared/ui/Logo/Logo'
 import styles from './AppLayout.module.css'
 import { useFocusOnNavigation } from './useFocusOnNavigation'
 
-/**
- * A moldura de todas as telas: cabeçalho, conteúdo e rodapé.
- *
- * As páginas ficam no <Outlet>, então nenhuma delas precisa saber da largura
- * máxima nem das margens laterais.
- */
 export function AppLayout() {
   const main = useFocusOnNavigation<HTMLElement>()
 
-  // A home e os resultados já têm a busca grande no topo da página. Repetir no
-  // cabeçalho seria dois campos para a mesma coisa na mesma tela.
   const { pathname } = useLocation()
   const showHeaderSearch = pathname !== '/'
 
@@ -39,8 +31,6 @@ export function AppLayout() {
 
           {showHeaderSearch && <HeaderSearch className={styles.search} />}
 
-          {/* Sem link para o início: o logo já faz isso, que é o que todo
-              mundo espera de um logo. */}
           <nav className={styles.navArea} aria-label="Principal">
             <ul className={styles.nav}>
               <li>
@@ -68,8 +58,6 @@ export function AppLayout() {
         className={classNames(styles.main, styles.container)}
         id="conteudo"
         ref={main}
-        // -1 aceita foco por código sem entrar na ordem do Tab, que é o que
-        // permite mover o foco para cá na troca de rota.
         tabIndex={-1}
       >
         <Outlet />
@@ -84,8 +72,6 @@ export function AppLayout() {
             atualizados toda semana.
           </p>
           <p>Consulta informativa. Não substitui a orientação do médico ou do farmacêutico.</p>
-          {/* Atribuição exigida pela licença da base de geolocalização (CC BY
-              4.0), em toda página, porque o estado sugerido vale em todas. */}
           <p>
             Estado sugerido pela conexão com dados de{' '}
             <a href="https://db-ip.com" rel="noopener">

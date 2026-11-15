@@ -4,18 +4,6 @@ using Remedin.Infrastructure.Persistence;
 
 namespace Remedin.Api;
 
-/// <summary>
-/// Verifica se a API consegue consultar o banco.
-///
-/// Substitui o AddDbContextCheck do EF, que usa CanConnectAsync: ele engole a
-/// exceção e devolve só "não conectou", e o log registrava "(null)" como
-/// motivo. No primeiro deploy isso impediu saber se era o banco acordando ou a
-/// senha errada. Aqui a exceção segue junto, e o log mostra a causa.
-///
-/// A mensagem da exceção de conexão do Npgsql não carrega a senha. O caso em
-/// que carregaria, string de conexão malformada, é barrado antes, na
-/// inicialização, por DatabaseConnectionString.
-/// </summary>
 public sealed class DatabaseHealthCheck(RemedinDbContext database) : IHealthCheck
 {
     public async Task<HealthCheckResult> CheckHealthAsync(

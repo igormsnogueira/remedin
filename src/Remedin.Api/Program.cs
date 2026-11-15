@@ -12,13 +12,9 @@ var connectionString = builder.Configuration.GetConnectionString("Remedin")
 
 builder.Services.AddInfrastructure(connectionString);
 
-// Sem consultar o banco, a rota responderia 200 com ele fora do ar, que é o
-// oposto do que um health check serve para dizer.
 builder.Services.AddHealthChecks().AddCheck<DatabaseHealthCheck>("postgres");
 
-// Uma linha por requisição: método, caminho, status e duração. Sem cabeçalho
-// e sem corpo — interessa saber o que foi chamado e quanto demorou, e
-// cabeçalho carrega dado que não precisa ir para log.
+// Sem cabeçalhos no log: eles podem carregar dado pessoal.
 builder.Services.AddHttpLogging(options =>
 {
     options.LoggingFields = HttpLoggingFields.RequestMethod
@@ -29,9 +25,6 @@ builder.Services.AddHttpLogging(options =>
     options.CombineLogs = true;
 });
 
-// O front-end roda em outra porta, e o navegador bloqueia a chamada sem isso.
-// A lista vem de configuração porque o endereço muda entre a máquina de
-// desenvolvimento e o ambiente publicado.
 const string FrontendCors = "frontend";
 var allowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>() ?? [];
 
@@ -41,8 +34,6 @@ builder.Services.AddCors(options => options.AddPolicy(
 
 var app = builder.Build();
 
-// O health check fica de fora do log: o Render o chama o tempo todo, e cada
-// chamada viraria uma linha sem informação nenhuma.
 app.UseWhen(
     context => !context.Request.Path.StartsWithSegments("/health"),
     branch => branch.UseHttpLogging());
@@ -53,16 +44,12 @@ app.MapHealthChecks("/health");
 
 app.MapGet("/estados", () => StateOptions.All);
 
-// O estado provável de quem acessa, pelo IP, para o site já abrir com os
-// preços certos. O IP é usado só nesta consulta: não vai para o log (o
-// registro de requisições não guarda cabeçalho nem endereço) nem para o banco.
+// O IP serve só para esta consulta: não vai para o log nem para o banco.
 app.MapGet("/localizacao", async (
     HttpContext http,
     IStateLocator locator,
     CancellationToken cancellationToken) =>
 {
-    // A resposta depende de quem pergunta; cache compartilhado entregaria o
-    // estado de uma pessoa para outra.
     http.Response.Headers.CacheControl = "private, no-store";
 
     var address = ClientAddress.From(http);
@@ -159,7 +146,5 @@ static IResult InvalidState(string uf) =>
     Results.BadRequest(new
     {
         erro = $"Unidade da federação desconhecida: '{uf}'.",
-        // O preço-teto depende do ICMS estadual, então chutar um padrão
-        // publicaria valor errado para quem digitou a sigla errada.
         aceitos = IcmsRates.States.Order(),
     });

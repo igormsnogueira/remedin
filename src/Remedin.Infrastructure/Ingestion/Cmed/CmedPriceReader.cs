@@ -7,23 +7,13 @@ using Remedin.Domain.Medicines;
 
 namespace Remedin.Infrastructure.Ingestion.Cmed;
 
-/// <summary>
-/// Lê a lista de preços de medicamentos da CMED.
-///
-/// As regras vêm da análise da lista real, em docs/analise-dados-cmed.md.
-/// </summary>
 public sealed partial class CmedPriceReader
 {
     private static readonly Encoding FileEncoding = Encoding.UTF8;
 
-    /// <summary>A lista real tem 15,8 MB; abaixo disso veio truncada.</summary>
     public const long MinimumBytes = 5_000_000;
 
-    /// <summary>
-    /// O arquivo começa com dezenas de linhas de texto jurídico. Procurar o
-    /// cabeçalho pela linha mais larga, em vez de pular um número fixo, é o
-    /// que sobrevive a esse texto mudar de tamanho.
-    /// </summary>
+    // A planilha da CMED tem linhas de título antes do cabeçalho, e a quantidade varia.
     private const int HeaderScanLines = 200;
 
     private const string RegistrationColumn = "REGISTRO";
@@ -40,10 +30,6 @@ public sealed partial class CmedPriceReader
     private static readonly string[] RequiredColumns =
         [RegistrationColumn, GgremColumn, ProductColumn, PresentationColumn];
 
-    /// <summary>
-    /// A CMED usa "-" e "- (*)" como preenchimento de campo sem valor. Sem
-    /// converter para ausência, viram categoria fantasma nos filtros.
-    /// </summary>
     private static readonly string[] Placeholders = ["-", "- (*)"];
 
     private static readonly CultureInfo BrazilianNumbers = CultureInfo.GetCultureInfo("pt-BR");
@@ -57,7 +43,6 @@ public sealed partial class CmedPriceReader
         return ReadRows(content);
     }
 
-    /// <summary>Sem a validação de arquivo. Serve para ler amostra em teste.</summary>
     public PriceReadResult ReadRows(Stream content)
     {
         ArgumentNullException.ThrowIfNull(content);
@@ -148,17 +133,12 @@ public sealed partial class CmedPriceReader
         return prices;
     }
 
-    /// <summary>
-    /// A CMED escreve "1.234,56". Interpretar com cultura invariável devolve
-    /// 123456, e o site mostraria preço cem vezes maior.
-    /// </summary>
     private static decimal? ParseMoney(string? value) =>
         value is not null
         && decimal.TryParse(value, NumberStyles.Number, BrazilianNumbers, out var parsed)
             ? parsed
             : null;
 
-    /// <summary>"D7B2 - CORTICOESTERÓIDES" vira código e descrição.</summary>
     private static (string? Code, string? Name) SplitTherapeuticClass(string? value)
     {
         if (value is null)
@@ -208,8 +188,6 @@ public sealed partial class CmedPriceReader
             TrimOptions = TrimOptions.Trim,
             BadDataFound = null,
             MissingFieldFound = null,
-            // O texto jurídico do começo tem linhas com contagem de colunas
-            // diferente da do cabeçalho.
             IgnoreBlankLines = false,
             DetectDelimiter = false,
         };
@@ -239,10 +217,6 @@ public sealed partial class CmedPriceReader
         return Placeholders.Contains(trimmed) ? null : trimmed;
     }
 
-    /// <summary>
-    /// Uma coluna de preço, identificada pelo próprio cabeçalho:
-    /// "PF Sem Impostos", "PF 0%", "PMC 17,5 %", "PMC 22 %  ALC".
-    /// </summary>
     private sealed partial record PriceColumn(string Header, PriceKind Kind, decimal? Aliquot, bool FreeTradeZone)
     {
         public static PriceColumn? TryParse(string header)

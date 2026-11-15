@@ -5,10 +5,8 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace Remedin.Infrastructure.Persistence.Migrations
 {
-    /// <inheritdoc />
     public partial class IngestionRuns : Migration
     {
-        /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
@@ -38,7 +36,6 @@ namespace Remedin.Infrastructure.Persistence.Migrations
                 columns: new[] { "source", "outcome", "started_at" });
         }
 
-        /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(

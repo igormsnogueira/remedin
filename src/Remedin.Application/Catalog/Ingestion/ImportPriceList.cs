@@ -3,14 +3,6 @@ using Remedin.Domain.Ingestion;
 
 namespace Remedin.Application.Catalog.Ingestion;
 
-/// <summary>
-/// Carrega a lista de preços vigente e liga cada apresentação ao medicamento
-/// já registrado.
-///
-/// A cobertura do cruzamento é medida a cada carga, não assumida: queda brusca
-/// indica mudança de formato na origem, e gravar assim mesmo esvaziaria o
-/// preço do catálogo sem ninguém perceber (ADR 0002).
-/// </summary>
 public sealed class ImportPriceList(
     IPriceSnapshotSource source,
     IMedicineCatalog catalog,
@@ -21,10 +13,8 @@ public sealed class ImportPriceList(
 {
     public const string SourceName = "cmed-preco";
 
-    /// <summary>Abaixo disso a carga é rejeitada e o preço anterior permanece.</summary>
     public const decimal MinimumCoverage = 0.95m;
 
-    /// <summary>Entre este valor e o mínimo, grava e registra alerta.</summary>
     public const decimal ExpectedCoverage = 0.99m;
 
     public async Task<IngestionRun> ExecuteAsync(
@@ -81,8 +71,6 @@ public sealed class ImportPriceList(
 
         if (coverage < MinimumCoverage)
         {
-            // Rejeitar mantém o preço da carga anterior, que é velho mas
-            // correto. Gravar deixaria o catálogo sem preço.
             throw new InvalidOperationException(
                 $"Cobertura do cruzamento em {coverage:P2}, abaixo do mínimo de {MinimumCoverage:P0}. " +
                 "Carga rejeitada e dados anteriores mantidos.");

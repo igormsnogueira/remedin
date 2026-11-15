@@ -4,17 +4,10 @@ public enum IngestionOutcome
 {
     Running = 0,
     Succeeded = 1,
-    /// <summary>A origem publicou o mesmo arquivo da carga anterior.</summary>
     Skipped = 2,
     Failed = 3,
 }
 
-/// <summary>
-/// Registro de uma execução de carga.
-///
-/// A carga roda uma vez por mês, sem ninguém olhando. Sem este registro, uma
-/// falha em setembro só apareceria quando alguém notasse o catálogo velho.
-/// </summary>
 public sealed class IngestionRun
 {
     private IngestionRun(Guid id, string source, DateTimeOffset startedAt)
@@ -35,7 +28,6 @@ public sealed class IngestionRun
 
     public IngestionOutcome Outcome { get; private set; }
 
-    /// <summary>Hash do arquivo, usado para não reprocessar a mesma publicação.</summary>
     public string? ContentHash { get; private set; }
 
     public int RowsRead { get; private set; }

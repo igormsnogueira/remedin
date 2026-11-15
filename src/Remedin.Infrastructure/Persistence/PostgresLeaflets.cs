@@ -4,13 +4,7 @@ using Remedin.Application.Catalog.Ingestion;
 
 namespace Remedin.Infrastructure.Persistence;
 
-/// <summary>
-/// A lista de bulas, numa tabela própria.
-///
-/// Fora da tabela de medicamentos de propósito: o catálogo é regravado a cada
-/// carga da base de registro, e uma coluna ali seria apagada junto. Também
-/// não tem chave estrangeira, para as duas cargas não dependerem da ordem.
-/// </summary>
+// Tabela própria: o catálogo é regravado a cada carga e levaria junto uma coluna dele.
 public sealed class PostgresLeaflets(RemedinDbContext context) : ILeafletStore
 {
     public async Task ReplaceAllAsync(IReadOnlyList<Leaflet> leaflets, CancellationToken cancellationToken)

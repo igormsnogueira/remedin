@@ -12,24 +12,14 @@ namespace Remedin.Infrastructure;
 
 public static class DependencyInjection
 {
-    /// <summary>
-    /// A ANVISA responde 403 a requisição sem User-Agent de navegador. Não é
-    /// proteção contra automação: é checagem de cabeçalho, e declarar um
-    /// agente honesto basta.
-    /// </summary>
+    // A ANVISA responde 403 a requisição sem User-Agent.
     private const string UserAgent =
         "Remedin/1.0 (+https://github.com/igormsnogueira/remedin) Mozilla/5.0 compatible";
 
     private static readonly TimeSpan DownloadTimeout = TimeSpan.FromMinutes(5);
 
-    /// <summary>A base de geolocalização passa de 100 MB compactada.</summary>
     private static readonly TimeSpan LargeDownloadTimeout = TimeSpan.FromMinutes(15);
 
-    /// <summary>
-    /// Recebe a string de conexão em vez de <c>IConfiguration</c>: a
-    /// infraestrutura não precisa saber de onde a configuração veio, e isso
-    /// mantém quem chama no controle.
-    /// </summary>
     public static IServiceCollection AddInfrastructure(
         this IServiceCollection services,
         string connectionString)

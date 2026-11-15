@@ -6,13 +6,6 @@ import { classNames } from '@/shared/ui/classNames'
 
 import styles from './HeaderSearch.module.css'
 
-/**
- * Busca compacta do cabeçalho, para as páginas internas.
- *
- * Quem está na ficha de um remédio e quer consultar outro não deveria precisar
- * voltar para o início. Usa o estado já escolhido, por isso não tem seletor: a
- * troca de estado acontece na própria página de resultados.
- */
 export function HeaderSearch({ className }: { className?: string }) {
   const [term, setTerm] = useState('')
   const navigate = useNavigate()

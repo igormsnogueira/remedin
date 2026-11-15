@@ -10,7 +10,6 @@
   }
 
   html {
-    /* Rolagem suave só para quem não pediu menos movimento no sistema. */
     -webkit-text-size-adjust: none;
     text-size-adjust: none;
   }
@@ -36,7 +35,6 @@
     color: inherit;
   }
 
-  /* Palavra longa de nome de medicamento não pode estourar o cartão. */
   p,
   h1,
   h2,
@@ -64,8 +62,7 @@
     *::before,
     *::after {
       animation-duration: 0.01ms !important;
-      /* Sem zerar o atraso, o que entra com animação ficaria invisível até
-         o atraso acabar, mesmo sem movimento nenhum. */
+      /* Sem zerar o atraso, o que entra animado ficaria invisível por um tempo. */
       animation-delay: 0ms !important;
       animation-iteration-count: 1 !important;
       transition-duration: 0.01ms !important;

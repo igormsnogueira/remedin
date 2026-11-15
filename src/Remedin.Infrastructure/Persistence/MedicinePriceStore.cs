@@ -6,14 +6,6 @@ using Remedin.Domain.Medicines;
 
 namespace Remedin.Infrastructure.Persistence;
 
-/// <summary>
-/// Grava as apresentações e seus preços.
-///
-/// São cerca de 25 mil apresentações e 1,3 milhão de preços por carga. Pelo
-/// rastreamento de mudanças do EF isso levaria minutos e ocuparia memória à
-/// toa; a importação em bloco do PostgreSQL resolve em segundos. É a exceção
-/// que a carga em lote justifica — o resto do sistema continua no EF.
-/// </summary>
 public sealed class MedicinePriceStore(RemedinDbContext context) : IMedicinePriceStore
 {
     public async Task ReplaceAllAsync(
@@ -31,7 +23,6 @@ public sealed class MedicinePriceStore(RemedinDbContext context) : IMedicinePric
 
         await using var transaction = await connection.BeginTransactionAsync(cancellationToken);
 
-        // Os preços saem junto pela cascata declarada na migration.
         await using (var clear = new NpgsqlCommand("DELETE FROM presentations;", connection, transaction))
         {
             await clear.ExecuteNonQueryAsync(cancellationToken);
@@ -44,13 +35,6 @@ public sealed class MedicinePriceStore(RemedinDbContext context) : IMedicinePric
         await transaction.CommitAsync(cancellationToken);
     }
 
-    /// <summary>
-    /// Completa no catálogo os campos clínicos que a lista de preço traz e a
-    /// base de registro não tem, ou tem pior (ADR 0009).
-    ///
-    /// Via tabela temporária: são cerca de 9 mil medicamentos, e uma atualização
-    /// por linha custaria 9 mil idas ao banco.
-    /// </summary>
     private static async Task UpdateClinicalInformationAsync(
         NpgsqlConnection connection,
         IReadOnlyList<PricedMedicine> medicines,
@@ -86,15 +70,10 @@ public sealed class MedicinePriceStore(RemedinDbContext context) : IMedicinePric
                 await writer.StartRowAsync(cancellationToken);
                 await writer.WriteAsync(medicine.Registration.Value, NpgsqlDbType.Char, cancellationToken);
                 await WriteNullableAsync(writer, medicine.Clinical.ActiveIngredient, cancellationToken);
-                // A chave vem do domínio, num lugar só: calcular em SQL aqui
-                // duplicaria a regra e as duas cópias divergiriam.
                 await WriteNullableAsync(
                     writer, SubstanceKey.From(medicine.Clinical.ActiveIngredient), cancellationToken);
                 await WriteNullableAsync(writer, medicine.Clinical.TherapeuticClassCode, cancellationToken);
                 await WriteNullableAsync(writer, medicine.Clinical.TherapeuticClassName, cancellationToken);
-                // A tradução para linguagem comum é a mesma que a ficha exibe.
-                // Gravar aqui é o que a torna pesquisável: traduzir em SQL
-                // duplicaria a tabela de categorias dentro de uma migration.
                 await WriteNullableAsync(
                     writer,
                     TherapeuticCategories.Describe(medicine.Clinical.TherapeuticClassCode)?.Label,
@@ -105,9 +84,6 @@ public sealed class MedicinePriceStore(RemedinDbContext context) : IMedicinePric
             await writer.CompleteAsync(cancellationToken);
         }
 
-        // coalesce preserva o valor da ANVISA quando a CMED não publica o
-        // campo: os dois recortes não coincidem, e sobrescrever com nulo
-        // apagaria informação boa.
         await using (var update = new NpgsqlCommand(
             """
             UPDATE medicines m
@@ -125,8 +101,6 @@ public sealed class MedicinePriceStore(RemedinDbContext context) : IMedicinePric
             await update.ExecuteNonQueryAsync(cancellationToken);
         }
 
-        // A marca de preço precisa refletir a carga inteira, inclusive quem
-        // saiu da lista e deixou de ter preço.
         await using var markPriced = new NpgsqlCommand(
             """
             UPDATE medicines m

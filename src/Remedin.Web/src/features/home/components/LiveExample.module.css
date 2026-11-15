@@ -34,7 +34,6 @@
     margin-block: var(--space-xs) 0;
   }
 
-  /* As linhas entram uma depois da outra quando o dado chega. */
   .row,
   .compare {
     animation: row-in 420ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
@@ -146,7 +145,6 @@
     font-weight: 700;
   }
 
-  /* Formato final, vazio, enquanto a API acorda. */
   .placeholder {
     min-block-size: 22rem;
     animation: none;

@@ -30,7 +30,6 @@ export function MedicineDetailPage() {
 
   useDocumentTitle(medicine.status === 'success' ? medicine.data.name : null)
 
-  // Antes dos retornos antecipados: hook não pode ser chamado só às vezes.
   const presentations = medicine.status === 'success' ? medicine.data.presentations : []
   const pharmacy = groupPackages(presentations, 'pharmacy')
   const institutional = groupPackages(presentations, 'institutional')
@@ -55,9 +54,6 @@ export function MedicineDetailPage() {
   }
 
   return (
-    // Na ordem do código: topo, lateral, corpo. No celular é a ordem de
-    // leitura, e o estado aparece antes dos preços que dependem dele. No
-    // desktop a lateral sobe para a direita pela grade.
     <article className={styles.layout}>
       <div className={styles.head}>
         <MedicineHeader medicine={medicine.data} />
@@ -79,7 +75,6 @@ export function MedicineDetailPage() {
           reference={{
             milligrams: selected?.milligrams ?? null,
             strength: selected?.strength ?? null,
-            // Comprimido se compara com comprimido, gotas com gotas.
             form: selected ? (selected.units ? 'counted' : 'measured') : null,
             release: selected?.release ?? null,
             perUnit: selected?.perUnit ?? null,
