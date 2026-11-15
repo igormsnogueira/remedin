@@ -10,17 +10,8 @@ import type { PackageOption } from '../model/packages'
 
 import styles from './MedicineFacts.module.css'
 
-/**
- * As três respostas da ficha, logo abaixo do nome: para que serve, se precisa
- * de receita e o preço máximo.
- *
- * Um painel só, com uma linha por pergunta, como a ficha desenhada na home.
- * Antes cada resposta era uma seção com título grande e a resposta em letra
- * pequena embaixo, que é o contrário do que importa.
- */
 interface MedicineFactsProps {
   medicine: MedicineDetail
-  /** Embalagens vendidas em farmácia, para a faixa de preço. */
   packages: PackageOption[]
   selected: PackageOption | null
 }
@@ -61,11 +52,6 @@ function Fact({ label, children }: { label: string; children: ReactNode }) {
   )
 }
 
-/**
- * Sem tradução da classe terapêutica, mostra a classificação como a fonte
- * escreve, avisando que é termo técnico. Esconder jogaria fora a única
- * informação disponível sobre a finalidade.
- */
 function Purpose({ medicine }: { medicine: MedicineDetail }) {
   if (medicine.purpose) {
     return <p className={styles.answer}>{medicine.purpose}</p>
@@ -86,13 +72,8 @@ function Purpose({ medicine }: { medicine: MedicineDetail }) {
   return <p className={styles.unknown}>A fonte não informa.</p>
 }
 
-/**
- * Três casos, e não dois. `requiresPrescription` nulo significa que a fonte não
- * publicou a tarja — mostrar isso como venda livre seria a interface afirmando
- * o que o dado não diz, sobre a informação que pode fazer a pessoa sair de casa
- * para nada.
- */
 function Prescription({ medicine }: { medicine: MedicineDetail }) {
+  // Nulo é "a fonte não informa", e não "venda livre".
   if (medicine.requiresPrescription === null) {
     return (
       <>
@@ -119,11 +100,6 @@ function Prescription({ medicine }: { medicine: MedicineDetail }) {
   )
 }
 
-/**
- * O preço da embalagem escolhida, e não uma faixa: "de R$ 6 a R$ 20" não
- * responde quanto a pessoa vai pagar. A faixa fica como nota, para mostrar
- * que existem outras.
- */
 function SelectedPrice({ medicine, packages, selected }: MedicineFactsProps) {
   if (!selected || selected.price === null) {
     return (
@@ -167,14 +143,7 @@ function SelectedPrice({ medicine, packages, selected }: MedicineFactsProps) {
   )
 }
 
-/**
- * O caminho até a bula, no Bulário Eletrônico da ANVISA.
- *
- * Não abre o PDF direto: o download no Bulário passa por uma verificação
- * contra robôs, de propósito. O link cai na busca já filtrada pelo registro, e
- * a nota diz onde tocar, para a pessoa não achar que o link levou ao lugar
- * errado.
- */
+// O PDF do Bulário fica atrás de verificação contra robôs; o link leva à busca já filtrada pelo registro.
 function Leaflet({
   registrationNumber,
   publishedOn,
@@ -199,10 +168,7 @@ function Leaflet({
   )
 }
 
-/**
- * "2025-12-09" vira "09/12/2025". Sem passar por Date: new Date("2025-12-09")
- * é meia-noite em UTC, que no Brasil ainda é o dia 8.
- */
+// Sem Date: "2025-12-09" vira meia-noite UTC, que no Brasil ainda é dia 8.
 function formatDate(isoDate: string): string {
   const [year, month, day] = isoDate.split('-')
   return `${day}/${month}/${year}`

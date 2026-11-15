@@ -7,7 +7,6 @@ public class SubstanceKeyTests
     [Fact]
     public void A_mesma_associacao_em_ordem_diferente_gera_a_mesma_chave()
     {
-        // Os dois existem no catálogo, escritos assim.
         var first = SubstanceKey.From("CITRATO DE ORFENADRINA;CAFEÍNA ANIDRA;DIPIRONA MONOIDRATADA");
         var second = SubstanceKey.From("DIPIRONA MONOIDRATADA;CITRATO DE ORFENADRINA;CAFEÍNA ANIDRA");
 
@@ -23,7 +22,6 @@ public class SubstanceKeyTests
     [Fact]
     public void Espaco_duplicado_nao_separa_equivalentes()
     {
-        // "CLORIDRATO  DE ONDANSETRONA DI-HIDRATADO" aparece assim na origem.
         Assert.Equal(
             SubstanceKey.From("CLORIDRATO DE ONDANSETRONA"),
             SubstanceKey.From("CLORIDRATO  DE ONDANSETRONA"));
@@ -38,15 +36,12 @@ public class SubstanceKeyTests
     [Fact]
     public void Componente_repetido_na_origem_conta_uma_vez()
     {
-        // "DIPIRONA;DIPIRONA" é erro da fonte.
         Assert.Equal(SubstanceKey.From("DIPIRONA"), SubstanceKey.From("DIPIRONA;DIPIRONA"));
     }
 
     [Fact]
     public void Sal_e_hidratacao_continuam_separados()
     {
-        // Decisão da ADR 0010: agrupar de mais é pior que agrupar de menos,
-        // porque alguém pode comprar a coisa errada.
         Assert.NotEqual(SubstanceKey.From("DIPIRONA"), SubstanceKey.From("DIPIRONA MONOIDRATADA"));
     }
 

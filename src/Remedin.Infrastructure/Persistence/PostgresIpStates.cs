@@ -5,13 +5,6 @@ using Remedin.Application.Location;
 
 namespace Remedin.Infrastructure.Persistence;
 
-/// <summary>
-/// As faixas de IP por estado, no PostgreSQL.
-///
-/// O tipo inet do PostgreSQL compara endereços IPv4 e IPv6 do jeito certo, e
-/// um índice comum sobre o início da faixa basta: a consulta pega a última
-/// faixa que começa antes do endereço e confere se ele cabe nela.
-/// </summary>
 public sealed class PostgresIpStates(RemedinDbContext context) : IIpStateStore, IStateLocator
 {
     public async Task ReplaceAllAsync(
@@ -50,8 +43,7 @@ public sealed class PostgresIpStates(RemedinDbContext context) : IIpStateStore, 
     {
         ArgumentNullException.ThrowIfNull(address);
 
-        // Endereço IPv4 que chega escrito como IPv6 (::ffff:1.2.3.4) não
-        // encontraria as faixas IPv4.
+        // IPv4 escrito como IPv6 (::ffff:1.2.3.4) não acharia as faixas IPv4.
         if (address.IsIPv4MappedToIPv6)
         {
             address = address.MapToIPv4();

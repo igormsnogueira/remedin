@@ -15,8 +15,6 @@ public class StateOptionsTests
     {
         var names = StateOptions.All.Select(option => option.Name).ToArray();
 
-        // "Espírito Santo" tem que ficar entre "Distrito Federal" e "Goiás".
-        // Ordenar por byte jogaria as palavras com acento para o fim da lista.
         Assert.Equal("Acre", names[0]);
         Assert.Equal("Espírito Santo", names[Array.IndexOf(names, "Goiás") - 1]);
         Assert.Equal("Tocantins", names[^1]);

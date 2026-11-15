@@ -1,7 +1,6 @@
 import styles from './Spinner.module.css'
 
 interface SpinnerProps {
-  /** O que está sendo carregado, para quem usa leitor de tela. */
   label: string
 }
 

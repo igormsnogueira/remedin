@@ -21,15 +21,6 @@ interface FavoriteCardProps {
   onRemove: (registrationNumber: string) => void
 }
 
-/**
- * Um remédio salvo, com o preço de hoje.
- *
- * O nome vem do que foi guardado, e aparece na hora. O preço não é guardado:
- * muda todo mês e depende do estado, então vem da API a cada visita.
- *
- * Clicável por inteiro como o cartão da busca: o link fica no nome e cobre o
- * cartão, e o botão de remover fica por cima.
- */
 export function FavoriteCard({ favorite, onRemove }: FavoriteCardProps) {
   const { state } = useSelectedState()
 
@@ -38,8 +29,6 @@ export function FavoriteCard({ favorite, onRemove }: FavoriteCardProps) {
     [favorite.registrationNumber, state],
   )
 
-  // A finalidade não é guardada com o favorito: vem junto com o preço, e o
-  // cartão ganha a cor quando a resposta chega.
   const loaded = detail.status === 'success' ? detail.data : null
 
   return (
@@ -93,7 +82,6 @@ export function FavoriteCard({ favorite, onRemove }: FavoriteCardProps) {
 
 function Price({ detail }: { detail: QueryState<MedicineDetail> }) {
   if (detail.status === 'idle' || detail.status === 'loading') {
-    // Espaço reservado com a altura do preço, para o cartão não pular.
     return <span className={styles.pricePlaceholder} aria-hidden="true" />
   }
 

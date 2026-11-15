@@ -17,8 +17,6 @@
     border-block-start: 1px solid var(--color-border-soft);
   }
 
-  /* Rótulo à esquerda e resposta à direita quando cabe, como numa ficha
-     impressa. */
   @container (min-width: 32rem) {
     .fact {
       grid-template-columns: 11rem minmax(0, 1fr);

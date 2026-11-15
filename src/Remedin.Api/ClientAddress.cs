@@ -3,19 +3,9 @@ using System.Net.Sockets;
 
 namespace Remedin.Api;
 
-/// <summary>
-/// O endereço IP de quem fez a requisição.
-///
-/// Em produção a API fica atrás do proxy do Render, e o endereço da conexão é
-/// o do proxy. O de quem acessa vem nos cabeçalhos que ele acrescenta.
-///
-/// Os cabeçalhos podem ser forjados por quem chama. Aqui isso não é risco: o
-/// único efeito é a pessoa escolher o próprio estado sugerido, o que ela
-/// também pode fazer no seletor.
-/// </summary>
 internal static class ClientAddress
 {
-    /// <summary>Do mais confiável para o menos, como os proxies costumam preencher.</summary>
+    // Atrás do proxy do Render, o IP da conexão é o do proxy. Cabeçalho forjado só muda o estado sugerido.
     private static readonly string[] Headers = ["CF-Connecting-IP", "True-Client-IP", "X-Forwarded-For"];
 
     public static IPAddress? From(HttpContext context)
@@ -24,8 +14,6 @@ internal static class ClientAddress
         {
             var value = context.Request.Headers[header].ToString();
 
-            // X-Forwarded-For vem como "cliente, proxy1, proxy2": o primeiro
-            // é quem abriu a conexão.
             var first = value.Split(',', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries)
                 .FirstOrDefault();
 
@@ -38,10 +26,6 @@ internal static class ClientAddress
         return context.Connection.RemoteIpAddress;
     }
 
-    /// <summary>
-    /// Endereço de rede interna, como o da máquina de desenvolvimento, não
-    /// aparece na base. Responder logo evita uma consulta inútil.
-    /// </summary>
     public static bool IsPrivate(IPAddress address)
     {
         if (IPAddress.IsLoopback(address))

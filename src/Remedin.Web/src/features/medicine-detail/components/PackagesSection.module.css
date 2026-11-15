@@ -10,7 +10,6 @@
     font-size: var(--text-xl);
   }
 
-  /* Um painel só, com divisórias, em vez de um cartão por linha. */
   .list,
   .plainList {
     min-inline-size: 0;
@@ -64,7 +63,6 @@
     accent-color: var(--color-accent);
   }
 
-  /* O anel de foco vai na linha inteira, que é a área clicável. */
   .radio:focus-visible {
     outline: none;
   }

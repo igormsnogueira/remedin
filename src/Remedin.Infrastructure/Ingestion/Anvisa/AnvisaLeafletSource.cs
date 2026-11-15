@@ -3,7 +3,6 @@ using Remedin.Application.Catalog.Ingestion;
 
 namespace Remedin.Infrastructure.Ingestion.Anvisa;
 
-/// <summary>Baixa e interpreta a lista de bulas dos dados abertos da ANVISA.</summary>
 public sealed class AnvisaLeafletSource(HttpClient http, AnvisaLeafletReader reader) : ILeafletSource
 {
     public static readonly Uri FileUrl =
@@ -14,8 +13,6 @@ public sealed class AnvisaLeafletSource(HttpClient http, AnvisaLeafletReader rea
         using var response = await http.GetAsync(FileUrl, cancellationToken);
         response.EnsureSuccessStatusCode();
 
-        // 1,6 MB: cabe em memória, e o conteúdo posicionável permite calcular
-        // o hash antes de ler.
         using var content = new MemoryStream();
         await response.Content.CopyToAsync(content, cancellationToken);
 

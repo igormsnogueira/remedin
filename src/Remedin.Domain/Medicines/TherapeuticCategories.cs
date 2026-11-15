@@ -1,27 +1,7 @@
 namespace Remedin.Domain.Medicines;
 
-/// <summary>
-/// A finalidade do medicamento em linguagem comum.
-/// </summary>
-/// <param name="Label">
-/// Descreve para que serve a categoria, sem recomendar uso. A ficha exibe isto
-/// junto do aviso de que o site não substitui médico ou farmacêutico.
-/// </param>
 public sealed record TherapeuticCategory(string Code, string Label, string GroupCode, string GroupLabel);
 
-/// <summary>
-/// Traduz o código de classe terapêutica da CMED para linguagem que o cidadão
-/// entende. "ANTIRREUMÁTICOS NÃO ESTEROIDAIS PUROS" não comunica nada para
-/// quem só quer saber se aquilo serve para dor.
-///
-/// São 528 classes distintas no catálogo, e as 36 mais comuns cobrem apenas
-/// 42% dele. Por isso o mapeamento tem dois níveis: a letra inicial do código
-/// é o grupo anatômico, e os 17 grupos cobrem 100% — nenhum medicamento fica
-/// sem descrição. A classe específica refina onde há volume que justifique.
-///
-/// Dado curado do projeto, e não das fontes. Cresce conforme a interface
-/// mostrar onde a descrição genérica não basta.
-/// </summary>
 public static class TherapeuticCategories
 {
     private static readonly Dictionary<string, string> GroupLabels = new(StringComparer.OrdinalIgnoreCase)
@@ -42,16 +22,8 @@ public static class TherapeuticCategories
         ["S"] = "Olhos e ouvidos",
         ["T"] = "Exames e diagnóstico",
         ["V"] = "Outros",
-
-        // O grupo F não consta na classificação de referência e tem 4
-        // medicamentos no catálogo. Fica sem tradução até alguém conferir na
-        // fonte, e o nome técnico aparece no lugar.
     };
 
-    /// <summary>
-    /// Classes específicas, escolhidas por volume no catálogo. Quem não está
-    /// aqui cai na descrição do grupo.
-    /// </summary>
     private static readonly Dictionary<string, string> ClassLabels = new(StringComparer.OrdinalIgnoreCase)
     {
         ["M1A1"] = "Anti-inflamatório para dor e inflamação",
@@ -86,8 +58,6 @@ public static class TherapeuticCategories
         ["M3B"] = "Relaxante muscular",
         ["M5B3"] = "Osteoporose",
         ["A3F"] = "Náusea e digestão lenta",
-        // Sem estas, a meclizina caía em "Estômago, intestino e diabetes",
-        // que não diz nada a quem procura remédio para enjoo.
         ["A4A1"] = "Enjoo, náusea e vômito",
         ["A4A9"] = "Enjoo, náusea e vômito",
         ["B1F"] = "Anticoagulante",
@@ -95,7 +65,6 @@ public static class TherapeuticCategories
         ["N7D1"] = "Alzheimer",
     };
 
-    /// <summary>Grupos disponíveis para navegação por finalidade.</summary>
     public static IReadOnlyList<TherapeuticCategory> Groups =>
     [
         .. GroupLabels
@@ -103,11 +72,6 @@ public static class TherapeuticCategories
             .OrderBy(category => category.Label, StringComparer.CurrentCulture)
     ];
 
-    /// <summary>
-    /// Devolve a finalidade em linguagem comum, ou nulo quando o código não
-    /// tem tradução. Nulo é resposta honesta: a interface mostra o nome
-    /// técnico em vez de inventar.
-    /// </summary>
     public static TherapeuticCategory? Describe(string? code)
     {
         if (string.IsNullOrWhiteSpace(code))

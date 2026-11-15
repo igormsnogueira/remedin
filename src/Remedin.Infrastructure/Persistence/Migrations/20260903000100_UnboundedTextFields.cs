@@ -4,18 +4,6 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace Remedin.Infrastructure.Persistence.Migrations
 {
-    /// <summary>
-    /// Tira o limite de tamanho dos campos de texto livre.
-    ///
-    /// Limitar não valida nada — a origem escreve o que quiser — e transforma
-    /// variação normal do dado em carga quebrada: a CMED concatena os
-    /// princípios ativos de uma associação e passa de mil caracteres. Código e
-    /// identificador mantêm limite, porque a forma deles é definida.
-    ///
-    /// A coluna de busca é gerada a partir destes campos, e o PostgreSQL não
-    /// permite alterar o tipo de coluna usada por coluna gerada. Por isso a
-    /// migration derruba o índice de busca, altera, e recria.
-    /// </summary>
     public partial class UnboundedTextFields : Migration
     {
         private const string SearchVector = """
@@ -47,7 +35,6 @@ namespace Remedin.Infrastructure.Persistence.Migrations
             ALTER TABLE medicines DROP COLUMN IF EXISTS search_vector;
             """;
 
-        /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.Sql(DropSearch);
@@ -65,13 +52,10 @@ namespace Remedin.Infrastructure.Persistence.Migrations
             migrationBuilder.Sql(SearchIndexes);
         }
 
-        /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.Sql(DropSearch);
 
-            // Voltar pode truncar: os valores que motivaram esta migration não
-            // cabem no tamanho anterior.
             migrationBuilder.Sql("""
                 ALTER TABLE presentations ALTER COLUMN description TYPE character varying(500);
                 ALTER TABLE medicines ALTER COLUMN name TYPE character varying(300);

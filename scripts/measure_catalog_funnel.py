@@ -35,26 +35,21 @@ HOSPITAL_ONLY = "RESTRIÇÃO HOSPITALAR"
 SOLD_LAST_YEAR = "COMERCIALIZAÇÃO 2025"
 CLINICAL_COLUMNS = ("TARJA", "SUBSTÂNCIA", "CLASSE TERAPÊUTICA")
 
-# Valor de preenchimento da CMED: "-" e variantes com espaco nao sao dado.
 PLACEHOLDERS = {"-", "- (*)", ""}
 
 REPORT_TITLE = "Funil do catálogo e cobertura da informação clínica"
 DEFAULT_REPORT = repo_path("docs", "output", "funil-do-catalogo.md")
 
-
 def digits_only(series):
     return series.dropna().astype(str).str.replace(r"\D", "", regex=True)
 
-
 def is_filled(series):
     return ~series.fillna("").astype(str).str.strip().isin(PLACEHOLDERS)
-
 
 def step(label, count, previous):
     share = f"{count / previous * 100:5.1f}% do anterior" if previous else ""
     print(f"{label:.<52} {count:>7,}  {share}".replace(",", "."))
     return count
-
 
 def measure(registry_path, price_path, report_path):
     for path in (registry_path, price_path):
@@ -66,7 +61,6 @@ def measure(registry_path, price_path, report_path):
 
     with report_to(report_path, REPORT_TITLE, price_path):
         write_funnel(registry, price)
-
 
 def write_funnel(registry, price):
     section("funil do catálogo")
@@ -87,8 +81,6 @@ def write_funnel(registry, price):
     priced = active_keys[active_keys.isin(set(price_keys))]
     previous = step("registros ativos com preço", len(priced), previous)
 
-    # Do lado do preco o filtro e por linha, porque restricao hospitalar e
-    # comercializacao sao atributos da apresentacao, nao do registro.
     retail = price[price[HOSPITAL_ONLY].str.strip() != "Sim"]
     retail_keys = digits_only(retail[PRICE_KEY]).str[:REGISTRY_KEY_LENGTH]
     in_retail = priced[priced.isin(set(retail_keys))]
@@ -134,7 +126,6 @@ def write_funnel(registry, price):
     without_price = active_keys[~active_keys.isin(set(price_keys))]
     print(f"{len(without_price):,} registros ficam sem informação clínica".replace(",", "."))
     print("A fonte clínica é a lista da CMED, então eles entram só com nome e fabricante.")
-
 
 if __name__ == "__main__":
     if len(sys.argv) < 3:

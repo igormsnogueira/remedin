@@ -1,11 +1,5 @@
 import styles from './Logo.module.css'
 
-/**
- * A marca: uma cápsula inclinada em dois verdes, e o nome em minúsculas.
- *
- * O desenho é o mesmo do favicon (public/favicon.svg). Mudar um exige mudar o
- * outro.
- */
 export function Logo() {
   return (
     <span className={styles.logo}>
@@ -15,7 +9,6 @@ export function Logo() {
   )
 }
 
-/** Só o símbolo, para usos em que o nome já aparece ao lado ou não cabe. */
 export function LogoMark({ size = 30 }: { size?: number }) {
   return (
     <svg

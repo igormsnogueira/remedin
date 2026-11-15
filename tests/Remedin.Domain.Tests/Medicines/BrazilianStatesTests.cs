@@ -7,9 +7,6 @@ public class BrazilianStatesTests
     [Fact]
     public void Toda_sigla_com_nome_tem_aliquota_e_o_contrario_tambem()
     {
-        // As duas tabelas são listas de 27 escritas à mão, em arquivos
-        // diferentes. Acrescentar um estado numa e esquecer da outra derrubaria
-        // o seletor da interface, ou publicaria preço sem alíquota.
         Assert.Equal(
             BrazilianStates.Codes.Order(),
             IcmsRates.States.Order());
@@ -48,8 +45,6 @@ public class BrazilianStatesTests
     [InlineData("Distrito Federal", "DF")]
     public void Nome_do_estado_vira_sigla_com_ou_sem_acento(string name, string expected)
     {
-        // A base de geolocalização por IP escreve os nomes sem acento, e o
-        // Distrito Federal em inglês.
         Assert.True(BrazilianStates.TryFindByName(name, out var code));
         Assert.Equal(expected, code);
     }

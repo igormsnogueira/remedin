@@ -6,13 +6,8 @@ import { fetchLocation } from '@/features/state-selection/api/fetchLocation'
 import { SelectedStateContext } from './SelectedStateContext'
 import type { StateOrigin } from './SelectedStateContext'
 
-/** A escolha da pessoa. A chave é a mesma de antes: quem já escolheu continua escolhido. */
 const MANUAL_KEY = 'remedin:state'
 
-/**
- * O último estado detectado. Guardado para a próxima visita já abrir nele,
- * sem esperar a API, enquanto a detecção roda de novo por trás.
- */
 const DETECTED_KEY = 'remedin:state-detected'
 
 const DEFAULT_STATE = 'SP'
@@ -26,8 +21,6 @@ function read(key: string): string | null {
   try {
     return localStorage.getItem(key)
   } catch {
-    // Navegação anônima com armazenamento bloqueado. A escolha vale só para
-    // esta sessão, e o site continua funcionando.
     return null
   }
 }
@@ -36,7 +29,7 @@ function write(key: string, value: string): void {
   try {
     localStorage.setItem(key, value)
   } catch {
-    // Sem persistir, mas sem quebrar a troca de estado.
+    // Armazenamento bloqueado: segue sem salvar.
   }
 }
 
@@ -57,9 +50,7 @@ function initialSelection(): Selection {
 export function SelectedStateProvider({ children }: { children: ReactNode }) {
   const [selection, setSelection] = useState(initialSelection)
 
-  // Detecta pela conexão uma vez por visita, se a pessoa ainda não escolheu.
-  // O resultado só vale se ela não tiver escolhido enquanto a resposta vinha:
-  // a escolha manual sempre ganha.
+  // Detecta o estado pela conexão; a escolha manual sempre vence.
   useEffect(() => {
     if (initialSelection().origin === 'manual') {
       return
@@ -78,8 +69,6 @@ export function SelectedStateProvider({ children }: { children: ReactNode }) {
           current.origin === 'manual' ? current : { state, origin: 'detected' },
         )
       },
-      // Sem palpite, fica o que já estava (o último detectado ou SP). Não é
-      // erro que a pessoa precise ver.
       () => {},
     )
 

@@ -5,10 +5,10 @@ namespace Remedin.Domain.Tests.Medicines;
 public class RegistrationNumberTests
 {
     [Theory]
-    [InlineData("102980592", "102980592")]      // formato da base de registro
-    [InlineData("1705600230032", "170560023")]  // formato da lista de preços
-    [InlineData("1.0298.0592", "102980592")]    // com pontuação
-    [InlineData("  102980592  ", "102980592")]  // com espaço em volta
+    [InlineData("102980592", "102980592")]
+    [InlineData("1705600230032", "170560023")]
+    [InlineData("1.0298.0592", "102980592")]
+    [InlineData("  102980592  ", "102980592")]
     public void Parse_normaliza_os_formatos_das_duas_fontes(string raw, string expected)
     {
         var number = RegistrationNumber.Parse(raw);
@@ -30,8 +30,8 @@ public class RegistrationNumberTests
     [InlineData("")]
     [InlineData("   ")]
     [InlineData("abc")]
-    [InlineData("12345678")]     // oito dígitos: a análise confirmou que é lixo,
-    [InlineData("1234567890")]   // e não zero à esquerda perdido
+    [InlineData("12345678")]
+    [InlineData("1234567890")]
     [InlineData("12345678901")]
     public void TryParse_recusa_valor_que_nao_e_registro(string? raw)
     {

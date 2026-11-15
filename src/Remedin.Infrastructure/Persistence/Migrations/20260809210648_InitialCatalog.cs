@@ -4,10 +4,8 @@
 
 namespace Remedin.Infrastructure.Persistence.Migrations
 {
-    /// <inheritdoc />
     public partial class InitialCatalog : Migration
     {
-        /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.AlterDatabase()
@@ -56,7 +54,6 @@ namespace Remedin.Infrastructure.Persistence.Migrations
                 });
         }
 
-        /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(

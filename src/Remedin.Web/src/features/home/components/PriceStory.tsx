@@ -7,18 +7,6 @@ import type { ExampleState } from '../model/useExample'
 
 import styles from './PriceStory.module.css'
 
-/**
- * Como usar, contado pela rolagem.
- *
- * Em tela grande e navegador com animação ligada à rolagem, a seção fica
- * presa na tela e os três passos se trocam conforme a pessoa desce, cada um
- * com a sua cena ao lado. Nos outros casos (celular, navegador sem suporte,
- * pedido de menos movimento) é uma lista comum, um passo embaixo do outro.
- * A decisão é toda do CSS; o conteúdo é o mesmo.
- *
- * As cenas usam o mesmo exemplo real do topo. Sem ele, mostram o passo sem
- * números.
- */
 export function PriceStory({ example }: { example: ExampleState }) {
   const ready = example.status === 'ready' ? example.example : null
 
@@ -113,7 +101,6 @@ export function PriceStory({ example }: { example: ExampleState }) {
           </li>
         </ol>
 
-        {/* Quanto da história já passou. Só aparece na versão presa à tela. */}
         <div className={styles.progress} aria-hidden="true" />
       </div>
     </section>
@@ -139,8 +126,6 @@ function SearchScene({
   term: string
   results: { name: string; maker: string | null }[]
 }) {
-  // Desenho de uma busca, não uma busca: fica fora do leitor de tela, e o
-  // texto do passo já diz o que ela mostra.
   return (
     <div className={styles.card} aria-hidden="true">
       <div className={styles.fakeInput}>

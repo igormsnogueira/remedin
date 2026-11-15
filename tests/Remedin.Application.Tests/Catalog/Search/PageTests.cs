@@ -18,8 +18,6 @@ public class PageTests
     [InlineData(-5)]
     public void Pagina_abaixo_de_um_vira_a_primeira(int number)
     {
-        // O número vem da barra de endereço, onde qualquer um digita qualquer
-        // coisa. Corrigir serve melhor que recusar.
         Assert.Equal(1, Page.Of(number).Number);
     }
 
@@ -56,8 +54,6 @@ public class PageTests
     [Fact]
     public void Pagina_vazia_nao_tem_intervalo()
     {
-        // Pedir a página 99 de uma lista de 206: o deslocamento sozinho diria
-        // "0 a 1960", um intervalo que não existe.
         var results = PagedResults<string>.Of([], total: 0, Page.Of(99));
 
         Assert.Equal(0, results.FirstPosition);

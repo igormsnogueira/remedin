@@ -1,18 +1,7 @@
 namespace Remedin.Domain.Medicines;
 
-/// <summary>
-/// Alíquota de ICMS aplicável a medicamento, por estado.
-///
-/// Derivada do dicionário oficial da lista de preços da CMED, cópia em
-/// docs/fontes/. É dado que envelhece: mudança de alíquota estadual exige
-/// atualizar esta tabela e a data abaixo.
-///
-/// Exibir a alíquota errada faz o site publicar um teto abaixo do legal, e o
-/// cidadão reclamar na farmácia de um preço que é legítimo.
-/// </summary>
 public static class IcmsRates
 {
-    /// <summary>Data da publicação de onde a tabela foi extraída.</summary>
     public static readonly DateOnly SourcedOn = new(2026, 7, 21);
 
     public const string DefaultState = "SP";
@@ -28,8 +17,6 @@ public static class IcmsRates
         ["MG"] = 18m, ["PB"] = 18m, ["PE"] = 18m, ["PI"] = 18m, ["PR"] = 18m,
         ["RN"] = 18m, ["RS"] = 18m, ["SE"] = 18m, ["SP"] = 18m, ["TO"] = 18m,
 
-        // "Demais estados" no dicionário, listados aqui para que consultar um
-        // estado inexistente falhe em vez de devolver a alíquota padrão.
         ["AC"] = Standard, ["AL"] = Standard, ["DF"] = Standard, ["ES"] = Standard,
         ["GO"] = Standard, ["MS"] = Standard, ["MT"] = Standard, ["PA"] = Standard,
         ["RR"] = Standard, ["SC"] = Standard,
@@ -37,16 +24,8 @@ public static class IcmsRates
 
     public static IReadOnlyCollection<string> States => ByState.Keys;
 
-    /// <summary>
-    /// As alíquotas que o catálogo consulta — hoje quatro, para 27 estados.
-    ///
-    /// Derivada da tabela acima, e não escrita à parte: é a mesma informação
-    /// vista do outro lado. A carga usa isto para descartar as alíquotas que a
-    /// CMED publica e nenhuma tela pede.
-    /// </summary>
     public static IReadOnlySet<decimal> Served { get; } = ByState.Values.ToHashSet();
 
-    /// <summary>Se alguma unidade da federação usa esta alíquota.</summary>
     public static bool Serves(decimal? rate) => rate is { } value && Served.Contains(value);
 
     public static decimal For(string state)

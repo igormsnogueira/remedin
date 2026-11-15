@@ -27,7 +27,6 @@ public class PackagingTests
     [Fact]
     public void Sem_espaco_entre_numero_e_unidade_tambem_le()
     {
-        // "20MG CAP DURA CT FR PLAS OPC X 28" aparece assim na origem.
         var packaging = Packaging.Read("20MG CAP DURA CT FR PLAS OPC X 28");
 
         Assert.Equal(20m, packaging.DosageInMilligrams);
@@ -39,8 +38,6 @@ public class PackagingTests
     [InlineData("(10 + 0,4) MG/G CREM DERM CT BG AL X 40G")]
     public void Numero_com_unidade_depois_nao_e_quantidade(string description)
     {
-        // Aqui o número após o X é volume ou peso, não quantidade de doses.
-        // Lê-lo como quantidade daria preço por unidade absurdo, em silêncio.
         Assert.Null(Packaging.Read(description).UnitCount);
     }
 
@@ -49,7 +46,6 @@ public class PackagingTests
     [InlineData("10 MG/G CREM DERM CT BG X 30")]
     public void Concentracao_nao_e_dosagem_por_unidade(string description)
     {
-        // "50 MG/ML" é a concentração do líquido, não a dose de um comprimido.
         Assert.Null(Packaging.Read(description).DosageInMilligrams);
     }
 
@@ -64,8 +60,6 @@ public class PackagingTests
     [Fact]
     public void Quantidade_com_texto_depois_e_ignorada()
     {
-        // "X 30 (EMB FRAC)" é embalagem fracionada, e o 30 pode não ser o que
-        // se compra. Na dúvida, ausência.
         Assert.Null(Packaging.Read("40 MG CAP CT BL AL X 30 (EMB FRAC)").UnitCount);
     }
 
@@ -101,7 +95,6 @@ public class PackagingTests
     [InlineData("24 MG CAP DURA LIB PROL CT BL AL PLAS PVDC/PVC TRANS X 280")]
     public void Embalagem_institucional_e_reconhecida(string description)
     {
-        // Exemplos reais da lista da CMED de novembro de 2026.
         Assert.True(Packaging.IsInstitutional(description));
     }
 
@@ -114,8 +107,6 @@ public class PackagingTests
     [InlineData(null)]
     public void Embalagem_de_balcao_nao_e_institucional(string? description)
     {
-        // Caixa de 120 e de 150 ainda é tratamento contínuo comprado na
-        // farmácia, e "CT 4 SER" tem poucas seringas.
         Assert.False(Packaging.IsInstitutional(description));
     }
 }

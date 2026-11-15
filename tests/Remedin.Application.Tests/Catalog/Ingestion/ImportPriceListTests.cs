@@ -72,11 +72,6 @@ public class ImportPriceListTests
         new(new FakeSource(snapshot), catalog, store, journal,
             new FakeTimeProvider(Now), NullLogger<ImportPriceList>.Instance);
 
-    /// <summary>
-    /// Registros conhecidos, mais alguns órfãos. A proporção importa: a regra
-    /// de cobertura rejeita a carga inteira quando muita linha fica sem
-    /// medicamento, então cenário com metade de órfão testa outra coisa.
-    /// </summary>
     private static (PriceSnapshot Snapshot, string[] Registered) Catalog(int registered, int orphans)
     {
         var known = Enumerable.Range(0, registered).Select(index => $"1{index:D8}").ToArray();
@@ -118,9 +113,6 @@ public class ImportPriceListTests
     [Fact]
     public async Task Cobertura_abaixo_do_minimo_rejeita_a_carga_inteira()
     {
-        // Metade das linhas sem medicamento correspondente indica que o
-        // formato da origem mudou. Gravar assim esvaziaria o preço do
-        // catálogo; manter o anterior é velho mas correto.
         var (snapshot, registered) = Catalog(registered: 50, orphans: 50);
 
         var store = new FakePriceStore();
@@ -137,8 +129,6 @@ public class ImportPriceListTests
     [Fact]
     public async Task Cobertura_entre_o_minimo_e_o_esperado_grava_mesmo_assim()
     {
-        // 97% é abaixo do esperado e acima do mínimo: registra alerta e segue,
-        // porque rejeitar deixaria o catálogo sem preço por causa de ruído.
         var (snapshot, registered) = Catalog(registered: 97, orphans: 3);
 
         var store = new FakePriceStore();
@@ -182,8 +172,6 @@ public class ImportPriceListTests
     [Fact]
     public async Task Reprocessa_a_mesma_publicacao_quando_pedido()
     {
-        // O caso que motivou a opção: guardar só as alíquotas servidas mudou o
-        // que a carga grava, e o arquivo da CMED era o mesmo.
         var snapshot = new PriceSnapshot([Priced("102980592")], 1, 0, "mesmo-hash");
         var store = new FakePriceStore();
 
@@ -199,8 +187,6 @@ public class ImportPriceListTests
     [Fact]
     public async Task Reprocessar_nao_dispensa_a_verificacao_de_cobertura()
     {
-        // Forçar a carga pula só a comparação de arquivo. A proteção contra
-        // gravar um cruzamento ruim continua valendo.
         var (snapshot, registered) = Catalog(registered: 50, orphans: 50);
         var store = new FakePriceStore();
 

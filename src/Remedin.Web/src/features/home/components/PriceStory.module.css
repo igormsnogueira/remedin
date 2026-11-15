@@ -1,7 +1,4 @@
 @layer components {
-  /* Versão básica: um passo embaixo do outro, com a cena ao lado quando cabe.
-     É o que vê quem está no celular, em navegador sem animação por rolagem ou
-     com pedido de menos movimento. */
   .story {
     padding-block: var(--space-xl);
   }
@@ -68,7 +65,6 @@
     box-shadow: var(--shadow-md);
   }
 
-  /* Cena 1: o campo de busca e os primeiros resultados. */
   .fakeInput {
     display: flex;
     align-items: center;
@@ -115,7 +111,6 @@
     background-color: var(--color-border-soft);
   }
 
-  /* Cena 2: o preço grande. */
   .sceneLabel {
     color: var(--color-text-muted);
     font-size: var(--text-sm);
@@ -134,7 +129,6 @@
     color: var(--color-text-muted);
   }
 
-  /* Cena 3: o número que mais importa da página, do maior tamanho dela. */
   .ratio {
     color: var(--color-heading);
     font-size: clamp(4.5rem, 2rem + 10vw, 9rem);
@@ -157,8 +151,7 @@
     }
   }
 
-  /* Versão contada pela rolagem. A seção fica com três telas de altura, o
-     palco fica preso na tela, e cada passo ocupa um terço do caminho. */
+  /* Versão animada só com suporte a animação por rolagem, tela larga e sem pedido de menos movimento. */
   @supports (animation-timeline: view()) {
     @media (min-width: 60rem) and (prefers-reduced-motion: no-preference) {
       .story {
@@ -179,9 +172,6 @@
         gap: 0;
       }
 
-      /* Os três passos no mesmo lugar, um por cima do outro. Texto e cena
-         alinhados pelo topo: centralizados, o número do passo ficava mais
-         baixo que o cartão e parecia solto. */
       .step {
         grid-area: 1 / 1;
         align-items: start;
@@ -199,7 +189,6 @@
         animation-name: step-last;
       }
 
-      /* O número cresce enquanto o último passo entra. */
       .step:last-child .ratio {
         animation: ratio-in linear both;
         animation-timeline: --story;

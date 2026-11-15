@@ -1,21 +1,14 @@
 @layer components {
-  /* A faixa vai de uma borda à outra da janela, mas o conteúdo continua
-     alinhado com o resto da página. O border-image pinta o fundo para fora
-     da caixa sem criar rolagem horizontal, o que width: 100vw criaria no
-     Windows, onde a barra de rolagem ocupa espaço. A cor é sólida: o
-     conic-gradient aqui só serve de "imagem" de uma cor só. */
   .band {
     --band-text-muted: color-mix(in oklab, white 78%, var(--color-heading));
-    /* O anel de foco padrão é verde, e some sobre verde escuro. */
     --focus-ring: 3px solid var(--color-accent-light);
 
+    /* Pinta o fundo até as bordas da janela sem criar rolagem horizontal. */
     border-image: conic-gradient(var(--color-heading) 0 0) fill 0 // 0 100vw;
     color: white;
     padding-block: var(--space-lg) var(--space-md);
   }
 
-  /* Em tela grande o topo ocupa a primeira tela inteira, com o conteúdo no
-     meio e as fontes no pé. 4.5rem é a altura do cabeçalho. */
   @media (min-width: 60rem) {
     .band {
       display: grid;
@@ -26,7 +19,6 @@
     }
   }
 
-  /* Ao rolar, o conteúdo do topo recua e esmaece enquanto sai da tela. */
   @supports (animation-timeline: view()) {
     @media (prefers-reduced-motion: no-preference) {
       .grid {
@@ -50,8 +42,6 @@
     gap: var(--space-xl);
   }
 
-  /* Duas colunas só com a ficha presente. Se a API falhar, ela some, e o
-     texto não fica ao lado de um buraco. */
   @media (min-width: 60rem) {
     .grid:has(> .example) {
       grid-template-columns: minmax(0, 1.2fr) minmax(0, 25rem);
@@ -86,8 +76,6 @@
     font-size: var(--text-lg);
   }
 
-  /* O formulário fica num cartão claro: os campos foram desenhados para
-     fundo claro, e o cartão é o primeiro lugar para onde o olho vai. */
   .search {
     margin-block-start: var(--space-xs);
     padding: var(--space-sm);

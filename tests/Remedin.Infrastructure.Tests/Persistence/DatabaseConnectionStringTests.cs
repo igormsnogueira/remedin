@@ -27,8 +27,6 @@ public class DatabaseConnectionStringTests
     [Fact]
     public void Parametro_invalido_nao_repete_o_valor_recebido()
     {
-        // O caso real: a URL colada no lugar de "Require". O Npgsql poria a
-        // string inteira, senha incluída, na mensagem do erro.
         var malformed =
             $"Host=db.exemplo;Database=remedin;Username=remedin;Password={Password};" +
             $"SSL Mode=postgresql://remedin:{Password}@db.exemplo/remedin";

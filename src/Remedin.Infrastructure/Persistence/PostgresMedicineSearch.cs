@@ -6,24 +6,8 @@ using Remedin.Domain.Medicines;
 
 namespace Remedin.Infrastructure.Persistence;
 
-/// <summary>
-/// Busca por nome comercial, princípio ativo, fabricante e classe terapêutica.
-///
-/// Combina duas estratégias porque o público erra a grafia e nem sempre sabe
-/// o nome do princípio ativo:
-///
-///   busca textual  encontra palavra inteira, com radical em português, de
-///                  modo que "analgésicos" acha "analgésico"
-///   trigrama       encontra grafia aproximada, tolerando erro de digitação
-///
-/// Os pesos da relevância estão na ADR 0008.
-///
-/// SQL direto em vez de LINQ: as duas estratégias combinadas não têm tradução
-/// natural, e a consulta é o coração do produto — vale poder lê-la inteira.
-/// </summary>
 public sealed class PostgresMedicineSearch(RemedinDbContext context) : IMedicineSearch
 {
-    /// <summary>Abaixo disso o trigrama devolve o catálogo inteiro.</summary>
     private const int MinimumTermLength = 3;
 
     private const string Sql = """
@@ -40,11 +24,6 @@ public sealed class PostgresMedicineSearch(RemedinDbContext context) : IMedicine
                    m.therapeutic_class_name,
                    m.status,
                    m.has_price,
-                   -- Quem digita "dipirona" procura primeiro o produto que se
-                   -- chama assim, não os trezentos que têm esse princípio
-                   -- ativo. Daí a escada: nome exato, nome que começa com o
-                   -- termo, relevância textual com peso por campo, e por
-                   -- último a semelhança que socorre erro de digitação.
                    ( CASE WHEN immutable_unaccent(lower(m.name)) = i.plain THEN 10 ELSE 0 END
                    + CASE WHEN immutable_unaccent(lower(m.name)) LIKE i.plain || '%' THEN 3 ELSE 0 END
                    + ts_rank(m.search_vector, i.query) * 4
@@ -57,16 +36,8 @@ public sealed class PostgresMedicineSearch(RemedinDbContext context) : IMedicine
                OR immutable_unaccent(coalesce(m.active_ingredient, '')) % i.plain
         ),
         ranked AS (
-            -- A função de janela conta antes do corte, então o total da busca
-            -- sai desta mesma consulta. Um segundo SELECT count(*) repetindo os
-            -- filtros é o tipo de duplicação que diverge na primeira alteração.
             SELECT *, count(*) OVER () AS total
             FROM scored
-            -- Registro ativo e com preço vem antes: para o mesmo grau de
-            -- relevância, produto fora do mercado ou sem preço publicado é
-            -- resposta pior (ADR 0007). A marca de preço entra aqui, e não
-            -- depois, porque reordenar após o corte não traz de volta quem
-            -- ficou de fora.
             ORDER BY (status = 'Active') DESC, score DESC, has_price DESC, name ASC
             LIMIT @limit OFFSET @offset
         )
@@ -74,9 +45,6 @@ public sealed class PostgresMedicineSearch(RemedinDbContext context) : IMedicine
                r.therapeutic_class_code, r.therapeutic_class_name, r.status, cheapest.amount,
                r.total
         FROM ranked r
-        -- O preço é buscado só para as linhas que vão sair, e não para as
-        -- milhares que a busca casou. Sem isso, procurar um princípio ativo
-        -- comum varreria centenas de milhares de preços à toa.
         LEFT JOIN LATERAL (
             SELECT min(pr.amount) AS amount
             FROM presentations p
@@ -88,9 +56,6 @@ public sealed class PostgresMedicineSearch(RemedinDbContext context) : IMedicine
               AND pr.icms_rate = @rate
               AND NOT pr.free_trade_zone
         ) AS cheapest ON true
-        -- O preço só desempata no fim, entre os que já foram escolhidos: vários
-        -- laboratórios publicam o mesmo genérico com o mesmo nome, e mostrar o
-        -- mais caro primeiro contraria o motivo de o site existir.
         ORDER BY (r.status = 'Active') DESC, r.score DESC, r.has_price DESC,
                  r.name ASC, cheapest.amount ASC NULLS LAST;
         """;
@@ -121,10 +86,6 @@ public sealed class PostgresMedicineSearch(RemedinDbContext context) : IMedicine
 
         var results = new List<MedicineSummary>();
 
-        // A contagem viaja em cada linha, então página vazia devolve total
-        // zero mesmo quando a busca tem resultados — é o caso de pedir uma
-        // página além do fim. A tela distingue pelo número da página pedida, e
-        // isso evita uma segunda consulta para um caso que quase não acontece.
         var total = 0;
 
         while (await reader.ReadAsync(cancellationToken))

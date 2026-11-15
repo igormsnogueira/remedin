@@ -5,20 +5,8 @@ using Remedin.Domain.Medicines;
 
 namespace Remedin.Infrastructure.Persistence;
 
-/// <summary>
-/// Navegação por finalidade, para quem não sabe o nome de nenhum remédio.
-///
-/// O agrupamento é a primeira letra do código de classe da CMED, que é o grupo
-/// anatômico. Os 16 grupos cobrem todo o catálogo com código, então nenhum
-/// medicamento fica fora da navegação por falta de tradução específica.
-/// </summary>
 public sealed class PostgresMedicinePurposes(RemedinDbContext context) : IMedicinePurposes
 {
-    /// <summary>
-    /// Só entra na navegação o que a pessoa pode comprar: registro ativo e
-    /// preço publicado. Categoria cheia de produto fora do mercado é promessa
-    /// que a tela seguinte não cumpre.
-    /// </summary>
     private const string Eligible = "m.status = 'Active' AND m.has_price AND m.therapeutic_class_code IS NOT NULL";
 
     private const string CountSql = $"""
@@ -38,7 +26,6 @@ public sealed class PostgresMedicinePurposes(RemedinDbContext context) : IMedici
         )
         SELECT c.registration_number, c.name, c.active_ingredient, c.manufacturer,
                c.therapeutic_class_code, c.therapeutic_class_name, cheapest.amount,
-               -- Conta antes do corte, na mesma consulta, como na busca.
                count(*) OVER () AS total
         FROM chosen c
         LEFT JOIN LATERAL (
@@ -52,9 +39,6 @@ public sealed class PostgresMedicinePurposes(RemedinDbContext context) : IMedici
               AND pr.icms_rate = @rate
               AND NOT pr.free_trade_zone
         ) AS cheapest ON true
-        -- Do mais barato ao mais caro: aqui não há termo de busca para medir
-        -- relevância, e quem navega por finalidade veio ver o que cabe no bolso.
-        -- Sem preço no estado vai para o fim, porque não responde a pergunta.
         ORDER BY cheapest.amount ASC NULLS LAST, c.name ASC
         LIMIT @limit OFFSET @offset;
         """;
@@ -73,7 +57,6 @@ public sealed class PostgresMedicinePurposes(RemedinDbContext context) : IMedici
             totals[reader.GetString(0)] = (int)reader.GetInt64(1);
         }
 
-        // A ordem e os rótulos vêm do domínio, e o banco só informa a contagem.
         return
         [
             .. TherapeuticCategories.Groups

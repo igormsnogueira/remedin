@@ -12,9 +12,6 @@ public sealed class RemedinDbContext(DbContextOptions<RemedinDbContext> options)
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        // Declaradas aqui para que a migration as crie. Se ficassem só no
-        // script de inicialização do container, existiriam em desenvolvimento
-        // e faltariam em produção.
         modelBuilder.HasPostgresExtension("unaccent");
         modelBuilder.HasPostgresExtension("pg_trgm");
 

@@ -5,7 +5,6 @@
     min-block-size: 100dvb;
   }
 
-  /* Um lugar só define a largura e as margens laterais do conteúdo. */
   .container {
     inline-size: 100%;
     max-inline-size: var(--layout-max);
@@ -13,20 +12,14 @@
     padding-inline: var(--layout-gutter);
   }
 
-  /* Verde-escuro em todas as páginas, como a barra da marca. Antes era
-     verde só na home e branco no resto, e cada clique trocava a cor do
-     topo, como se fossem dois sites. Na home ele emenda com a faixa. */
   .header {
     --logo-text: white;
-    /* O anel de foco padrão é verde, e some sobre verde escuro. */
     --focus-ring: 3px solid var(--color-accent-light);
 
     background-color: var(--color-heading);
     color: white;
   }
 
-  /* No celular: logo e menu na primeira linha, busca na segunda, de ponta a
-     ponta. Com flex-wrap o menu caía sozinho numa terceira linha. */
   .bar {
     display: grid;
     grid-template-columns: auto 1fr;
@@ -96,8 +89,6 @@
     color: white;
   }
 
-  /* Cor, peso e sublinhado, e não só cor: quem não distingue o verde ainda
-     vê qual é a página atual. */
   .navLinkActive {
     color: white;
     font-weight: 700;
@@ -116,14 +107,10 @@
     }
   }
 
-  /* Página que abre com uma faixa colorida de ponta a ponta encosta a faixa
-     no cabeçalho, sem a folga de cima. */
   .main:has([data-full-bleed]) {
     padding-block-start: 0;
   }
 
-  /* O foco vai para cá na troca de rota, e o anel em volta do conteúdo
-     inteiro não ajuda ninguém a se localizar. */
   .main:focus {
     outline: none;
   }
@@ -144,7 +131,6 @@
     font-size: var(--text-xs);
   }
 
-  /* Primeiro item do Tab: pula o cabeçalho e vai direto ao conteúdo. */
   .skip {
     position: absolute;
     inset-inline-start: -100vi;

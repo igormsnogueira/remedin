@@ -6,14 +6,6 @@ using Remedin.Domain.Medicines;
 
 namespace Remedin.Infrastructure.Persistence;
 
-/// <summary>
-/// Grava o catálogo de medicamentos.
-///
-/// A carga atualiza em cima do que já existe, em vez de apagar e reinserir.
-/// Apagar levaria junto, pela cascata, as apresentações e os preços — que são
-/// da outra carga e não seriam recriados se a lista de preço não tivesse
-/// mudado naquele mês.
-/// </summary>
 public sealed class MedicineCatalog(RemedinDbContext context) : IMedicineCatalog
 {
     private const string CreateStaging = """
@@ -33,12 +25,6 @@ public sealed class MedicineCatalog(RemedinDbContext context) : IMedicineCatalog
         FROM STDIN (FORMAT BINARY)
         """;
 
-    /// <summary>
-    /// Nome, fabricante e situação vêm sempre da ANVISA. Princípio ativo e
-    /// classe terapêutica só entram se ainda estiverem vazios, porque a lista
-    /// de preço traz versão melhor deles (ADR 0009). Tarja e código da classe
-    /// não aparecem aqui: são exclusivos da CMED e sobrevivem à carga.
-    /// </summary>
     private const string Upsert = """
         INSERT INTO medicines (registration_number, name, active_ingredient, manufacturer,
                                therapeutic_class_name, status)
@@ -53,7 +39,6 @@ public sealed class MedicineCatalog(RemedinDbContext context) : IMedicineCatalog
             therapeutic_class_name = coalesce(medicines.therapeutic_class_name, EXCLUDED.therapeutic_class_name);
         """;
 
-    /// <summary>Registro que saiu da publicação sai do catálogo.</summary>
     private const string DeleteMissing = """
         DELETE FROM medicines m
         WHERE NOT EXISTS (
@@ -75,8 +60,6 @@ public sealed class MedicineCatalog(RemedinDbContext context) : IMedicineCatalog
             await connection.OpenAsync(cancellationToken);
         }
 
-        // Tudo numa transação: quem consulta continua vendo o catálogo
-        // anterior até o commit.
         await using var transaction = await connection.BeginTransactionAsync(cancellationToken);
 
         await ExecuteAsync(connection, CreateStaging, cancellationToken);

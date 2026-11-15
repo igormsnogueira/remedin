@@ -39,8 +39,6 @@ public sealed class IngestionRunConfiguration : IEntityTypeConfiguration<Ingesti
 
         builder.Property(run => run.Detail).HasColumnName("detail").HasMaxLength(2000);
 
-        // A consulta de idempotência é sempre "última execução bem-sucedida
-        // desta origem".
         builder.HasIndex(run => new { run.Source, run.Outcome, run.StartedAt })
             .HasDatabaseName("ix_ingestion_runs_source_outcome_started_at");
     }

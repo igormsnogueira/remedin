@@ -2,13 +2,6 @@ using System.Text;
 
 namespace Remedin.Infrastructure.Ingestion.DbIp;
 
-/// <summary>
-/// Leitura dos campos de uma linha do CSV da DB-IP (RFC 4180).
-///
-/// Campo com vírgula vem entre aspas, como "Mountain View". Só os primeiros
-/// campos interessam, então a leitura para assim que tem os que pediu, sem
-/// percorrer cidade e coordenadas de 7 milhões de linhas.
-/// </summary>
 internal static class DbIpCsv
 {
     public static List<string> ReadFields(string line, int count)
@@ -25,7 +18,6 @@ internal static class DbIpCsv
             {
                 if (character == '"')
                 {
-                    // Aspas dobradas dentro de campo entre aspas são uma aspa literal.
                     if (index + 1 < line.Length && line[index + 1] == '"')
                     {
                         current.Append('"');

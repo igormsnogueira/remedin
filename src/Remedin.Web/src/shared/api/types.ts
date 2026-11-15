@@ -1,14 +1,3 @@
-/**
- * O formato das respostas da API.
- *
- * Escrito à mão e não gerado: são poucos endpoints, e um gerador de tipos a
- * partir do OpenAPI é mais uma ferramenta no build para manter. Se a API
- * crescer, a decisão se reabre.
- *
- * Campo opcional aqui é campo que a fonte pode não ter — ausência de dado é
- * parte do domínio, não erro de digitação.
- */
-
 export interface StateOption {
   code: string
   name: string
@@ -24,11 +13,9 @@ export interface MedicineSummary {
   therapeuticClass: string | null
   isActive: boolean
   cheapestConsumerPrice: number | null
-  /** Para que serve, em linguagem comum. Nulo quando não há tradução. */
   purpose: string | null
 }
 
-/** Uma fatia de uma lista maior, com o total de que ela faz parte. */
 export interface PagedResults<T> {
   items: T[]
   total: number
@@ -36,7 +23,6 @@ export interface PagedResults<T> {
   pageSize: number
   hasNext: boolean
   hasPrevious: boolean
-  /** Zero quando a página veio vazia. */
   firstPosition: number
   lastPosition: number
 }
@@ -69,7 +55,6 @@ export interface PresentationDetail {
   soldRecently: boolean
   consumerPrice: number | null
   factoryPrice: number | null
-  /** Embalagem de compra institucional (hospital, prefeitura, rede): fora da escolha. */
   institutional: boolean
 }
 
@@ -87,13 +72,11 @@ export interface MedicineDetail {
   presentations: PresentationDetail[]
   purpose: string | null
   prescriptionRule: string | null
-  /** Nulo quando a fonte não informa, que é diferente de não exigir. */
   requiresPrescription: boolean | null
   hasPrice: boolean
   soldInPharmacy: boolean
   soldRecently: boolean
   cheapestConsumerPrice: number | null
-  /** Data da bula atual no Bulário Eletrônico ("2025-12-09"). Nula quando não há bula lá. */
   leafletPublishedOn: string | null
 }
 
@@ -106,7 +89,6 @@ export interface MedicineAlternative {
   dosageInMilligrams: number | null
   unitCount: number | null
   isCurrent: boolean
-  /** Nulo quando a embalagem não permite ler a quantidade. */
   pricePerUnit: number | null
 }
 

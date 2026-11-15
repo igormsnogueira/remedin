@@ -8,18 +8,10 @@ import styles from './FavoriteButton.module.css'
 
 interface FavoriteButtonProps {
   medicine: FavoriteInput
-  /** Só o ícone, para caber no cartão da lista de resultados. */
   compact?: boolean
   className?: string
 }
 
-/**
- * Liga e desliga o remédio nos favoritos.
- *
- * Botão de alternar (aria-pressed) com o nome sempre igual. Trocar o texto
- * entre "Salvar" e "Salvo" e ainda marcar pressionado faria o leitor de tela
- * dizer duas coisas diferentes sobre o mesmo estado.
- */
 export function FavoriteButton({ medicine, compact = false, className }: FavoriteButtonProps) {
   const { isFavorite, isFull, add, remove } = useFavorites()
 
@@ -44,8 +36,6 @@ export function FavoriteButton({ medicine, compact = false, className }: Favorit
       type="button"
       className={classNames(styles.button, compact && styles.compact, className)}
       aria-pressed={saved}
-      // No cartão só há o ícone, e numa lista de vinte cartões "Favorito"
-      // sozinho não diz de qual remédio é.
       aria-label={compact ? `Favorito: ${medicine.name}` : undefined}
       title={blocked ? `Limite de ${FAVORITES_LIMIT} favoritos atingido` : undefined}
       disabled={blocked}

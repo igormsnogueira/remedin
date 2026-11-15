@@ -1,12 +1,5 @@
 namespace Remedin.Domain.Medicines;
 
-/// <summary>
-/// Um medicamento registrado na ANVISA, com as apresentações que a CMED
-/// publica preço.
-///
-/// É a raiz do agregado: as apresentações só são alteradas por aqui, o que
-/// mantém num lugar só a regra de que não existem duas com o mesmo código.
-/// </summary>
 public sealed class Medicine
 {
     private readonly List<Presentation> _presentations = [];
@@ -26,33 +19,22 @@ public sealed class Medicine
 
     public string? Manufacturer { get; private set; }
 
-    /// <summary>Código e descrição da classe terapêutica, no padrão da CMED.</summary>
     public string? TherapeuticClassCode { get; private set; }
 
     public string? TherapeuticClassName { get; private set; }
 
-    /// <summary>Tarja, que indica a exigência de receita. Nem sempre informada.</summary>
     public string? PrescriptionBand { get; private set; }
 
     public RegistrationStatus Status { get; private set; }
 
     public IReadOnlyList<Presentation> Presentations => _presentations;
 
-    /// <summary>
-    /// Medicamento sem apresentação é estado válido: a carga de preço pode não
-    /// ter rodado, e parte dos registros ativos não tem preço publicado.
-    /// </summary>
     public bool HasPrice => _presentations.Any(presentation => presentation.HasPrice);
 
     public bool IsSoldInPharmacy => _presentations.Any(presentation => !presentation.HospitalOnly);
 
     public bool WasSoldRecently => _presentations.Any(presentation => presentation.SoldRecently);
 
-    /// <summary>
-    /// Menor preço ao consumidor entre as apresentações de balcão, no estado
-    /// pedido. Apresentação hospitalar fica de fora porque não vai à farmácia,
-    /// e o preço dela induziria a erro.
-    /// </summary>
     public decimal? CheapestConsumerPriceIn(string state) => _presentations
         .Where(presentation => !presentation.HospitalOnly)
         .Select(presentation => presentation.ConsumerPriceIn(state))
@@ -102,10 +84,6 @@ public sealed class Medicine
         _presentations.Add(presentation);
     }
 
-    /// <summary>
-    /// Troca o conjunto inteiro de apresentações. É como a carga mensal
-    /// funciona: a CMED publica a lista completa, não um incremento.
-    /// </summary>
     public void ReplacePresentations(IEnumerable<Presentation> presentations)
     {
         ArgumentNullException.ThrowIfNull(presentations);

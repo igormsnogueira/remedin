@@ -1,15 +1,5 @@
 namespace Remedin.Application.Catalog.Search;
 
-/// <summary>
-/// Uma embalagem na ficha, com o teto legal no estado consultado.
-/// </summary>
-/// <param name="ConsumerPrice">
-/// Ausente em produto de uso hospitalar, que não vai ao balcão.
-/// </param>
-/// <param name="Institutional">
-/// Embalagem de compra institucional (hospital, prefeitura, rede de farmácia).
-/// Aparece na ficha, mas fora da escolha e da comparação de preço.
-/// </param>
 public sealed record PresentationDetail(
     string GgremCode,
     string Description,
@@ -19,18 +9,6 @@ public sealed record PresentationDetail(
     decimal? FactoryPrice,
     bool Institutional = false);
 
-/// <summary>
-/// A ficha do medicamento.
-///
-/// Os campos ausentes são declarados em vez de escondidos: o catálogo tem
-/// medicamento sem preço publicado, sem tarja informada e sem registro de
-/// comercialização recente, e omitir isso faria o produto parecer incompleto
-/// sem explicar por quê (ADR 0007).
-/// </summary>
-/// <param name="LeafletPublishedOn">
-/// Data da bula atual no Bulário Eletrônico. Nula quando o medicamento não tem
-/// bula publicada lá.
-/// </param>
 public sealed record MedicineDetail(
     string RegistrationNumber,
     string Name,
@@ -45,17 +23,11 @@ public sealed record MedicineDetail(
     IReadOnlyList<PresentationDetail> Presentations,
     DateOnly? LeafletPublishedOn = null)
 {
-    /// <summary>
-    /// Para que serve, em linguagem comum. Nulo quando não há tradução, e
-    /// nesse caso a interface mostra o nome técnico da fonte.
-    /// </summary>
     public string? Purpose => Domain.Medicines.TherapeuticCategories.Describe(TherapeuticClassCode)?.Label;
 
-    /// <summary>Exigência de receita em linguagem comum.</summary>
     public string? PrescriptionRule =>
         Domain.Medicines.PrescriptionRules.Describe(PrescriptionBand)?.Label;
 
-    /// <summary>Nulo quando a fonte não informa, que é diferente de não exigir.</summary>
     public bool? RequiresPrescription =>
         Domain.Medicines.PrescriptionRules.Describe(PrescriptionBand)?.RequiresPrescription;
 

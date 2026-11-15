@@ -2,13 +2,6 @@ using Remedin.Domain.Medicines;
 
 namespace Remedin.Infrastructure.Ingestion.Anvisa;
 
-/// <summary>
-/// Resultado da leitura do arquivo de registro.
-///
-/// Linha recusada não interrompe a carga: um quarto da base não tem número de
-/// registro e fica fora do catálogo por decisão de escopo, então rejeição é o
-/// caso normal, não a exceção. O que importa é a contagem ficar visível.
-/// </summary>
 public sealed record RegistryReadResult(
     IReadOnlyList<Medicine> Medicines,
     int RowsRead,

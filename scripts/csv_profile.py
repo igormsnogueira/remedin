@@ -23,24 +23,17 @@ HEADER_SCAN_LINES = 200
 SEPARATOR_SAMPLE_BYTES = 64 * 1024
 REPEATED_ROWS_SHOWN = 5
 
-# Sequencia tipica de UTF-8 lido como latin1 ("Ã§", "Ã£"): a letra acentuada
-# virou dois caracteres. Nao basta procurar "Ã" sozinho, que e letra valida
-# em portugues (APRESENTAÇÃO, NÃO, SÃO).
 MOJIBAKE = re.compile(r"[ÃÂ][-¿]")
 
-# Letra acentuada substituida por "?" no meio da palavra (FITOTER?PICO).
-# Diferente do mojibake: aqui o caractere original se perdeu.
 LOST_CHARACTER = re.compile(r"[A-Za-zÀ-ÿ]\?[A-Za-zÀ-ÿ]")
 
 REPLACEMENT_CHARACTER = "�"
-
 
 class LoadedCsv(NamedTuple):
     frame: pd.DataFrame
     encoding: str
     separator: str
     header_row: int
-
 
 def detect_encoding(path):
     for enc in ENCODINGS:
@@ -54,10 +47,7 @@ def detect_encoding(path):
             continue
     return None
 
-
 def detect_separator(path, encoding):
-    # Amostra varias linhas, nao so a primeira: em arquivo com preambulo a
-    # primeira linha nao representa a estrutura do resto.
     with open(path, "r", encoding=encoding) as f:
         sample = f.read(SEPARATOR_SAMPLE_BYTES)
     try:
@@ -65,11 +55,7 @@ def detect_separator(path, encoding):
     except csv.Error:
         return max(SEPARATORS, key=sample.count)
 
-
 def detect_header_row(path, encoding, separator):
-    # A lista da CMED comeca com dezenas de linhas de texto legal que ocupam
-    # so a primeira coluna. O cabecalho e a linha que preenche mais colunas.
-    # Em arquivo sem preambulo isso devolve 0.
     widest = 0
     header_row = 0
     with open(path, "r", encoding=encoding, newline="") as f:
@@ -82,29 +68,18 @@ def detect_header_row(path, encoding, separator):
                 header_row = index
     return header_row
 
-
 def section(text):
     print(f"\n-- {text}")
 
-
 def display_path(path):
-    # Caminho curto quando a saida esta dentro do repositorio; absoluto
-    # quando o usuario apontou pra fora dele.
     relative = os.path.relpath(path, REPO_ROOT)
     return path if relative.startswith(os.pardir) else relative
 
-
 def repo_path(*parts):
-    # Saida sempre na raiz do repositorio, independente de onde o script foi
-    # chamado - senao rodar de dentro de scripts/ cria uma arvore duplicada.
     return os.path.join(REPO_ROOT, *parts)
-
 
 @contextmanager
 def report_to(destination, title, source_path):
-    # O perfil e longo demais pro terminal e serve de evidencia da analise,
-    # entao vai pra arquivo. Bloco de codigo em markdown preserva o
-    # alinhamento das tabelas do pandas.
     os.makedirs(os.path.dirname(destination), exist_ok=True)
     with open(destination, "w", encoding="utf-8") as handle:
         handle.write(f"# {title}\n\n")
@@ -121,9 +96,7 @@ def report_to(destination, title, source_path):
             handle.write("```\n")
     print(f"relatório salvo em {display_path(destination)}")
 
-
 def load_csv(path):
-    # dtype=str preserva zero a esquerda em campos que parecem numero.
     encoding = detect_encoding(path)
     if encoding is None:
         raise ValueError("nenhum encoding testado leu o arquivo")
@@ -144,7 +117,6 @@ def load_csv(path):
     frame.columns = frame.columns.str.strip()
     return LoadedCsv(frame, encoding, separator, header_row)
 
-
 def print_file_info(path, loaded):
     size_mb = os.path.getsize(path) / (1024 * 1024)
     total_rows, total_columns = loaded.frame.shape
@@ -155,7 +127,6 @@ def print_file_info(path, loaded):
     print(f"linhas: {total_rows:,} | colunas: {total_columns}".replace(",", "."))
     if loaded.header_row:
         print(f"preambulo descartado: {loaded.header_row} linhas antes do cabeçalho")
-
 
 def print_column_summary(df):
     total_rows = len(df)
@@ -174,18 +145,12 @@ def print_column_summary(df):
     pd.set_option("display.max_colwidth", 48)
     print(summary.to_string())
 
-
 def find_key_candidates(df, extra_terms=()):
-    # "PROCESSO" (ou um termo extra da fonte, ex.: GGREM/EAN) já basta
-    # sozinho. "REGISTRO" só conta se vier com prefixo de numero/codigo,
-    # senao pega SITUACAO_REGISTRO, EMPRESA_DETENTORA_REGISTRO etc., que
-    # citam "registro" no nome mas nao sao chave de linha.
     number_prefixes = ("NUMERO", "NRO", "NUM", "N_", "CODIGO", "CÓDIGO", "COD")
 
     def looks_like_key(name):
         n = name.upper()
         if n.startswith("DATA"):
-            # DATA_FINALIZACAO_PROCESSO cita "processo" mas e data, nao chave.
             return False
         if "PROCESSO" in n or any(t in n for t in extra_terms):
             return True
@@ -195,14 +160,11 @@ def find_key_candidates(df, extra_terms=()):
 
     return [c for c in df.columns if looks_like_key(c)]
 
-
 def print_key_analysis(df, candidates, sample_columns_limit=8):
     total_columns = len(df.columns)
     print(f"colunas candidatas: {candidates}")
 
     for col in candidates:
-        # Linha vazia nao repete chave nenhuma: contar as duas coisas sobre o
-        # total do arquivo infla a média em coluna com muito nulo.
         values = df[col].dropna()
         distinct = values.nunique()
         unique = distinct == len(values)
@@ -221,11 +183,8 @@ def print_key_analysis(df, candidates, sample_columns_limit=8):
                 example = repeated.index[0]
                 qty = repeated.iloc[0]
                 print(f"  exemplo repetido: {example} ({qty} linhas)")
-                # head: valor de preenchimento como "-" repete dezenas de
-                # milhares de vezes, e o dump inteiro nao acrescenta nada.
                 sample_columns = df.columns[: min(sample_columns_limit, total_columns)]
                 print(df[df[col] == example][sample_columns].head(REPEATED_ROWS_SHOWN).to_string(index=False))
-
 
 def print_quality_checks(df):
     duplicates = df.duplicated().sum()
@@ -242,7 +201,6 @@ def print_quality_checks(df):
     if columns_with_spaces:
         print(f"colunas com espaços sobrando (quebram agrupamento e comparação): {columns_with_spaces}")
 
-    # Os dois defeitos de acento pedem tratamento diferente: mojibake dá pra
     # reverter reprocessando o encoding, "?" no lugar da letra não.
     scrambled = []
     lost = []
@@ -262,7 +220,6 @@ def print_quality_checks(df):
         print(f"colunas com acento perdido (letra virou '?', não recuperável): {lost}")
     if not scrambled and not lost:
         print("acentuação: nenhum defeito detectado")
-
 
 def save_sample(df, destination, separator, rows=100):
     os.makedirs(os.path.dirname(destination), exist_ok=True)

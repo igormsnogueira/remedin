@@ -5,20 +5,10 @@ using Remedin.Domain.Medicines;
 
 namespace Remedin.Infrastructure.Persistence;
 
-/// <summary>
-/// Lista os medicamentos com o mesmo princípio ativo, do mais barato por
-/// comprimido ao mais caro, com o preço do estado consultado.
-/// </summary>
 public sealed class PostgresMedicineAlternatives(RemedinDbContext context) : IMedicineAlternatives
 {
-    /// <summary>
-    /// Preço por comprimido quando a quantidade é conhecida, e pela caixa
-    /// quando não é. Comparar caixas premia a embalagem pequena, que custa
-    /// menos e rende menos.
-    /// </summary>
     private const string PricePerUnit = "pr.amount / coalesce(nullif(p.unit_count, 0), 1)";
 
-    /// <summary>A apresentação de balcão mais barata por comprimido.</summary>
     private const string CheapestPresentation = $"""
         SELECT p.description, p.dosage_mg, p.unit_count, pr.amount,
                {PricePerUnit} AS price_per_unit
@@ -55,18 +45,12 @@ public sealed class PostgresMedicineAlternatives(RemedinDbContext context) : IMe
           ON source.substance_key = t.substance_key AND source.has_price
         JOIN LATERAL ({CheapestPresentation}) AS chosen ON true
         WHERE t.substance_key IS NOT NULL
-        -- Mesma dosagem primeiro: 10 MG e 40 MG do mesmo princípio ativo não
-        -- são alternativas um do outro, e apareciam misturados.
         ORDER BY (chosen.dosage_mg IS NOT DISTINCT FROM t.dosage_mg) DESC,
                  chosen.price_per_unit ASC,
                  source.name ASC
         LIMIT @limit;
         """;
 
-    /// <summary>
-    /// Um princípio ativo comum tem dezenas de fabricantes. Passar disso vira
-    /// lista que ninguém lê, e o que importa está no começo.
-    /// </summary>
     private const int MaximumAlternatives = 30;
 
     public async Task<AlternativesResult?> FindAsync(

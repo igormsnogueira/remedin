@@ -15,8 +15,6 @@
     }
   }
 
-  /* Ícone, nome e botão na mesma linha. O nome longo quebra dentro da
-     própria coluna, e o botão fica sempre no canto. */
   .title {
     display: grid;
     grid-template-columns: auto minmax(0, 1fr) auto;
@@ -28,11 +26,9 @@
     color: var(--purpose-ink);
     font-size: var(--text-2xl);
     letter-spacing: -0.02em;
-    /* Nomes da fonte chegam a ter palavras maiores que a tela do celular. */
     overflow-wrap: anywhere;
   }
 
-  /* No celular o ícone ocupa espaço demais ao lado de um nome longo. */
   @media (max-width: 30rem) {
     .title {
       grid-template-columns: minmax(0, 1fr) auto;
@@ -55,8 +51,6 @@
     margin-block-start: var(--space-2xs);
   }
 
-  /* As etiquetas verdes padrão brigavam com o fundo laranja ou roxo. Aqui
-     ficam brancas, com o texto na cor da finalidade. */
   .tags > span {
     background-color: var(--color-surface);
     color: var(--purpose-ink);

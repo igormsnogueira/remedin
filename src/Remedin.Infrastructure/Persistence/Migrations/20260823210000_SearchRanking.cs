@@ -4,14 +4,6 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace Remedin.Infrastructure.Persistence.Migrations;
 
-/// <summary>
-/// Dá peso diferente a cada campo da busca.
-///
-/// Com todos os campos valendo o mesmo, buscar "dipirona" devolvia os
-/// medicamentos em ordem alfabética, porque centenas deles têm esse princípio
-/// ativo e todos empatavam. O que a pessoa procura primeiro é o produto que
-/// se chama assim.
-/// </summary>
 public partial class SearchRanking : Migration
 {
     private const string WeightedVector = """
@@ -21,10 +13,8 @@ public partial class SearchRanking : Migration
         setweight(to_tsvector('portuguese', immutable_unaccent(coalesce(manufacturer, ''))), 'D')
         """;
 
-    /// <inheritdoc />
     protected override void Up(MigrationBuilder migrationBuilder)
     {
-        // Coluna gerada não se altera no lugar: recriar é o caminho.
         migrationBuilder.Sql("DROP INDEX IF EXISTS ix_medicines_search_vector;");
         migrationBuilder.Sql("ALTER TABLE medicines DROP COLUMN IF EXISTS search_vector;");
 
@@ -40,7 +30,6 @@ public partial class SearchRanking : Migration
             """);
     }
 
-    /// <inheritdoc />
     protected override void Down(MigrationBuilder migrationBuilder)
     {
         migrationBuilder.Sql("DROP INDEX IF EXISTS ix_medicines_search_vector;");

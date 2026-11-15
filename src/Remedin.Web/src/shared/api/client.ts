@@ -3,16 +3,9 @@ import { trackRequest } from './apiStatus'
 const baseUrl = import.meta.env.VITE_API_URL
 
 if (!baseUrl) {
-  // Falhar aqui, no carregamento, é melhor que uma tela em branco com erro de
-  // rede na primeira busca.
   throw new Error('VITE_API_URL não configurada. Copie .env.example para .env.')
 }
 
-/**
- * Erro de uma chamada que chegou ao servidor e voltou com status de falha.
- * Separado do erro de rede porque a interface trata os dois de forma
- * diferente: um pede "tente de novo", o outro é problema do que foi pedido.
- */
 export class ApiError extends Error {
   readonly status: number
 
@@ -31,14 +24,6 @@ interface ErrorBody {
   erro?: string
 }
 
-/**
- * Uma chamada GET à API.
- *
- * O tipo de retorno é uma afirmação, não uma verificação: `T` descreve o que a
- * API promete, e ninguém confere em tempo de execução. É aceitável porque as
- * duas pontas estão neste repositório e a API é a única origem do dado. Com
- * fonte externa, entraria validação de esquema aqui.
- */
 export async function get<T>(path: string, signal?: AbortSignal): Promise<T> {
   const done = trackRequest()
   let response: Response
@@ -71,14 +56,6 @@ async function readErrorMessage(response: Response): Promise<string> {
   }
 }
 
-/**
- * Acorda a API assim que o site abre, antes da primeira busca.
- *
- * O /health consulta o banco, então acorda os dois de uma vez. A resposta não
- * importa: se falhar, a primeira chamada de verdade tenta de novo. Passa pelo
- * mesmo registro das outras chamadas, então o aviso de servidor ligando
- * aparece também enquanto a pessoa ainda está lendo a página.
- */
 export function wakeUpApi(): void {
   const done = trackRequest()
 
@@ -88,7 +65,6 @@ export function wakeUpApi(): void {
   )
 }
 
-/** Monta a query string ignorando o que estiver vazio. */
 export function query(params: Record<string, string | number | undefined>): string {
   const entries = Object.entries(params).filter(
     ([, value]) => value !== undefined && value !== '',

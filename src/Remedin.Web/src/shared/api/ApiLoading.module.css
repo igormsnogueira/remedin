@@ -41,8 +41,6 @@
     background-color: var(--color-border-soft);
   }
 
-  /* Tudo o que é "forma vazia" pulsa devagar e junto, sem degradê
-     passando: o brilho correndo é o carregando mais genérico que existe. */
   .line,
   .lineSm,
   .tile,

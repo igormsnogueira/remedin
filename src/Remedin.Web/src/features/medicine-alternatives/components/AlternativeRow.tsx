@@ -6,7 +6,6 @@ import { describePresentation } from '@/shared/format/presentation'
 
 import styles from './AlternativeRow.module.css'
 
-/** Uma linha da lista de equivalentes, clicável por inteiro. */
 export function AlternativeRow({ alternative }: { alternative: MedicineAlternative }) {
   const readable = describePresentation(alternative.presentation)
   const measure = readable?.measure ?? null

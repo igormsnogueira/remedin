@@ -3,19 +3,6 @@ using System.Text;
 
 namespace Remedin.Domain.Medicines;
 
-/// <summary>
-/// Forma canônica do princípio ativo, usada para achar medicamentos
-/// equivalentes.
-///
-/// A CMED escreve a mesma associação de várias maneiras: em ordem diferente,
-/// com espaço duplicado, e às vezes repetindo um componente na mesma linha.
-/// A chave normaliza essas variações de escrita.
-///
-/// Não normaliza sal, hidratação nem sinônimo — "DIPIRONA" e "DIPIRONA
-/// MONOIDRATADA" continuam separados. Ver ADR 0010: agrupar de menos deixa de
-/// mostrar uma alternativa, agrupar de mais apresenta como equivalente algo
-/// que pode não ser.
-/// </summary>
 public static class SubstanceKey
 {
     private const char ComponentSeparator = ';';
